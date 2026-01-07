@@ -1,0 +1,75 @@
+/**
+ * Design Tokens - Cores Globais
+ * Cores que NÃO mudam entre temas (semânticas/funcionais)
+ */
+
+:root {
+    // ============================================
+    // STATUS COLORS (Globais - não mudam por tema)
+    // Importantes para UX e compreensão do usuário
+    // ============================================
+
+    // Success (verde)
+    --status-success-h: 142;
+    --status-success-s: 71%;
+    --status-success-l: 45%;
+    --color-success: hsl(var(--status-success-h), var(--status-success-s), var(--status-success-l));
+    --color-success-bg: hsl(var(--status-success-h), var(--status-success-s), 95%);
+    --color-success-text: hsl(var(--status-success-h), var(--status-success-s), 25%);
+    --color-success-border: hsl(var(--status-success-h), var(--status-success-s), 40%);
+
+    // Warning (amarelo/laranja)
+    --status-warning-h: 38;
+    --status-warning-s: 92%;
+    --status-warning-l: 50%;
+    --color-warning: hsl(var(--status-warning-h), var(--status-warning-s), var(--status-warning-l));
+    --color-warning-bg: hsl(var(--status-warning-h), var(--status-warning-s), 95%);
+    --color-warning-text: hsl(var(--status-warning-h), var(--status-warning-s), 30%);
+    --color-warning-border: hsl(var(--status-warning-h), var(--status-warning-s), 45%);
+
+    // Error (vermelho)
+    --status-error-h: 0;
+    --status-error-s: 84%;
+    --status-error-l: 60%;
+    --color-error: hsl(var(--status-error-h), var(--status-error-s), var(--status-error-l));
+    --color-error-bg: hsl(var(--status-error-h), var(--status-error-s), 95%);
+    --color-error-text: hsl(var(--status-error-h), var(--status-error-s), 35%);
+    --color-error-border: hsl(var(--status-error-h), var(--status-error-s), 50%);
+
+    // Info (azul)
+    --status-info-h: 217;
+    --status-info-s: 91%;
+    --status-info-l: 60%;
+    --color-info: hsl(var(--status-info-h), var(--status-info-s), var(--status-info-l));
+    --color-info-bg: hsl(var(--status-info-h), var(--status-info-s), 95%);
+    --color-info-text: hsl(var(--status-info-h), var(--status-info-s), 30%);
+    --color-info-border: hsl(var(--status-info-h), var(--status-info-s), 50%);
+}
+
+// ============================================
+// DARK THEME STATUS COLORS OVERRIDE
+// Cores de status precisam adaptar-se para temas escuros
+// ============================================
+[data-theme='dark'],
+[data-theme='ocean'],
+[data-theme='forest'] {
+    // Success
+    --color-success-bg: hsl(var(--status-success-h), var(--status-success-s), 15%);
+    --color-success-text: hsl(var(--status-success-h), var(--status-success-s), 85%);
+    --color-success-border: hsl(var(--status-success-h), var(--status-success-s), 45%);
+
+    // Warning
+    --color-warning-bg: hsl(var(--status-warning-h), var(--status-warning-s), 15%);
+    --color-warning-text: hsl(var(--status-warning-h), var(--status-warning-s), 85%);
+    --color-warning-border: hsl(var(--status-warning-h), var(--status-warning-s), 50%);
+
+    // Error
+    --color-error-bg: hsl(var(--status-error-h), var(--status-error-s), 15%);
+    --color-error-text: hsl(var(--status-error-h), var(--status-error-s), 85%);
+    --color-error-border: hsl(var(--status-error-h), var(--status-error-s), 55%);
+
+    // Info
+    --color-info-bg: hsl(var(--status-info-h), var(--status-info-s), 15%);
+    --color-info-text: hsl(var(--status-info-h), var(--status-info-s), 85%);
+    --color-info-border: hsl(var(--status-info-h), var(--status-info-s), 55%);
+}

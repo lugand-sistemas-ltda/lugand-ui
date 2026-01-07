@@ -1,0 +1,57 @@
+/**
+ * Tema Dracula (Inspirado no tema popular Dracula)
+ * Um tema escuro com alto contraste e tons de roxo/vampiro
+ */
+
+[data-theme='dracula'] {
+    color-scheme: dark;
+
+    // ============================================
+    // NEUTRAL PALETTE (Dracula Grey Scale)
+    // ============================================
+    --neutral-50: hsl(231, 15%, 18%); // Background principal
+    --neutral-100: hsl(232, 14%, 31%); // Current Line
+    --neutral-200: hsl(232, 14%, 35%);
+    --neutral-300: hsl(225, 27%, 51%); // Comentários
+    --neutral-400: hsl(231, 15%, 65%);
+    --neutral-500: hsl(231, 15%, 75%);
+    --neutral-600: hsl(231, 15%, 85%);
+    --neutral-700: hsl(231, 15%, 90%);
+    --neutral-800: hsl(0, 0%, 95%);
+    --neutral-900: hsl(0, 0%, 98%); // Foreground
+    --neutral-950: hsl(0, 0%, 100%);
+
+    // ============================================
+    // BACKGROUNDS
+    // ============================================
+    --color-bg-primary: hsl(231, 15%, 18%); // #282a36
+    --color-bg-secondary: hsl(232, 14%, 25%); // Ligeiramente mais claro que o bg
+    --color-bg-tertiary: hsl(232, 14%, 31%); // #44475a
+    --color-bg-elevated: hsl(231, 15%, 15%); // Sombra/profundidade
+
+    // ============================================
+    // TEXT
+    // ============================================
+    --color-text-primary: hsl(60, 30%, 96%); // #f8f8f2
+    --color-text-secondary: hsl(225, 27%, 85%); // Levemente azulado
+    --color-text-tertiary: hsl(225, 27%, 65%); // Mais apagado
+    --color-text-inverse: hsl(231, 15%, 18%); // Para botões
+    --color-text-muted: hsl(225, 27%, 51%); // #6272a4
+
+    // ============================================
+    // PRIMARY COLOR (Dracula Purple)
+    // ============================================
+    --hsl-primary: 265, 89%, 78%; // #bd93f9
+    --color-primary: hsl(var(--hsl-primary));
+    --color-primary-hover: hsl(265, 89%, 85%);
+    --color-primary-active: hsl(265, 89%, 70%);
+    // Versões faded para fundos/anéis
+    --color-primary-faded: hsla(var(--hsl-primary), 0.2);
+    --color-primary-bg: hsla(var(--hsl-primary), 0.1);
+
+    // ============================================
+    // BORDERS
+    // ============================================
+    --color-border-base: hsl(232, 14%, 31%); // #44475a
+    --color-border-dark: hsl(225, 27%, 51%); // #6272a4
+}

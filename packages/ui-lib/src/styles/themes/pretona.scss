@@ -1,0 +1,65 @@
+/**
+ * Tema Pretona (Inspirado nas viaturas táticas / ROTAM / CHOQUE)
+ * Cores: Preto, Cinza Grafite, Vermelho Alerta (Giroflex/Sinalizador)
+ * Estilo: Tático, Operacional, Noturno, Stealth com Alertas
+ */
+
+[data-theme='pretona'] {
+    color-scheme: dark;
+
+    // ============================================
+    // NEUTRAL PALETTE (Camuflagem Urbana / Tons de Grafite)
+    // ============================================
+    --neutral-50: hsl(210, 10%, 5%); // Preto fosco viatura
+    --neutral-100: hsl(210, 10%, 10%); // Grafite muito escuro
+    --neutral-200: hsl(210, 8%, 15%);
+    --neutral-300: hsl(210, 6%, 20%);
+    --neutral-400: hsl(210, 5%, 30%); // Detalhes da lataria cinza
+    --neutral-500: hsl(210, 4%, 40%);
+    --neutral-600: hsl(210, 3%, 50%);
+    --neutral-700: hsl(210, 2%, 70%); // Letras da viatura
+    --neutral-800: hsl(0, 0%, 85%);
+    --neutral-900: hsl(0, 0%, 95%);
+    --neutral-950: hsl(0, 0%, 100%);
+
+    // ============================================
+    // BACKGROUNDS
+    // ============================================
+    --color-bg-primary: hsl(0, 0%, 5%); // Preto Fundo
+    --color-bg-secondary: hsl(0, 0%, 10%); // Preto levemente mais claro
+    --color-bg-tertiary: hsl(240, 100%, 20%); // Azul suave policial (Sirene)
+    --color-bg-elevated: hsl(0, 0%, 0%); // Preto absoluto
+
+    // ============================================
+    // TEXT (Cinza prateado refletivo)
+    // ============================================
+    --color-text-primary: hsl(0, 0%, 100%); // Branco puro
+    --color-text-secondary: hsl(0, 0%, 80%); // Prata
+    --color-text-tertiary: hsl(0, 0%, 60%);
+    --color-text-inverse: hsl(0, 0%, 0%); // Preto para contrastar no branco
+    --color-text-muted: var(--neutral-400);
+
+    // ============================================
+    // PRIMARY COLOR (Vermelho ROTAM Diferenciado)
+    // ============================================
+    // Vermelho mais escuro e sério, diferente do Danger (#ef4444)
+    // Usando um tom mais carmim/sangue
+    --hsl-primary: 345, 100%, 45%; // Crimson Red
+    --color-primary: hsl(var(--hsl-primary));
+    --color-primary-hover: hsl(345, 100%, 55%);
+    --color-primary-active: hsl(345, 100%, 35%);
+
+    // Detalhes Secundários (Azul Sirene)
+    // Variáveis customizadas para este tema se necessário
+    --color-accent-blue: hsl(220, 100%, 50%);
+
+    // Versões faded com tom azulado para o efeito sirene mista
+    --color-primary-faded: hsla(220, 100%, 50%, 0.2); // Azulado no fundo
+    --color-primary-bg: hsla(345, 100%, 50%, 0.15); // Vermelho no fundo
+
+    // ============================================
+    // BORDERS & ACCENTS
+    // ============================================
+    --color-border-base: var(--neutral-300);
+    --color-border-dark: hsl(220, 100%, 40%); // Bordas Azuladas
+}

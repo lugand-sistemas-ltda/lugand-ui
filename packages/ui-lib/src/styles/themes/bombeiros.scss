@@ -1,0 +1,76 @@
+/**
+ * Tema Bombeiros (Corpo de Bombeiros / SIATE)
+ * Baseado na paleta: Azul Institucional, Acinzentados, Amarelo e Vermelho de Alerta
+ * Estilo: Alta visibilidade, Emergência, Institucional
+ */
+
+[data-theme='bombeiros'] {
+    color-scheme: dark;
+
+    // ============================================
+    // PALETA BOMBEIROS (Base)
+    // ============================================
+    --cbpr-azul: hsl(211, 100%, 30%); // #004a99 - Fundo Principal
+    --cbpr-cinza: hsl(0, 0%, 33%); // #555555 - Elementos Secundários
+    --cbpr-amarelo: hsl(48, 100%, 50%); // #ffcc00 - Alerta / Botões
+    --cbpr-vermelho: hsl(0, 100%, 45%); // #e60000 - Emergência / Títulos
+    --cbpr-branco: hsl(0, 0%, 100%); // #ffffff - Texto
+
+    // ============================================
+    // NEUTRAL PALETTE (Azulada para harmonia)
+    // ============================================
+    --neutral-50: hsl(211, 100%, 98%);
+    --neutral-100: hsl(211, 80%, 90%);
+    --neutral-200: hsl(211, 60%, 80%);
+    --neutral-300: hsl(211, 40%, 60%);
+    --neutral-400: hsl(211, 30%, 50%);
+    --neutral-500: hsl(211, 40%, 40%);
+    --neutral-600: var(--cbpr-azul); // Base do tema
+    --neutral-700: hsl(211, 100%, 25%);
+    --neutral-800: hsl(211, 100%, 20%);
+    --neutral-900: hsl(211, 100%, 15%);
+    --neutral-950: hsl(211, 100%, 10%);
+
+    // ============================================
+    // BACKGROUNDS
+    // ============================================
+    --color-bg-primary: var(--cbpr-azul); // Azul Institucional Forte
+    --color-bg-secondary: hsl(211, 100%, 25%); // Azul um pouco mais escuro para cards
+    --color-bg-tertiary: var(--neutral-800); // Azul bem escuro
+    --color-bg-elevated: hsl(211, 100%, 20%); // Dropdowns
+
+    // ============================================
+    // TEXT (Contraste Branco sobre Azul)
+    // ============================================
+    --color-text-primary: var(--cbpr-branco);
+    --color-text-secondary: hsl(211, 20%, 80%);
+    --color-text-tertiary: hsl(211, 10%, 65%);
+    --color-text-inverse: var(--neutral-900); // Preto/Azul escuro para contraste no amarelo
+    --color-text-muted: hsl(211, 10%, 50%);
+
+    // ============================================
+    // PRIMARY COLOR (Amarelo de Alerta)
+    // ============================================
+    // O Amarelo (#FFCC00) para ações (Botões), garantindo visibilidade máxima sobre o azul
+    --hsl-primary: 48, 100%, 50%;
+    --color-primary: hsl(var(--hsl-primary));
+    --color-primary-hover: hsl(48, 100%, 60%); // Mais claro no hover
+    --color-primary-active: hsl(48, 100%, 40%); // Mais escuro no active
+
+    // Versões faded (Transparências)
+    --color-primary-faded: hsla(48, 100%, 50%, 0.15);
+    --color-primary-bg: hsla(48, 100%, 50%, 0.1);
+
+    // ============================================
+    // BORDERS & ACCENTS
+    // ============================================
+    --color-border-base: hsl(211, 50%, 40%); // Bordas sutis no azul
+    --color-border-dark: hsl(211, 50%, 20%);
+
+    // Vermelho de Emergência para erros e destaques críticos
+    --color-danger: var(--cbpr-vermelho);
+    --color-accent-red: var(--cbpr-vermelho);
+
+    // Focus ring
+    --color-focus-ring: var(--cbpr-amarelo);
+}

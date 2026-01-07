@@ -1,0 +1,105 @@
+/**
+ * Tema Light (padrão)
+ * Aplicado automaticamente via :root
+ * Usa HSL para flexibilidade e ranges de cores
+ */
+
+:root,
+[data-theme='light'] {
+    color-scheme: light;
+
+    // ============================================
+    // NEUTRAL PALETTE (escala de cinzas)
+    // ============================================
+    --neutral-50: hsl(0, 0%, 98%);
+    --neutral-100: hsl(0, 0%, 96%);
+    --neutral-200: hsl(0, 0%, 93%);
+    --neutral-300: hsl(0, 0%, 88%);
+    --neutral-400: hsl(0, 0%, 74%);
+    --neutral-500: hsl(0, 0%, 62%);
+    --neutral-600: hsl(0, 0%, 46%);
+    --neutral-700: hsl(0, 0%, 38%);
+    --neutral-800: hsl(0, 0%, 23%);
+    --neutral-900: hsl(0, 0%, 10%);
+    --neutral-950: hsl(0, 0%, 5%);
+
+    // ============================================
+    // BACKGROUNDS (usando neutrals)
+    // ============================================
+    --color-bg-primary: var(--neutral-50);
+    --color-bg-secondary: var(--neutral-100);
+    --color-bg-tertiary: var(--neutral-200);
+    --color-bg-elevated: hsl(0, 0%, 100%);
+
+    // ============================================
+    // TEXT (usando neutrals)
+    // ============================================
+    --color-text-primary: var(--neutral-900);
+    --color-text-secondary: var(--neutral-700);
+    --color-text-tertiary: var(--neutral-600);
+    --color-text-inverse: hsl(0, 0%, 100%);
+    --color-text-muted: var(--neutral-500);
+
+    // ============================================
+    // BORDERS (usando neutrals)
+    // ============================================
+    --color-border-light: var(--neutral-200);
+    --color-border-base: var(--neutral-300);
+    --color-border-dark: var(--neutral-400);
+
+    // ============================================
+    // PRIMARY PALETTE (azul - tema light)
+    // Usando HSL para criar range completo
+    // ============================================
+    --primary-h: 217;
+    --primary-s: 91%;
+
+    --primary-50: hsl(var(--primary-h), calc(var(--primary-s) * 0.9), 97%);
+    --primary-100: hsl(var(--primary-h), var(--primary-s), 94%);
+    --primary-200: hsl(var(--primary-h), var(--primary-s), 87%);
+    --primary-300: hsl(var(--primary-h), var(--primary-s), 78%);
+    --primary-400: hsl(var(--primary-h), var(--primary-s), 68%);
+    --primary-500: hsl(var(--primary-h), var(--primary-s), 60%); // base
+    --primary-600: hsl(var(--primary-h), var(--primary-s), 52%);
+    --primary-700: hsl(var(--primary-h), var(--primary-s), 46%);
+    --primary-800: hsl(var(--primary-h), calc(var(--primary-s) * 0.85), 38%);
+    --primary-900: hsl(var(--primary-h), calc(var(--primary-s) * 0.75), 28%);
+    --primary-950: hsl(var(--primary-h), calc(var(--primary-s) * 0.7), 18%);
+
+    // Primary semantic colors
+    --color-primary: var(--primary-500);
+    --color-primary-hover: var(--primary-600);
+    --color-primary-active: var(--primary-700);
+    --color-border-focus: var(--primary-500);
+
+    // ============================================
+    // SECONDARY PALETTE (roxo - tema light)
+    // ============================================
+    --secondary-h: 258;
+    --secondary-s: 90%;
+
+    --secondary-50: hsl(var(--secondary-h), calc(var(--secondary-s) * 0.85), 97%);
+    --secondary-100: hsl(var(--secondary-h), var(--secondary-s), 94%);
+    --secondary-200: hsl(var(--secondary-h), var(--secondary-s), 87%);
+    --secondary-300: hsl(var(--secondary-h), var(--secondary-s), 78%);
+    --secondary-400: hsl(var(--secondary-h), var(--secondary-s), 68%);
+    --secondary-500: hsl(var(--secondary-h), var(--secondary-s), 63%); // base
+    --secondary-600: hsl(var(--secondary-h), var(--secondary-s), 55%);
+    --secondary-700: hsl(var(--secondary-h), var(--secondary-s), 49%);
+    --secondary-800: hsl(var(--secondary-h), calc(var(--secondary-s) * 0.8), 41%);
+    --secondary-900: hsl(var(--secondary-h), calc(var(--secondary-s) * 0.7), 31%);
+    --secondary-950: hsl(var(--secondary-h), calc(var(--secondary-s) * 0.65), 21%);
+
+    // Secondary semantic colors
+    --color-secondary: var(--secondary-500);
+    --color-secondary-hover: var(--secondary-600);
+    --color-secondary-active: var(--secondary-700);
+
+    // ============================================
+    // SHADOWS (tema light)
+    // ============================================
+    --shadow-color-sm: hsla(0, 0%, 0%, 0.05);
+    --shadow-color-md: hsla(0, 0%, 0%, 0.1);
+    --shadow-color-lg: hsla(0, 0%, 0%, 0.15);
+    --shadow-color-xl: hsla(0, 0%, 0%, 0.2);
+}

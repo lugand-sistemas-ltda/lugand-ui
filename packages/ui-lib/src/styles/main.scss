@@ -1,0 +1,28 @@
+/**
+ * Entry point para todos os estilos globais
+ * Usando @use/@forward (modern SASS syntax)
+ */
+
+// 1. Reset e base
+@use './base/reset.scss';
+
+// 2. Design Tokens Globais (cores que não mudam por tema)
+@use './tokens/colors.scss';
+
+// 3. Utilitários (variáveis, mixins, funções)
+@use './utils/variables.scss';
+@use './utils/mixins.scss';
+
+// 4. Temas (todos os temas disponíveis)
+@use './themes/default.scss';
+@use './themes/dark.scss';
+@use './themes/ocean.scss';
+@use './themes/forest.scss';
+@use './themes/dracula.scss';
+@use './themes/cyberpunk.scss';
+@use './themes/pcpr.scss';
+@use './themes/pretona.scss';
+@use './themes/bombeiros.scss';
+
+// 5. Estilos globais de elementos HTML
+@use './base/elements.scss';

@@ -1,0 +1,74 @@
+/**
+ * Tema PCPR (Padrão Polícia Civil do Paraná)
+ * Baseado nas cores oficiais: Azul Escuro, Amarelo Ouro, Branco e Cinza Claro
+ * Estilo: Institucional, Sóbrio, Corporativo
+ */
+
+[data-theme='pcpr'] {
+    color-scheme: light;
+
+    // ============================================
+    // PALETA PMPR (Variáveis Locais)
+    // ============================================
+    --pmpr-azul: hsl(210, 100%, 20%); // #003366
+    --pmpr-amarelo: hsl(48, 100%, 50%); // #FFCC00
+    --pmpr-branco: hsl(0, 0%, 100%); // #FFFFFF
+    --pmpr-cinza: hsl(0, 0%, 94%); // #F0F0F0
+
+    // ============================================
+    // NEUTRAL PALETTE (Baseada no Azul/Cinza)
+    // ============================================
+    --neutral-50: var(--pmpr-branco);
+    --neutral-100: hsl(210, 10%, 96%); // Branco levemente azulado
+    --neutral-200: var(--pmpr-cinza);
+    --neutral-300: hsl(210, 10%, 80%);
+    --neutral-400: hsl(210, 15%, 60%);
+    --neutral-500: hsl(210, 20%, 50%);
+    --neutral-600: hsl(210, 30%, 40%);
+    --neutral-700: hsl(210, 40%, 30%);
+    --neutral-800: var(--pmpr-azul); // Azul profundo servindo como "quase preto"
+    --neutral-900: hsl(210, 100%, 15%); // Azul muito escuro
+    --neutral-950: hsl(210, 100%, 10%);
+
+    // ============================================
+    // BACKGROUNDS
+    // ============================================
+    --color-bg-primary: var(--pmpr-branco);
+    --color-bg-secondary: var(--pmpr-cinza);
+    --color-bg-tertiary: hsl(210, 50%, 96%); // Azul bem claro para destaque de fundo
+    --color-bg-elevated: var(--pmpr-branco);
+
+    // ============================================
+    // TEXT (Azul Escuro Predominante)
+    // ============================================
+    --color-text-primary: var(--pmpr-azul); // Texto principal é Azul PMPR
+    --color-text-secondary: hsl(210, 20%, 40%); // Cinza azulado
+    --color-text-tertiary: hsl(210, 10%, 60%);
+    --color-text-inverse: var(--pmpr-branco); // Branco sobre azul
+    --color-text-muted: hsl(210, 10%, 70%);
+
+    // ============================================
+    // PRIMARY COLOR (Azul PMPR)
+    // ============================================
+    // O Azul #003366 é a cor da autoridade
+    --hsl-primary: 210, 100%, 20%;
+    --color-primary: hsl(var(--hsl-primary));
+    --color-primary-hover: hsl(210, 80%, 30%); // Um pouco mais claro no hover
+    --color-primary-active: hsl(210, 100%, 15%); // Mais profundo no click
+
+    // Versões faded
+    --color-primary-faded: hsla(210, 100%, 20%, 0.1);
+    --color-primary-bg: hsla(210, 100%, 20%, 0.05);
+
+    // ============================================
+    // BORDERS & ACCENTS (Amarelo Ouro)
+    // ============================================
+    --color-border-base: hsl(210, 10%, 85%);
+    --color-border-dark: var(--pmpr-azul);
+
+    // O Amarelo Ouro entra como destaque secundário (focus ringing, badges, etc)
+    --color-accent-yellow: var(--pmpr-amarelo);
+
+    // Customização de foco para usar o Amarelo (Estilo Viatura)
+    --color-focus-ring: var(--pmpr-amarelo);
+}

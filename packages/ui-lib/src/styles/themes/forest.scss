@@ -1,0 +1,100 @@
+/**
+ * Tema Forest
+ * Tons de verde natureza com HSL
+ */
+
+[data-theme='forest'] {
+    color-scheme: light;
+
+    // ============================================
+    // NEUTRAL PALETTE (com toque esverdeado)
+    // ============================================
+    --neutral-50: hsl(138, 100%, 99%);
+    --neutral-100: hsl(138, 76%, 97%);
+    --neutral-200: hsl(138, 72%, 93%);
+    --neutral-300: hsl(138, 55%, 87%);
+    --neutral-400: hsl(138, 30%, 72%);
+    --neutral-500: hsl(138, 20%, 58%);
+    --neutral-600: hsl(138, 25%, 45%);
+    --neutral-700: hsl(138, 35%, 35%);
+    --neutral-800: hsl(138, 45%, 25%);
+    --neutral-900: hsl(138, 55%, 15%);
+    --neutral-950: hsl(138, 65%, 8%);
+
+    // ============================================
+    // BACKGROUNDS
+    // ============================================
+    --color-bg-primary: var(--neutral-50);
+    --color-bg-secondary: var(--neutral-100);
+    --color-bg-tertiary: var(--neutral-200);
+    --color-bg-elevated: hsl(0, 0%, 100%);
+
+    // ============================================
+    // TEXT
+    // ============================================
+    --color-text-primary: var(--neutral-900);
+    --color-text-secondary: var(--neutral-700);
+    --color-text-tertiary: var(--neutral-600);
+    --color-text-inverse: var(--neutral-50);
+    --color-text-muted: var(--neutral-500);
+
+    // ============================================
+    // BORDERS
+    // ============================================
+    --color-border-light: var(--neutral-200);
+    --color-border-base: var(--neutral-300);
+    --color-border-dark: var(--neutral-400);
+
+    // ============================================
+    // PRIMARY PALETTE (verde floresta)
+    // ============================================
+    --primary-h: 142;
+    --primary-s: 76%;
+
+    --primary-50: hsl(var(--primary-h), calc(var(--primary-s) * 0.9), 97%);
+    --primary-100: hsl(var(--primary-h), var(--primary-s), 93%);
+    --primary-200: hsl(var(--primary-h), var(--primary-s), 85%);
+    --primary-300: hsl(var(--primary-h), var(--primary-s), 75%);
+    --primary-400: hsl(var(--primary-h), var(--primary-s), 65%);
+    --primary-500: hsl(var(--primary-h), var(--primary-s), 55%); // base
+    --primary-600: hsl(var(--primary-h), var(--primary-s), 48%);
+    --primary-700: hsl(var(--primary-h), var(--primary-s), 41%);
+    --primary-800: hsl(var(--primary-h), calc(var(--primary-s) * 0.85), 34%);
+    --primary-900: hsl(var(--primary-h), calc(var(--primary-s) * 0.75), 26%);
+    --primary-950: hsl(var(--primary-h), calc(var(--primary-s) * 0.7), 16%);
+
+    --color-primary: var(--primary-500);
+    --color-primary-hover: var(--primary-600);
+    --color-primary-active: var(--primary-700);
+    --color-border-focus: var(--primary-500);
+
+    // ============================================
+    // SECONDARY PALETTE (verde-esmeralda)
+    // ============================================
+    --secondary-h: 158;
+    --secondary-s: 64%;
+
+    --secondary-50: hsl(var(--secondary-h), calc(var(--secondary-s) * 0.85), 97%);
+    --secondary-100: hsl(var(--secondary-h), var(--secondary-s), 93%);
+    --secondary-200: hsl(var(--secondary-h), var(--secondary-s), 85%);
+    --secondary-300: hsl(var(--secondary-h), var(--secondary-s), 75%);
+    --secondary-400: hsl(var(--secondary-h), var(--secondary-s), 65%);
+    --secondary-500: hsl(var(--secondary-h), var(--secondary-s), 55%); // base
+    --secondary-600: hsl(var(--secondary-h), var(--secondary-s), 48%);
+    --secondary-700: hsl(var(--secondary-h), var(--secondary-s), 41%);
+    --secondary-800: hsl(var(--secondary-h), calc(var(--secondary-s) * 0.8), 34%);
+    --secondary-900: hsl(var(--secondary-h), calc(var(--secondary-s) * 0.7), 26%);
+    --secondary-950: hsl(var(--secondary-h), calc(var(--secondary-s) * 0.65), 16%);
+
+    --color-secondary: var(--secondary-500);
+    --color-secondary-hover: var(--secondary-600);
+    --color-secondary-active: var(--secondary-700);
+
+    // ============================================
+    // SHADOWS (com toque esverdeado)
+    // ============================================
+    --shadow-color-sm: hsla(142, 76%, 55%, 0.1);
+    --shadow-color-md: hsla(142, 76%, 55%, 0.15);
+    --shadow-color-lg: hsla(142, 76%, 55%, 0.2);
+    --shadow-color-xl: hsla(142, 76%, 55%, 0.25);
+}

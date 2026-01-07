@@ -1,0 +1,60 @@
+# Arquivos de desenvolvimento (NÃO publicar no npm)
+
+# Source code (será compilado para dist/)
+src/
+lib/
+
+# Public assets do showcase
+public/
+
+# Config files
+vite.config.ts
+vite.config.lib.ts
+tsconfig.json
+tsconfig.app.json
+tsconfig.node.json
+index.html
+.gitignore
+
+# IDE
+.vscode/
+.idea/
+
+# Documentation de desenvolvimento
+SHOWCASE_GUIDE.md
+SUMMARY.md
+CHECKLIST.md
+
+# Git
+.git/
+.github/
+
+# Node
+node_modules/
+
+# Logs
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+lerna-debug.log*
+
+# Environment
+.env
+.env.local
+.env.*.local
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Build artifacts temporários
+dist-ssr/
+*.local
+
+# PUBLICAR APENAS:
+# - dist/
+# - package.json
+# - README.md
+# - LICENSE

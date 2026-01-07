@@ -1,0 +1,100 @@
+/**
+ * Tema Dark
+ * Escuro e elegante com HSL para flexibilidade
+ */
+
+[data-theme='dark'] {
+    color-scheme: dark;
+
+    // ============================================
+    // NEUTRAL PALETTE (invertido para dark)
+    // ============================================
+    --neutral-50: hsl(0, 0%, 5%);
+    --neutral-100: hsl(0, 0%, 8%);
+    --neutral-200: hsl(0, 0%, 11%);
+    --neutral-300: hsl(0, 0%, 15%);
+    --neutral-400: hsl(0, 0%, 25%);
+    --neutral-500: hsl(0, 0%, 45%);
+    --neutral-600: hsl(0, 0%, 62%);
+    --neutral-700: hsl(0, 0%, 74%);
+    --neutral-800: hsl(0, 0%, 83%);
+    --neutral-900: hsl(0, 0%, 96%);
+    --neutral-950: hsl(0, 0%, 98%);
+
+    // ============================================
+    // BACKGROUNDS
+    // ============================================
+    --color-bg-primary: var(--neutral-50);
+    --color-bg-secondary: var(--neutral-100);
+    --color-bg-tertiary: var(--neutral-200);
+    --color-bg-elevated: var(--neutral-300);
+
+    // ============================================
+    // TEXT
+    // ============================================
+    --color-text-primary: var(--neutral-900);
+    --color-text-secondary: var(--neutral-700);
+    --color-text-tertiary: var(--neutral-600);
+    --color-text-inverse: var(--neutral-50);
+    --color-text-muted: var(--neutral-500);
+
+    // ============================================
+    // BORDERS
+    // ============================================
+    --color-border-light: var(--neutral-200);
+    --color-border-base: var(--neutral-300);
+    --color-border-dark: var(--neutral-400);
+
+    // ============================================
+    // PRIMARY PALETTE (azul mais claro para dark)
+    // ============================================
+    --primary-h: 213;
+    --primary-s: 94%;
+
+    --primary-50: hsl(var(--primary-h), calc(var(--primary-s) * 0.7), 18%);
+    --primary-100: hsl(var(--primary-h), calc(var(--primary-s) * 0.75), 28%);
+    --primary-200: hsl(var(--primary-h), calc(var(--primary-s) * 0.85), 38%);
+    --primary-300: hsl(var(--primary-h), var(--primary-s), 46%);
+    --primary-400: hsl(var(--primary-h), var(--primary-s), 58%);
+    --primary-500: hsl(var(--primary-h), var(--primary-s), 70%); // base mais claro
+    --primary-600: hsl(var(--primary-h), var(--primary-s), 60%);
+    --primary-700: hsl(var(--primary-h), var(--primary-s), 52%);
+    --primary-800: hsl(var(--primary-h), var(--primary-s), 78%);
+    --primary-900: hsl(var(--primary-h), var(--primary-s), 87%);
+    --primary-950: hsl(var(--primary-h), calc(var(--primary-s) * 0.9), 94%);
+
+    --color-primary: var(--primary-500);
+    --color-primary-hover: var(--primary-600);
+    --color-primary-active: var(--primary-700);
+    --color-border-focus: var(--primary-500);
+
+    // ============================================
+    // SECONDARY PALETTE (roxo mais claro)
+    // ============================================
+    --secondary-h: 250;
+    --secondary-s: 95%;
+
+    --secondary-50: hsl(var(--secondary-h), calc(var(--secondary-s) * 0.65), 21%);
+    --secondary-100: hsl(var(--secondary-h), calc(var(--secondary-s) * 0.7), 31%);
+    --secondary-200: hsl(var(--secondary-h), calc(var(--secondary-s) * 0.8), 41%);
+    --secondary-300: hsl(var(--secondary-h), var(--secondary-s), 49%);
+    --secondary-400: hsl(var(--secondary-h), var(--secondary-s), 60%);
+    --secondary-500: hsl(var(--secondary-h), var(--secondary-s), 72%); // base
+    --secondary-600: hsl(var(--secondary-h), var(--secondary-s), 63%);
+    --secondary-700: hsl(var(--secondary-h), var(--secondary-s), 55%);
+    --secondary-800: hsl(var(--secondary-h), var(--secondary-s), 78%);
+    --secondary-900: hsl(var(--secondary-h), var(--secondary-s), 87%);
+    --secondary-950: hsl(var(--secondary-h), calc(var(--secondary-s) * 0.85), 94%);
+
+    --color-secondary: var(--secondary-500);
+    --color-secondary-hover: var(--secondary-600);
+    --color-secondary-active: var(--secondary-700);
+
+    // ============================================
+    // SHADOWS (mais escuras para dark)
+    // ============================================
+    --shadow-color-sm: hsla(0, 0%, 0%, 0.3);
+    --shadow-color-md: hsla(0, 0%, 0%, 0.4);
+    --shadow-color-lg: hsla(0, 0%, 0%, 0.5);
+    --shadow-color-xl: hsla(0, 0%, 0%, 0.6);
+}

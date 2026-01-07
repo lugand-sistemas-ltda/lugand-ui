@@ -1,0 +1,59 @@
+/**
+ * Tema Cyberpunk (Inspirado no estilo futurista/neon)
+ * Fundo muito escuro com amarelo neon de destaque
+ * Alta energia e contraste
+ */
+
+[data-theme='cyberpunk'] {
+    color-scheme: dark;
+
+    // ============================================
+    // NEUTRAL PALETTE (Dark Blue/Black Scale)
+    // ============================================
+    --neutral-50: hsl(240, 20%, 3%); // Quase preto
+    --neutral-100: hsl(240, 20%, 8%);
+    --neutral-200: hsl(240, 15%, 15%);
+    --neutral-300: hsl(240, 10%, 25%);
+    --neutral-400: hsl(240, 5%, 40%);
+    --neutral-500: hsl(240, 0%, 55%);
+    --neutral-600: hsl(0, 0%, 75%);
+    --neutral-700: hsl(0, 0%, 85%);
+    --neutral-800: hsl(0, 0%, 92%);
+    --neutral-900: hsl(60, 100%, 97%);
+    --neutral-950: hsl(0, 0%, 100%);
+
+    // ============================================
+    // BACKGROUNDS
+    // ============================================
+    --color-bg-primary: hsl(253, 16%, 10%); // Fundo base escuro arroxeado
+    --color-bg-secondary: hsl(253, 20%, 15%); // Fundo secundário
+    --color-bg-tertiary: hsl(253, 25%, 20%); // Fundo terciário
+    --color-bg-elevated: hsl(0, 0%, 0%); // Preto total para elevação
+
+    // ============================================
+    // TEXT
+    // ============================================
+    --color-text-primary: hsl(60, 90%, 90%); // Amarelo muito pálido
+    --color-text-secondary: hsl(180, 50%, 75%); // Ciano pálido
+    --color-text-tertiary: hsl(253, 20%, 65%); // Roxo pálido
+    --color-text-inverse: hsl(0, 0%, 0%); // Preto
+    --color-text-muted: hsl(253, 20%, 45%);
+
+    // ============================================
+    // PRIMARY COLOR (Cyber Yellow)
+    // ============================================
+    --hsl-primary: 58, 100%, 50%; // Amarelo Cyberpunk #FCEE0A
+    --color-primary: hsl(var(--hsl-primary));
+    --color-primary-hover: hsl(58, 100%, 60%);
+    --color-primary-active: hsl(58, 100%, 40%);
+
+    // Versões faded para fundos/anéis
+    --color-primary-faded: hsla(var(--hsl-primary), 0.3);
+    --color-primary-bg: hsla(var(--hsl-primary), 0.15);
+
+    // ============================================
+    // BORDERS
+    // ============================================
+    --color-border-base: hsl(253, 30%, 30%);
+    --color-border-dark: hsl(180, 100%, 50%); // Borda Ciano Neon para destaque
+}
