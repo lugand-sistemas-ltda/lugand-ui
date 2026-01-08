@@ -75,9 +75,29 @@ const products = Array.from({ length: 8 }).map((_, i) => ({
 </ScrollContainer>' />
             </template>
         </ComponentShowcase>
+
+        <!-- 3. Brands Marquee -->
+        <ComponentShowcase title="Autoplay Marquee (Brands)"
+            description="Scroll automático contínuo, ideal para parceiros e logotipos.">
+            <template #preview>
+                <ScrollContainer autoplay :speed="0.5" gap="xl" :show-arrows="false">
+                    <!-- Duplicando itens para simular loop infinito melhor -->
+                    <div v-for="i in 16" :key="i" class="brand-item">
+                        <div class="brand-box">Brand {{ i > 8 ? i - 8 : i }}</div>
+                    </div>
+                </ScrollContainer>
+            </template>
+
+            <template #code>
+                <CodeBlock code='<ScrollContainer autoplay :speed="1" :show-arrows="false">
+  <img src="brand1.png" />
+  <img src="brand2.png" />
+  <!-- ... -->
+</ScrollContainer>' />
+            </template>
+        </ComponentShowcase>
     </div>
 </template>
-
 <style lang="scss" scoped>
 .containers-view {
     display: flex;
@@ -122,5 +142,24 @@ const products = Array.from({ length: 8 }).map((_, i) => ({
     align-items: center;
     justify-content: center;
     flex-shrink: 0; // Importante para não encolher no flex
+}
+
+.brand-item {
+    // Placeholder para marcas
+    flex: 0 0 auto;
+}
+
+.brand-box {
+    width: 150px;
+    height: 80px;
+    background-color: var(--color-bg-tertiary);
+    border: 1px solid var(--color-border-base);
+    border-radius: var(--radius-md);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: 700;
+    color: var(--color-text-secondary);
+    text-transform: uppercase;
 }
 </style>

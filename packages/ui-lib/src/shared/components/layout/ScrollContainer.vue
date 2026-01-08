@@ -3,21 +3,30 @@
  * ScrollContainer - Lista horizontal com scroll snap
  * Perfeito para: Produtos Recomendados, Stories, Categorias
  */
-import { ref } from 'vue'
+import { ref, onMounted, onUnmounted, watch } from 'vue'
 
 interface Props {
-    gap?: 'sm' | 'md' | 'lg'
+    gap?: 'sm' | 'md' | 'lg' | 'xl'
     snap?: boolean // Se true, o scroll "imanta" nos itens
     showArrows?: boolean // Setas para desktop
+    autoplay?: boolean // Rola automaticamente (Marquee effect)
+    autoplaySpeed?: number // Pixels por frame
+    pauseOnHover?: boolean
 }
 
-withDefaults(defineProps<Props>(), {
+const props = withDefaults(defineProps<Props>(), {
     gap: 'md',
     snap: true,
-    showArrows: true
+    showArrows: true,
+    autoplay: false,
+    autoplaySpeed: 1,
+    pauseOnHover: true
 })
 
 const containerRef = ref<HTMLElement | null>(null)
+let animationId: number | null = null
+let accumulatedScroll = 0
+let isHovered = false
 
 function scroll(direction: 'left' | 'right') {
     if (!containerRef.value) return
@@ -30,24 +39,84 @@ function scroll(direction: 'left' | 'right') {
         behavior: 'smooth'
     })
 }
+
+// Lógica de Autoplay (Marquee)
+const startAutoplay = () => {
+    if (!props.autoplay || !containerRef.value) return
+
+    const animate = () => {
+        if (!containerRef.value) return
+
+        if (!isHovered) {
+            accumulatedScroll += props.autoplaySpeed
+
+            if (accumulatedScroll >= 1) {
+                const pixelsToScroll = Math.floor(accumulatedScroll)
+                containerRef.value.scrollLeft += pixelsToScroll
+                accumulatedScroll -= pixelsToScroll
+            }
+
+            // Loop infinito
+            if (containerRef.value.scrollLeft + containerRef.value.clientWidth >= containerRef.value.scrollWidth - 1) {
+                containerRef.value.scrollLeft = 0
+            }
+        }
+
+        animationId = requestAnimationFrame(animate)
+    }
+
+    if (animationId) cancelAnimationFrame(animationId)
+    animationId = requestAnimationFrame(animate)
+}
+
+const stopAutoplay = () => {
+    if (animationId) {
+        cancelAnimationFrame(animationId)
+        animationId = null
+    }
+}
+
+// Hooks
+onMounted(() => {
+    if (props.autoplay) startAutoplay()
+})
+
+onUnmounted(() => {
+    stopAutoplay()
+})
+
+watch(() => props.autoplay, (newVal) => {
+    if (newVal) startAutoplay()
+    else stopAutoplay()
+})
+
+const onMouseEnter = () => {
+    if (props.pauseOnHover) isHovered = true
+}
+
+const onMouseLeave = () => {
+    if (props.pauseOnHover) isHovered = false
+}
 </script>
 
 <template>
-    <div class="scroll-wrapper">
-        <!-- Botão Esquerda (só aparece em Desktop se habilitado) -->
-        <button v-if="showArrows" class="nav-btn nav-prev" @click="scroll('left')" aria-label="Scroll left">
+    <div class="scroll-wrapper" @mouseenter="onMouseEnter" @mouseleave="onMouseLeave">
+        <!-- Botão Esquerda (só aparece em Desktop se habilitado e sem autoplay) -->
+        <button v-if="showArrows && !autoplay" class="nav-btn nav-prev" @click="scroll('left')"
+            aria-label="Scroll left">
             &lsaquo;
         </button>
 
         <div ref="containerRef" class="scroll-container" :class="[
             `gap-${gap}`,
-            { 'snap-active': snap }
+            { 'snap-active': snap && !autoplay }
         ]">
             <slot />
         </div>
 
         <!-- Botão Direita -->
-        <button v-if="showArrows" class="nav-btn nav-next" @click="scroll('right')" aria-label="Scroll right">
+        <button v-if="showArrows && !autoplay" class="nav-btn nav-next" @click="scroll('right')"
+            aria-label="Scroll right">
             &rsaquo;
         </button>
     </div>
@@ -93,6 +162,10 @@ function scroll(direction: 'left' | 'right') {
 
     &.gap-lg {
         gap: var(--spacing-lg);
+    }
+
+    &.gap-xl {
+        gap: var(--spacing-xl);
     }
 
     &.snap-active {
