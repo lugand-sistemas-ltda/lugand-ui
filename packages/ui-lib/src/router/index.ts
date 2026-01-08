@@ -36,6 +36,12 @@ const routes: RouteRecordRaw[] = [
     name: 'ui-simple-containers',
     component: () => import('@/views/ui/simple/ContainersView.vue'),
   },
+  // UI Display Elements (New)
+  {
+    path: '/ui/elements/display',
+    name: 'ui-elements-display',
+    component: () => import('@/views/ui/elements/DisplayElementsView.vue'),
+  },
   // UI Complex Components
   {
     path: '/ui/complex/forms',

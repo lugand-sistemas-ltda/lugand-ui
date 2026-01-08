@@ -33,6 +33,8 @@ withDefaults(defineProps<Props>(), {
     empty: false,
     minItemWidth: '280px'
 })
+
+import Skeleton from '../display/Skeleton.vue'
 </script>
 
 <template>
@@ -51,8 +53,9 @@ withDefaults(defineProps<Props>(), {
                 '--cols-xl': colsXl
             }">
             <slot name="loading">
-                <!-- Default Loading: 4 caixas cinzas -->
-                <div v-for="i in 4" :key="i" class="skeleton-box"></div>
+                <!-- Default Loading: 4 Skeletons -->
+                <Skeleton v-for="i in 4" :key="i" height="300px" variant="rect" animation="pulse"
+                    border-radius="var(--radius-md)" />
             </slot>
         </div>
 
@@ -68,14 +71,14 @@ withDefaults(defineProps<Props>(), {
             `gap-${gap}`,
             cols === 'auto' ? 'grid-auto' : 'grid-fixed'
         ]" :style="cols === 'auto'
-        ? { '--min-width': minItemWidth }
-        : {
-            '--cols-xs': cols,
-            '--cols-sm': colsSm,
-            '--cols-md': colsMd,
-            '--cols-lg': colsLg,
-            '--cols-xl': colsXl
-        }">
+            ? { '--min-width': minItemWidth }
+            : {
+                '--cols-xs': cols,
+                '--cols-sm': colsSm,
+                '--cols-md': colsMd,
+                '--cols-lg': colsLg,
+                '--cols-xl': colsXl
+            }">
             <slot />
         </div>
     </div>
@@ -142,28 +145,6 @@ withDefaults(defineProps<Props>(), {
         background: var(--color-bg-tertiary);
         border-radius: var(--radius-md);
         border: 1px dashed var(--color-border-base);
-    }
-
-    // Skeleton básico para loading default
-    .skeleton-box {
-        height: 300px;
-        background: var(--color-bg-secondary);
-        border-radius: var(--radius-md);
-        animation: pulse 1.5s infinite;
-    }
-
-    @keyframes pulse {
-        0% {
-            opacity: 0.6;
-        }
-
-        50% {
-            opacity: 1;
-        }
-
-        100% {
-            opacity: 0.6;
-        }
     }
 }
 </style>

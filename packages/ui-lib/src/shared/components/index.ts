@@ -32,6 +32,10 @@ export { default as Navbar } from './navigation/Navbar.vue'
 // ============================================
 export { default as Card } from './display/Card.vue'
 export { default as MediaCard } from './display/MediaCard.vue'
+export { default as Badge } from './display/Badge.vue'
+export { default as Tooltip } from './display/Tooltip.vue'
+export { default as Avatar } from './display/Avatar.vue'
+export { default as Skeleton } from './display/Skeleton.vue'
 
 // ============================================
 // LAYOUT - Componentes de estrutura

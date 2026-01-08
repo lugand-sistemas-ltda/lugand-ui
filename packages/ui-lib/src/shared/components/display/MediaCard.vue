@@ -4,6 +4,7 @@
  * Extende o componente Card base com slots estruturados
  */
 import Card from './Card.vue'
+import Badge from './Badge.vue'
 
 interface Props {
     // Dados principais
@@ -14,7 +15,7 @@ interface Props {
 
     // Badge/Label (ex: "Promoção", "Novo")
     badge?: string
-    badgeColor?: 'primary' | 'success' | 'warning' | 'danger' | 'info'
+    badgeColor?: 'primary' | 'success' | 'warning' | 'danger' | 'error' | 'info' | 'secondary' | 'neutral'
 
     // Comportamento
     hoverable?: boolean
@@ -32,16 +33,22 @@ const emit = defineEmits<{
     click: [e: MouseEvent]
     'click:badge': [e: MouseEvent]
 }>()
+
+// Map legacy 'danger' to 'error' for Badge component
+const badgeVariant = (color: string) => {
+    if (color === 'danger') return 'error';
+    return color as any;
+}
 </script>
 
 <template>
     <Card class="media-card" padding="none" :hoverable="hoverable" :clickable="clickable"
         @click="emit('click', $event)">
         <!-- Badge Flutuante (Opcional) -->
-        <div v-if="badge" class="media-card__badge" :class="`media-card__badge--${badgeColor}`"
+        <Badge v-if="badge" class="media-card__badge" :variant="badgeVariant(badgeColor)" size="sm" rounded="pill"
             @click.stop="emit('click:badge', $event)">
             {{ badge }}
-        </div>
+        </Badge>
 
         <!-- Área de Mídia (Imagem) -->
         <div class="media-card__media">
@@ -92,40 +99,8 @@ const emit = defineEmits<{
         top: var(--spacing-sm);
         right: var(--spacing-sm);
         z-index: 10;
-
-        padding: 0.25rem 0.75rem;
-        border-radius: var(--radius-full);
-        font-size: 0.75rem;
-        font-weight: 600;
-        text-transform: uppercase;
-        letter-spacing: 0.5px;
-        box-shadow: var(--shadow-sm);
-
-        // Cores do Badge
-        &--primary {
-            background: var(--color-primary);
-            color: white;
-        }
-
-        &--success {
-            background: var(--color-success);
-            color: white;
-        }
-
-        &--warning {
-            background: var(--color-warning);
-            color: black;
-        }
-
-        &--danger {
-            background: var(--color-danger);
-            color: white;
-        }
-
-        &--info {
-            background: var(--color-info);
-            color: white;
-        }
+        box-shadow: var(--shadow-sm); // Shadow para contraste com imagem
+        cursor: default;
     }
 
     &__media {

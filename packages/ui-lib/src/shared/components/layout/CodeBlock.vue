@@ -4,6 +4,7 @@
  * Usado para mostrar exemplos de uso dos componentes
  */
 import { ref } from 'vue'
+import Badge from '../display/Badge.vue'
 
 interface Props {
     code: string
@@ -26,7 +27,9 @@ const toggleCode = () => {
 <template>
     <div class="code-block">
         <div class="code-block__header">
-            <span class="code-block__language">{{ language }}</span>
+            <Badge variant="neutral" type="soft" size="sm" rounded="sm" class="code-block__language">
+                {{ language }}
+            </Badge>
             <button v-if="collapsible" class="code-block__toggle" type="button" @click="toggleCode">
                 {{ isExpanded ? '▼ Ocultar código' : '▶ Ver código' }}
             </button>
@@ -52,9 +55,6 @@ const toggleCode = () => {
     }
 
     &__language {
-        font-size: var(--font-size-xs);
-        font-weight: var(--font-weight-semibold);
-        color: var(--color-text-secondary);
         text-transform: uppercase;
         letter-spacing: 0.05em;
     }
