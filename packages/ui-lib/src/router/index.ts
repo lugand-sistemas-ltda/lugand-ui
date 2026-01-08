@@ -26,6 +26,16 @@ const routes: RouteRecordRaw[] = [
     name: 'ui-simple-typography',
     component: () => import('@/views/ui/simple/TypographyView.vue'),
   },
+  {
+    path: '/ui/simple/cards',
+    name: 'ui-simple-cards',
+    component: () => import('@/views/ui/simple/CardsView.vue'),
+  },
+  {
+    path: '/ui/simple/containers',
+    name: 'ui-simple-containers',
+    component: () => import('@/views/ui/simple/ContainersView.vue'),
+  },
   // UI Complex Components
   {
     path: '/ui/complex/forms',

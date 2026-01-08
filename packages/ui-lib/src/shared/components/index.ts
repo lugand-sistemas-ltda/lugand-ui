@@ -28,8 +28,16 @@ export { default as NavItem } from './navigation/NavItem.vue'
 export { default as Navbar } from './navigation/Navbar.vue'
 
 // ============================================
+// DISPLAY - Visualização de dados
+// ============================================
+export { default as Card } from './display/Card.vue'
+export { default as MediaCard } from './display/MediaCard.vue'
+
+// ============================================
 // LAYOUT - Componentes de estrutura
 // ============================================
 // AppShell components moved to modules/AppShell
 export { default as ComponentShowcase } from './layout/ComponentShowcase.vue'
 export { default as CodeBlock } from './layout/CodeBlock.vue'
+export { default as GridContainer } from './layout/GridContainer.vue'
+export { default as ScrollContainer } from './layout/ScrollContainer.vue'

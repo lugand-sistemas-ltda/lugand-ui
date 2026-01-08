@@ -40,6 +40,8 @@ watch(
             <NavLink to="/ui/simple/buttons">Buttons</NavLink>
             <NavLink to="/ui/simple/inputs">Inputs</NavLink>
             <NavLink to="/ui/simple/typography">Typography</NavLink>
+            <NavLink to="/ui/simple/cards">Cards</NavLink>
+            <NavLink to="/ui/simple/containers">Containers</NavLink>
           </NavItem>
 
           <NavItem label="Complex" :default-expanded="false">
