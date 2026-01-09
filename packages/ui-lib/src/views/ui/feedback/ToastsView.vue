@@ -113,7 +113,7 @@ function showCustomClass() {
         <ComponentShowcase title="Playground" description="Construa e teste diferentes variações de notificação.">
             <template #preview>
                 <div class="playground-controls">
-                    <GridContainer cols="2">
+                    <GridContainer :cols="2">
                         <Input label="Título" v-model="pTitle" placeholder="Ex: Success" />
                         <Input label="Mensagem" v-model="pMessage" placeholder="Mensagem principal" />
 

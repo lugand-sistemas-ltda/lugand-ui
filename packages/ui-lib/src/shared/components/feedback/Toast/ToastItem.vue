@@ -93,22 +93,22 @@ function handleAction() {
 
     &.type-info {
         border-left-color: var(--color-info);
-        background: transparentize(#2196F3, 0.2);
+        background: rgba(#2196F3, 0.8);
     }
 
     &.type-success {
         border-left-color: var(--color-success);
-        background: transparentize(#4CAF50, 0.2);
+        background: rgba(#4CAF50, 0.8);
     }
 
     &.type-warning {
         border-left-color: var(--color-warning);
-        background: transparentize(#FFC107, 0.2);
+        background: rgba(#FFC107, 0.8);
     }
 
     &.type-error {
         border-left-color: var(--color-error);
-        background: transparentize(#F44336, 0.2);
+        background: rgba(#F44336, 0.8);
     }
 
     .toast-icon {

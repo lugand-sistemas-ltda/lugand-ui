@@ -31,63 +31,70 @@ export {
     // Primitives
     Btn,
     BtnToggle,
-    // Input, // Exportado individualmente abaixo
-    // Textarea, // Exportado individualmente abaixo
-    // Checkbox, // Exportado individualmente abaixo
-    // Select, // Exportado individualmente abaixo
-    // Scrollable, // Exportado individualmente abaixo
-
-    // Form
-    // DynamicForm, // Exportado individualmente abaixo
+    Input,
+    Textarea,
+    Checkbox,
+    Select,
+    Scrollable,
 
     // Navigation
-    // NavLink, // Exportado individualmente abaixo
-    // NavItem, // Exportado individualmente abaixo
-    // Navbar, // Exportado individualmente abaixo
+    NavLink,
+    NavItem,
+    Navbar,
+
+    // Display
+    Icon,
+    Avatar,
+    Badge,
+    Card,
+    MediaCard,
+    Skeleton,
+    Tooltip,
+
+    // Feedback
+    ToastProvider,
+    ToastItem,
 
     // Layout
-    // AppHeader, // Exportado individualmente abaixo
-    // AppFooter, // Exportado individualmente abaixo
-    // AppLayout, // Exportado individualmente abaixo
-    // ThemeSwitcher, // Exportado individualmente abaixo
-    // ComponentShowcase, // Exportado individualmente abaixo
-    // CodeBlock, // Exportado individualmente abaixo
+    ComponentShowcase,
+    CodeBlock,
+    GridContainer,
+    ScrollContainer
 } from '../src/shared/components/index'
-
-export { default as Input } from '../src/shared/components/primitives/Input.vue'
-export { default as Textarea } from '../src/shared/components/primitives/Textarea.vue'
-export { default as Checkbox } from '../src/shared/components/primitives/Checkbox.vue'
-export { default as Select } from '../src/shared/components/primitives/Select.vue'
-export { default as Scrollable } from '../src/shared/components/primitives/Scrollable.vue'
-
-// ============================================
-// SHARED - Navigation
-// ============================================
-export { default as NavLink } from '../src/shared/components/navigation/NavLink.vue'
-export { default as NavItem } from '../src/shared/components/navigation/NavItem.vue'
-export { default as Navbar } from '../src/shared/components/navigation/Navbar.vue'
-
-// ============================================
-// SHARED - Layout & Utils
-// ============================================
-export { default as ComponentShowcase } from '../src/shared/components/layout/ComponentShowcase.vue'
-export { default as CodeBlock } from '../src/shared/components/layout/CodeBlock.vue'
 
 // ============================================
 // COMPOSABLES
 // ============================================
-export { useTheme } from '../src/shared/composables/useTheme.ts'
+export {
+    useTheme,
+    useToast
+} from '../src/shared/composables/index.ts'
 
 // ============================================
 // TYPES
 // ============================================
 export type { ThemeName } from '../src/core/types/theme.types.ts'
 export type { Theme } from '../src/core/config/themes.config.ts'
+export type { ToastOptions, ToastType, ToastPosition, ToastAction } from '../src/shared/components/feedback/Toast/types.ts'
 
 // ============================================
-// CONFIGS
+// CONFIGS & CONSTANTS
 // ============================================
 export { themes, themeList } from '../src/core/config/themes.config.ts'
+export { UI_ICONS, type UiIconName } from '../src/core/constants/ui-icons.ts'
+export { BRANDS, type BrandName } from '../src/core/constants/brands.ts'
+export {
+    EMOJI_MAP as EMOJIS,
+    type EmojiName,
+    SMILEYS_PEOPLE,
+    ANIMALS_NATURE,
+    FOOD_DRINK,
+    ACTIVITIES,
+    TRAVEL_PLACES,
+    OBJECTS,
+    SYMBOLS,
+    FLAGS
+} from '../src/core/constants/emojis.ts'
 
 // ============================================
 // VERSION

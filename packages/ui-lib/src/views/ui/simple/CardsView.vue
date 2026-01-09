@@ -1,5 +1,4 @@
 <script setup lang="ts">
-import { ref } from 'vue'
 import { Card, MediaCard, Btn, ComponentShowcase, CodeBlock } from '@/shared/components'
 
 // Mock Data para Produtos

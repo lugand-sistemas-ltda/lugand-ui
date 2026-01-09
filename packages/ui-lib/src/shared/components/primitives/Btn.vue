@@ -4,7 +4,7 @@
  * Estende o elemento <button> com variantes visuais
  */
 interface Props {
-    variant?: 'primary' | 'secondary' | 'ghost' | 'danger'
+    variant?: 'primary' | 'secondary' | 'ghost' | 'danger' | 'outline'
     size?: 'sm' | 'md' | 'lg'
     disabled?: boolean
     type?: 'button' | 'submit' | 'reset'
@@ -116,6 +116,24 @@ withDefaults(defineProps<Props>(), {
 
         &:active:not(:disabled) {
             opacity: 0.8;
+        }
+    }
+
+    &--outline {
+        background-color: transparent;
+        color: var(--color-primary);
+        border-color: var(--color-primary);
+
+        &:hover:not(:disabled) {
+            background-color: rgba(var(--color-primary-rgb), 0.1); // Assuming rgb var exists, else use standard opacity trick or lighten
+            // Fallback if RGB var doesn't exist:
+            background-color: var(--color-bg-secondary);
+            border-color: var(--color-primary-hover);
+            color: var(--color-primary-hover);
+        }
+
+        &:active:not(:disabled) {
+            background-color: var(--color-bg-tertiary);
         }
     }
 
