@@ -40,6 +40,11 @@ watch(
             <NavLink to="/ui/elements/display">Badges & Tooltips</NavLink>
           </NavItem>
 
+          <NavItem label="Icons" :default-expanded="true">
+            <NavLink to="/ui/icons/emojis">Emojis</NavLink>
+            <NavLink to="/ui/icons/brands">Brands</NavLink>
+          </NavItem>
+
           <NavItem label="Simple" :default-expanded="false">
             <NavLink to="/ui/simple/buttons">Buttons</NavLink>
             <NavLink to="/ui/simple/inputs">Inputs</NavLink>

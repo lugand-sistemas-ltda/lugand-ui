@@ -36,11 +36,22 @@ const routes: RouteRecordRaw[] = [
     name: 'ui-simple-containers',
     component: () => import('@/views/ui/simple/ContainersView.vue'),
   },
-  // UI Display Elements (New)
+  // UI Elements
   {
     path: '/ui/elements/display',
     name: 'ui-elements-display',
     component: () => import('@/views/ui/elements/DisplayElementsView.vue'),
+  },
+  // UI Icons
+  {
+    path: '/ui/icons/emojis',
+    name: 'ui-icons-emojis',
+    component: () => import('@/views/ui/icons/EmojisView.vue'),
+  },
+  {
+    path: '/ui/icons/brands',
+    name: 'ui-icons-brands',
+    component: () => import('@/views/ui/icons/BrandsView.vue'),
   },
   // UI Complex Components
   {

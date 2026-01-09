@@ -36,6 +36,7 @@ export { default as Badge } from './display/Badge.vue'
 export { default as Tooltip } from './display/Tooltip.vue'
 export { default as Avatar } from './display/Avatar.vue'
 export { default as Skeleton } from './display/Skeleton.vue'
+export { default as Icon } from './display/Icon.vue'
 
 // ============================================
 // LAYOUT - Componentes de estrutura
