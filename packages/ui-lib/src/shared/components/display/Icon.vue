@@ -7,13 +7,14 @@
 import { computed } from 'vue'
 import { EMOJI_MAP, type EmojiName } from '@/core/constants/emojis'
 import { BRANDS, type BrandName } from '@/core/constants/brands'
+import { UI_ICONS, type UiIconName } from '@/core/constants/ui-icons'
 
 interface Props {
     // Nome do ícone (chave do mapa de emojis ou nome do SVG futuro)
     name: string
 
     // Tipo do ícone (permite expansão futura)
-    type?: 'emoji' | 'svg' | 'font' | 'brand'
+    type?: 'emoji' | 'svg' | 'font' | 'brand' | 'ui'
 
     // Tamanho (controla font-size ou width/height)
     size?: 'sm' | 'md' | 'lg' | 'xl' | '2xl' | string
@@ -50,6 +51,16 @@ const brandData = computed(() => {
     return null
 })
 
+// === UI ICON LOGIC ===
+const uiIconData = computed(() => {
+    if (props.type !== 'ui') return null
+
+    if (props.name in UI_ICONS) {
+        return UI_ICONS[props.name as UiIconName]
+    }
+    return null
+})
+
 // === SIZE LOGIC ===
 const sizeClass = computed(() => {
     if (['sm', 'md', 'lg', 'xl', '2xl'].includes(props.size)) {
@@ -80,6 +91,12 @@ const customStyle = computed(() => {
         <path :d="brandData.path" />
     </svg>
 
+    <!-- UI ICON RENDERER (Uses same SVG structure as Brand but separate styles if needed) -->
+    <svg v-else-if="type === 'ui' && uiIconData" class="icon icon--ui" :class="[sizeClass]" :style="customStyle"
+        :viewBox="uiIconData.viewBox" role="img" :aria-label="label || uiIconData.label" fill="currentColor">
+        <path :d="uiIconData.path" />
+    </svg>
+
     <!-- SVG RENDERER (Placeholder for Future) -->
     <span v-else-if="type === 'svg'" class="icon icon--svg">
         <!-- Future Logic: Dynamic SVG Import -->
@@ -101,6 +118,12 @@ const customStyle = computed(() => {
     }
 
     &--brand {
+        width: 1em;
+        height: 1em;
+        fill: currentColor;
+    }
+
+    &--ui {
         width: 1em;
         height: 1em;
         fill: currentColor;

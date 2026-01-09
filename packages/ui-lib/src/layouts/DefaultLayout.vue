@@ -43,6 +43,7 @@ watch(
           <NavItem label="Icons" :default-expanded="true">
             <NavLink to="/ui/icons/emojis">Emojis</NavLink>
             <NavLink to="/ui/icons/brands">Brands</NavLink>
+            <NavLink to="/ui/icons/ui">UI Icons</NavLink>
           </NavItem>
 
           <NavItem label="Simple" :default-expanded="false">

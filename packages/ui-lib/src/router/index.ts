@@ -53,6 +53,11 @@ const routes: RouteRecordRaw[] = [
     name: 'ui-icons-brands',
     component: () => import('@/views/ui/icons/BrandsView.vue'),
   },
+  {
+    path: '/ui/icons/ui',
+    name: 'ui-icons-ui',
+    component: () => import('@/views/ui/icons/UiIconsView.vue'),
+  },
   // UI Complex Components
   {
     path: '/ui/complex/forms',
