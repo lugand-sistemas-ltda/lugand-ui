@@ -46,3 +46,10 @@ export { default as ComponentShowcase } from './layout/ComponentShowcase.vue'
 export { default as CodeBlock } from './layout/CodeBlock.vue'
 export { default as GridContainer } from './layout/GridContainer.vue'
 export { default as ScrollContainer } from './layout/ScrollContainer.vue'
+
+// ============================================
+// FEEDBACK - Componentes de alerta e notificação
+// ============================================
+export { default as ToastProvider } from './feedback/Toast/ToastProvider.vue'
+export { default as ToastItem } from './feedback/Toast/ToastItem.vue'
+export * from './feedback/Toast/types'

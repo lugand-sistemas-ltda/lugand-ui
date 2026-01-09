@@ -58,7 +58,11 @@ watch(
             <NavLink to="/ui/complex/forms">Forms</NavLink>
             <NavLink to="/ui/complex/tables">Tables</NavLink>
             <NavLink to="/ui/complex/modals">Modals</NavLink>
-            <NavLink to="/ui/complex/alerts">Alerts</NavLink>
+          </NavItem>
+
+          <NavItem label="Feedback" :default-expanded="true">
+            <NavLink to="/ui/feedback/alerts">Alerts</NavLink>
+            <NavLink to="/ui/feedback/toasts">Toasts</NavLink>
           </NavItem>
         </NavItem>
 
