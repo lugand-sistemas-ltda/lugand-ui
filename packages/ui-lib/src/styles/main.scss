@@ -8,6 +8,8 @@
 
 // 2. Design Tokens Globais (cores que não mudam por tema)
 @use './tokens/colors.scss';
+// Component Tokens (Tier 3 - Granularidade)
+@use './tokens/components.scss';
 
 // 3. Utilitários (variáveis, mixins, funções)
 @use './utils/variables.scss';

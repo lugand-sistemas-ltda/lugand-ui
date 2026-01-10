@@ -17,11 +17,6 @@ const routes: RouteRecordRaw[] = [
     component: () => import('@/views/ui/simple/ButtonsView.vue'),
   },
   {
-    path: '/ui/simple/inputs',
-    name: 'ui-simple-inputs',
-    component: () => import('@/views/ui/simple/InputsView.vue'),
-  },
-  {
     path: '/ui/simple/typography',
     name: 'ui-simple-typography',
     component: () => import('@/views/ui/simple/TypographyView.vue'),
@@ -35,6 +30,16 @@ const routes: RouteRecordRaw[] = [
     path: '/ui/simple/containers',
     name: 'ui-simple-containers',
     component: () => import('@/views/ui/simple/ContainersView.vue'),
+  },
+  {
+    path: '/ui/inputs/inputs',
+    name: 'ui-inputs-general',
+    component: () => import('@/views/ui/inputs/InputsView.vue'),
+  },
+  {
+    path: '/ui/inputs/selection',
+    name: 'ui-inputs-selection',
+    component: () => import('@/views/ui/inputs/SelectionControlsView.vue'),
   },
   // UI Elements
   {

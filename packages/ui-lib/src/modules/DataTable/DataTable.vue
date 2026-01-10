@@ -1,9 +1,7 @@
 <script setup lang="ts">
 import { ref, computed, watch } from 'vue'
 import type { TableColumn, SortState } from './types'
-import Checkbox from '@/shared/components/primitives/Checkbox.vue'
-import Btn from '@/shared/components/primitives/Btn.vue'
-import Input from '@/shared/components/primitives/Input.vue'
+import { Checkbox, Btn, Input } from '@/shared/components'
 
 interface Props {
     data: any[]
@@ -197,7 +195,7 @@ const isSelected = (row: any) => selectedRows.value.includes(row)
         <div v-if="pagination" class="data-table-pagination">
             <div class="pagination-info">
                 Showing {{ (currentPage - 1) * itemsPerPage + 1 }} to {{ Math.min(currentPage * itemsPerPage,
-                filteredData.length) }} of {{ filteredData.length }} entries
+                    filteredData.length) }} of {{ filteredData.length }} entries
             </div>
 
             <div class="pagination-controls">

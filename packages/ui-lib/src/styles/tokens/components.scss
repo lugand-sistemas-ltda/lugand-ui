@@ -1,0 +1,59 @@
+/**
+ * Component Design Tokens (Tier 3)
+ * Mapeia tokens semânticos (Tier 2) para componentes específicos.
+ * Permite customização granular sem afetar o sistema todo.
+ */
+
+:root {
+    // ============================================
+    // BUTTONS (--btn-*)
+    // ============================================
+    --btn-radius: var(--radius-md);
+    --btn-font-weight: var(--font-weight-medium);
+    --btn-transition: all var(--transition-fast);
+
+    // Primary
+    --btn-primary-bg: var(--color-primary);
+    --btn-primary-text: var(--color-text-inverse);
+    --btn-primary-bg-hover: var(--color-primary-hover);
+    --btn-primary-bg-active: var(--color-primary-active);
+
+    // Secondary
+    --btn-secondary-bg: var(--color-secondary);
+    --btn-secondary-text: var(--color-text-inverse);
+    --btn-secondary-bg-hover: var(--color-secondary-hover);
+    --btn-secondary-bg-active: var(--color-secondary-active);
+
+    // Ghost/Outline
+    --btn-ghost-text: var(--color-text-primary);
+    --btn-ghost-bg-hover: var(--color-bg-secondary);
+    --btn-ghost-border: var(--color-border-base);
+
+    // ============================================
+    // FORMS / INPUTS (--input-*)
+    // ============================================
+    --input-bg: var(--color-bg-primary);
+    --input-border: var(--color-border-base); // Garante visibilidade da borda usando token semântico forte
+    --input-text: var(--color-text-primary);
+    --input-placeholder: var(--color-text-tertiary);
+    --input-radius: var(--radius-md);
+    --input-height-md: 40px;
+
+    --input-focus-border: var(--color-primary);
+    --input-focus-ring: rgba(var(--color-primary-rgb), 0.2);
+
+    // ============================================
+    // SWITCH (--switch-*)
+    // ============================================
+    --switch-bg: var(--color-bg-tertiary);
+    --switch-bg-checked: var(--color-success);
+    --switch-handle: var(--color-bg-primary);
+
+    // ============================================
+    // RADIO / CHECKBOX
+    // ============================================
+    --control-border: var(--color-border-dark); // Aumentado contraste para bordas de controles não selecionados
+    --control-border-checked: var(--color-primary);
+    --control-bg-checked: var(--color-primary);
+    --control-size: 1.25rem;
+}

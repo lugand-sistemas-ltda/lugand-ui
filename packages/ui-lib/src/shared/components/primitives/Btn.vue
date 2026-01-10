@@ -36,9 +36,9 @@ withDefaults(defineProps<Props>(), {
     justify-content: center;
     gap: var(--spacing-sm);
 
-    border-radius: var(--radius-md);
-    font-weight: var(--font-weight-medium);
-    transition: all var(--transition-fast);
+    border-radius: var(--btn-radius);
+    font-weight: var(--btn-font-weight);
+    transition: var(--btn-transition);
 
     // Remove estilos nativos
     border: 1px solid transparent;
@@ -66,38 +66,38 @@ withDefaults(defineProps<Props>(), {
 
     // Variants
     &--primary {
-        background-color: var(--color-primary);
-        color: var(--color-text-inverse);
+        background-color: var(--btn-primary-bg);
+        color: var(--btn-primary-text);
 
         &:hover:not(:disabled) {
-            background-color: var(--color-primary-hover);
+            background-color: var(--btn-primary-bg-hover);
         }
 
         &:active:not(:disabled) {
-            background-color: var(--color-primary-active);
+            background-color: var(--btn-primary-bg-active);
         }
     }
 
     &--secondary {
-        background-color: var(--color-secondary);
-        color: var(--color-text-inverse);
+        background-color: var(--btn-secondary-bg);
+        color: var(--btn-secondary-text);
 
         &:hover:not(:disabled) {
-            background-color: var(--color-secondary-hover);
+            background-color: var(--btn-secondary-bg-hover);
         }
 
         &:active:not(:disabled) {
-            background-color: var(--color-secondary-active);
+            background-color: var(--btn-secondary-bg-active);
         }
     }
 
     &--ghost {
         background-color: transparent;
-        color: var(--color-text-primary);
-        border-color: var(--color-border-base);
+        color: var(--btn-ghost-text);
+        border-color: var(--btn-ghost-border);
 
         &:hover:not(:disabled) {
-            background-color: var(--color-bg-secondary);
+            background-color: var(--btn-ghost-bg-hover);
             border-color: var(--color-border-dark);
         }
 

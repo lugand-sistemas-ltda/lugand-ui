@@ -6,7 +6,7 @@
 import { computed } from 'vue'
 import { useTheme } from '@/shared/composables'
 import { themeList } from '@/core/config/themes.config'
-import Select from '@/shared/components/primitives/Select.vue'
+import { Select } from '@/shared/components'
 
 const { currentTheme, setTheme } = useTheme()
 

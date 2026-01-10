@@ -3,7 +3,7 @@
  * InputsView - Showcase de componentes Input
  */
 import { ref } from 'vue'
-import { Input, Textarea, Checkbox, Select, ComponentShowcase, CodeBlock } from '@/shared/components'
+import { Input, Textarea, ComponentShowcase, CodeBlock } from '@/shared/components'
 
 // Estados reativos para demonstração
 const textInput = ref('')
@@ -16,19 +16,6 @@ const errorInput = ref('valor com erro')
 const textareaBasic = ref('')
 const textareaWithCounter = ref('')
 const textareaLarge = ref('')
-
-// Checkbox
-const checkboxBasic = ref(false)
-const checkboxLabel = ref(true)
-const checkboxDisabled = ref(true)
-
-// Select
-const selectValue = ref('')
-const selectOptions = [
-    { label: 'Opção 1', value: 'opt1' },
-    { label: 'Opção 2', value: 'opt2' },
-    { label: 'Opção 3', value: 'opt3' },
-]
 </script>
 
 <template>
@@ -188,51 +175,7 @@ const textInput = ref('')
             </template>
         </ComponentShowcase>
 
-        <!-- Checkbox -->
-        <div class="inputs-view__header" style="margin-top: 3rem;">
-            <h1>Checkbox</h1>
-            <p class="inputs-view__description">
-                Componentes de seleção binária
-            </p>
-        </div>
 
-        <ComponentShowcase title="Checkbox Básico" description="Estados do checkbox">
-            <template #preview>
-                <div style="display: flex; flex-direction: column; gap: 1rem;">
-                    <Checkbox v-model="checkboxBasic" label="Aceito os termos" />
-                    <Checkbox v-model="checkboxLabel" label="Opção marcada" />
-                    <Checkbox v-model="checkboxDisabled" label="Desabilitado" disabled />
-                </div>
-            </template>
-            <template #code>
-                <CodeBlock :code="`<Checkbox v-model='checked' label='Aceito os termos' />`" />
-            </template>
-        </ComponentShowcase>
-
-        <!-- Select -->
-        <div class="inputs-view__header" style="margin-top: 3rem;">
-            <h1>Select</h1>
-            <p class="inputs-view__description">
-                Componente de seleção de opções
-            </p>
-        </div>
-
-        <ComponentShowcase title="Select Básico" description="Seleção simples">
-            <template #preview>
-                <div style="max-width: 300px;">
-                    <Select v-model="selectValue" :options="selectOptions" label="Escolha uma opção"
-                        placeholder="Selecione..." />
-                    <p style="margin-top: 1rem; font-size: 0.9rem;">Valor selecionado: {{ selectValue }}</p>
-                </div>
-            </template>
-            <template #code>
-                <CodeBlock :code="`<Select 
-  v-model='value' 
-  :options='options'
-  label='Escolha uma opção'
-/>`" />
-            </template>
-        </ComponentShowcase>
 
     </div>
 </template>

@@ -68,16 +68,16 @@ const toggle = () => {
     user-select: none;
 
     &__box {
-        width: 1.25rem;
-        height: 1.25rem;
-        border: 2px solid var(--color-border-base);
+        width: var(--control-size);
+        height: var(--control-size);
+        border: 2px solid var(--control-border);
         border-radius: var(--radius-sm);
-        background: var(--color-bg-primary);
+        background: var(--input-bg);
         display: flex;
         align-items: center;
         justify-content: center;
         transition: all var(--transition-fast);
-        color: var(--color-bg-primary); // Icon color when checked
+        color: var(--color-text-inverse);
     }
 
     &__icon {
@@ -104,9 +104,11 @@ const toggle = () => {
         }
     }
 
-    &[aria-checked="true"] .checkbox__box {
-        background: var(--color-primary);
-        border-color: var(--color-primary);
+    &[aria-checked="true"] {
+        .checkbox__box {
+            background-color: var(--control-bg-checked);
+            border-color: var(--control-border-checked);
+        }
     }
 }
 

@@ -9,10 +9,17 @@
 export { default as Btn } from './primitives/Btn.vue'
 export { default as BtnToggle } from './primitives/BtnToggle.vue'
 export { default as Scrollable } from './primitives/Scrollable.vue'
-export { default as Input } from './primitives/Input.vue'
-export { default as Textarea } from './primitives/Textarea.vue'
-export { default as Checkbox } from './primitives/Checkbox.vue'
-export { default as Select } from './primitives/Select.vue'
+// ============================================
+// FORM COMPONENTS - Inputs, Selects, Checks
+// ============================================
+export { default as Input } from './form/inputs/Input.vue'
+export { default as Textarea } from './form/inputs/Textarea.vue'
+export { default as Select } from './form/selects/Select.vue'
+export { default as Checkbox } from './form/selection/Checkbox.vue'
+export { default as Switch } from './form/selection/Switch/Switch.vue'
+export { default as Radio } from './form/selection/Radio/Radio.vue'
+export { default as RadioGroup } from './form/selection/Radio/RadioGroup.vue'
+
 
 // ============================================
 // FORM - Componentes de formulário

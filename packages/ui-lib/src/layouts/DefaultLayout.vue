@@ -36,22 +36,20 @@ watch(
         </NavLink>
 
         <NavItem label="UI" icon="🎨" :default-expanded="false">
-          <NavItem label="Elements" :default-expanded="true">
+          <NavItem label="Inputs" :default-expanded="true">
+            <NavLink to="/ui/inputs/inputs">General Inputs</NavLink>
+            <NavLink to="/ui/inputs/selection">Selection Controls</NavLink>
+          </NavItem>
+
+          <NavItem label="Layout & Display" :default-expanded="false">
+            <NavLink to="/ui/simple/cards">Cards</NavLink>
+            <NavLink to="/ui/simple/containers">Containers</NavLink>
+            <NavLink to="/ui/simple/typography">Typography</NavLink>
             <NavLink to="/ui/elements/display">Badges & Tooltips</NavLink>
           </NavItem>
 
-          <NavItem label="Icons" :default-expanded="true">
-            <NavLink to="/ui/icons/emojis">Emojis</NavLink>
-            <NavLink to="/ui/icons/brands">Brands</NavLink>
-            <NavLink to="/ui/icons/ui">UI Icons</NavLink>
-          </NavItem>
-
-          <NavItem label="Simple" :default-expanded="false">
+          <NavItem label="Actions" :default-expanded="false">
             <NavLink to="/ui/simple/buttons">Buttons</NavLink>
-            <NavLink to="/ui/simple/inputs">Inputs</NavLink>
-            <NavLink to="/ui/simple/typography">Typography</NavLink>
-            <NavLink to="/ui/simple/cards">Cards</NavLink>
-            <NavLink to="/ui/simple/containers">Containers</NavLink>
           </NavItem>
 
           <NavItem label="Complex" :default-expanded="false">
@@ -63,6 +61,14 @@ watch(
           <NavItem label="Feedback" :default-expanded="true">
             <NavLink to="/ui/feedback/alerts">Alerts</NavLink>
             <NavLink to="/ui/feedback/toasts">Toasts</NavLink>
+          </NavItem>
+
+
+
+          <NavItem label="Icons" :default-expanded="true">
+            <NavLink to="/ui/icons/emojis">Emojis</NavLink>
+            <NavLink to="/ui/icons/brands">Brands</NavLink>
+            <NavLink to="/ui/icons/ui">UI Icons</NavLink>
           </NavItem>
         </NavItem>
 

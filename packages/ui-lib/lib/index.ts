@@ -59,7 +59,12 @@ export {
     ComponentShowcase,
     CodeBlock,
     GridContainer,
-    ScrollContainer
+    ScrollContainer,
+
+    // Forms
+    Switch,
+    Radio,
+    RadioGroup,
 } from '../src/shared/components/index'
 
 // ============================================
