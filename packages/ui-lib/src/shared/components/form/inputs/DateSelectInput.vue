@@ -90,11 +90,11 @@ watch(() => props.modelValue, (val) => {
     <div class="date-select-input">
         <label v-if="label" class="label">{{ label }}</label>
         <div class="row">
-            <div style="flex: 2;">
-                <Select v-model="month" :options="months" placeholder="Month" />
-            </div>
             <div style="flex: 1.2;">
                 <Select v-model="day" :options="days" placeholder="Day" />
+            </div>
+            <div style="flex: 2;">
+                <Select v-model="month" :options="months" placeholder="Month" />
             </div>
             <div style="flex: 2;">
                 <Select v-model="year" :options="years" placeholder="Year" />

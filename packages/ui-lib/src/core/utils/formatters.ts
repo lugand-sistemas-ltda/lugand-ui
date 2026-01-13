@@ -55,7 +55,8 @@ export const MASKS = {
     PHONE: '(##) #####-####',
     CEP: '#####-###',
     DATE_BR: '##/##/####',
-    TIME: '##:##'
+    TIME: '##:##',
+    DATETIME_BR: '##/##/#### ##:##'
 }
 
 /**
