@@ -114,6 +114,12 @@ const selectDate = ref<Date | null>(null)
                         </div>
                         <div class="mt-4">
                             <p><strong>Birth:</strong> {{ formatDate(birthDate || '') }}</p>
+                            <p><strong>Appointment:</strong> {{ formatDate(appointment || '', {
+                                day: '2-digit', month:
+                                    '2-digit', year: 'numeric', hour: '2-digit', minute: '2-digit' }) }}</p>
+                            <p><strong>Wake Up:</strong> {{ wakeUpTime ? formatDate(wakeUpTime, {
+                                hour: '2-digit',
+                                minute: '2-digit' }) : '' }}</p>
                         </div>
                     </Card>
 
@@ -133,7 +139,8 @@ const selectDate = ref<Date | null>(null)
                             <DateInput v-model="rawIsoDate" type="date" label="ISO Date" outputFormat="iso-string" />
                         </div>
                         <div class="mt-4">
-                            <p><strong>ISO String:</strong> {{ rawIsoDate }}</p>
+                            <p><strong>ISO Raw:</strong> {{ rawIsoDate }}</p>
+                            <p><strong>Formatted:</strong> {{ formatDate(rawIsoDate) }}</p>
                         </div>
                     </Card>
                 </GridContainer>

@@ -22,8 +22,20 @@ export const parseCurrency = (value: string): number => {
 }
 
 /* --- Date --- */
-export const formatDate = (value: string | Date, options: Intl.DateTimeFormatOptions = { dateStyle: 'short' }, locale = 'pt-BR'): string => {
-    const date = typeof value === 'string' ? new Date(value) : value
+export const formatDate = (value: string | Date, options: Intl.DateTimeFormatOptions = { day: '2-digit', month: '2-digit', year: 'numeric' }, locale = 'pt-BR'): string => {
+    let date: Date;
+    if (typeof value === 'string') {
+        // Fix for ISO date strings (YYYY-MM-DD) - parse components to avoid UTC timezone shift
+        if (/^\d{4}-\d{2}-\d{2}$/.test(value)) {
+            const [y, m, d] = value.split('-').map(Number)
+            date = new Date(y || 0, (m || 1) - 1, d || 1)
+        } else {
+            date = new Date(value)
+        }
+    } else {
+        date = value;
+    }
+
     if (isNaN(date.getTime())) return ''
     return new Intl.DateTimeFormat(locale, options).format(date)
 }

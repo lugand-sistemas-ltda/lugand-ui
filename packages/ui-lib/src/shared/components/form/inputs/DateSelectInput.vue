@@ -30,20 +30,20 @@ const month = ref<string>('')
 const year = ref<string>('')
 
 // Options
-const days = computed(() => Array.from({ length: 31 }, (_, i) => ({ label: String(i + 1), value: String(i + 1) })))
+const days = computed(() => Array.from({ length: 31 }, (_, i) => ({ label: String(i + 1).padStart(2, '0'), value: String(i + 1) })))
 const months = computed(() => [
-    { label: 'January', value: '1' },
-    { label: 'February', value: '2' },
-    { label: 'March', value: '3' },
-    { label: 'April', value: '4' },
-    { label: 'May', value: '5' },
-    { label: 'June', value: '6' },
-    { label: 'July', value: '7' },
-    { label: 'August', value: '8' },
-    { label: 'September', value: '9' },
-    { label: 'October', value: '10' },
-    { label: 'November', value: '11' },
-    { label: 'December', value: '12' },
+    { label: 'Janeiro', value: '1' },
+    { label: 'Fevereiro', value: '2' },
+    { label: 'Março', value: '3' },
+    { label: 'Abril', value: '4' },
+    { label: 'Maio', value: '5' },
+    { label: 'Junho', value: '6' },
+    { label: 'Julho', value: '7' },
+    { label: 'Agosto', value: '8' },
+    { label: 'Setembro', value: '9' },
+    { label: 'Outubro', value: '10' },
+    { label: 'Novembro', value: '11' },
+    { label: 'Dezembro', value: '12' },
 ])
 
 const years = computed(() => {
