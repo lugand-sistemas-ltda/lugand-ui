@@ -46,7 +46,7 @@ const shippingOptions = [
 <template>
     <div class="switches-view">
         <div class="header">
-            <h1>Selection Controls</h1>
+            <h1>Selection Inputs</h1>
             <p class="lead">Componentes para opções booleanas e seleção única.</p>
         </div>
 

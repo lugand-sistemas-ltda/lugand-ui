@@ -21,9 +21,9 @@ const textareaLarge = ref('')
 <template>
     <div class="inputs-view">
         <div class="inputs-view__header">
-            <h1>Inputs</h1>
+            <h1>Text Inputs</h1>
             <p class="inputs-view__description">
-                Componentes de entrada de dados com suporte a validação e estados
+                Componentes de entrada de dados tipo texto com suporte a validação
             </p>
         </div>
 

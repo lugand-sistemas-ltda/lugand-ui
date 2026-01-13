@@ -32,14 +32,19 @@ const routes: RouteRecordRaw[] = [
     component: () => import('@/views/ui/simple/ContainersView.vue'),
   },
   {
-    path: '/ui/inputs/inputs',
-    name: 'ui-inputs-general',
-    component: () => import('@/views/ui/inputs/InputsView.vue'),
+    path: '/ui/inputs/text',
+    name: 'ui-inputs-text',
+    component: () => import('@/views/ui/inputs/TextInputsView.vue'),
   },
   {
     path: '/ui/inputs/selection',
     name: 'ui-inputs-selection',
-    component: () => import('@/views/ui/inputs/SelectionControlsView.vue'),
+    component: () => import('@/views/ui/inputs/SelectionInputsView.vue'),
+  },
+  {
+    path: '/ui/inputs/specialized',
+    name: 'ui-inputs-specialized',
+    component: () => import('@/views/ui/inputs/SpecializedInputsView.vue'),
   },
   // UI Elements
   {

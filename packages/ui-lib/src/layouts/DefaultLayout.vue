@@ -37,8 +37,9 @@ watch(
 
         <NavItem label="UI" icon="🎨" :default-expanded="false">
           <NavItem label="Inputs" :default-expanded="true">
-            <NavLink to="/ui/inputs/inputs">General Inputs</NavLink>
-            <NavLink to="/ui/inputs/selection">Selection Controls</NavLink>
+            <NavLink to="/ui/inputs/text">Text Inputs</NavLink>
+            <NavLink to="/ui/inputs/selection">Selection Inputs</NavLink>
+            <NavLink to="/ui/inputs/specialized">Specialized Inputs</NavLink>
           </NavItem>
 
           <NavItem label="Layout & Display" :default-expanded="false">

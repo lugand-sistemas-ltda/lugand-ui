@@ -1,11 +1,12 @@
 <script setup lang="ts">
+import { useAttrs, computed, type StyleValue } from 'vue'
 /**
  * Input - Campo de entrada de texto genérico
  * Primitivo base para formulários
  */
 interface Props {
     modelValue?: string | number
-    type?: 'text' | 'email' | 'password' | 'number' | 'tel' | 'url' | 'search'
+    type?: 'text' | 'email' | 'password' | 'number' | 'tel' | 'url' | 'search' | 'date' | 'time' | 'datetime-local' | 'month' | 'week'
     placeholder?: string
     disabled?: boolean
     readonly?: boolean
@@ -15,6 +16,10 @@ interface Props {
     label?: string
     hint?: string
 }
+
+defineOptions({
+    inheritAttrs: false
+})
 
 withDefaults(defineProps<Props>(), {
     modelValue: '',
@@ -29,6 +34,18 @@ const emit = defineEmits<{
     'update:modelValue': [value: string | number]
 }>()
 
+const attrs = useAttrs()
+
+const wrapperAttrs = computed(() => {
+    const { class: cls, style } = attrs
+    return { class: cls, style: style as StyleValue }
+})
+
+const inputAttrs = computed(() => {
+    const { class: cls, style, ...rest } = attrs
+    return rest
+})
+
 const handleInput = (event: Event) => {
     const target = event.target as HTMLInputElement
     emit('update:modelValue', target.value)
@@ -36,13 +53,14 @@ const handleInput = (event: Event) => {
 </script>
 
 <template>
-    <div :class="['input-wrapper', `input-wrapper--${size}`, { 'input-wrapper--error': error }]">
+    <div v-bind="wrapperAttrs" :class="['input-wrapper', `input-wrapper--${size}`, { 'input-wrapper--error': error }]">
         <label v-if="label" class="input-wrapper__label">
             {{ label }}
         </label>
 
-        <input :class="['input', `input--${size}`, { 'input--error': error }]" :type="type" :value="modelValue"
-            :placeholder="placeholder" :disabled="disabled" :readonly="readonly" @input="handleInput" />
+        <input v-bind="inputAttrs" :class="['input', `input--${size}`, { 'input--error': error }]" :type="type"
+            :value="modelValue" :placeholder="placeholder" :disabled="disabled" :readonly="readonly"
+            @input="handleInput" />
 
         <span v-if="hint && !error" class="input-wrapper__hint">
             {{ hint }}

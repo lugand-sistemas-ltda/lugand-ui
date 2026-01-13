@@ -5,7 +5,7 @@
  */
 interface Props {
     modelValue?: string | number
-    type?: 'text' | 'email' | 'password' | 'number' | 'tel' | 'url' | 'search'
+    type?: 'text' | 'email' | 'password' | 'number' | 'tel' | 'url' | 'search' | 'date' | 'time' | 'datetime-local' | 'month' | 'week'
     placeholder?: string
     disabled?: boolean
     readonly?: boolean
