@@ -44,6 +44,49 @@ export const isValidDate = (day: number, month: number, year: number, hour = 0, 
 }
 
 /**
+ * Retorna o dia da semana de uma data (0 = Domingo, 6 = Sábado)
+ */
+export const getDayOfWeek = (date: Date): number => {
+    return date.getDay()
+}
+
+/**
+ * Retorna o nome do dia da semana em português
+ */
+export const getDayOfWeekName = (date: Date, format: 'long' | 'short' = 'long'): string => {
+    const days = {
+        long: ['Domingo', 'Segunda-feira', 'Terça-feira', 'Quarta-feira', 'Quinta-feira', 'Sexta-feira', 'Sábado'],
+        short: ['Dom', 'Seg', 'Ter', 'Qua', 'Qui', 'Sex', 'Sáb']
+    }
+    return days[format][date.getDay()] || ''
+}
+
+/**
+ * Verifica se a data é um dia útil (segunda a sexta)
+ */
+export const isWeekday = (date: Date): boolean => {
+    const day = date.getDay()
+    return day >= 1 && day <= 5
+}
+
+/**
+ * Verifica se a data é fim de semana (sábado ou domingo)
+ */
+export const isWeekend = (date: Date): boolean => {
+    const day = date.getDay()
+    return day === 0 || day === 6
+}
+
+/**
+ * Valida se data está dentro de um range (min/max)
+ */
+export const isDateInRange = (date: Date, min?: Date | null, max?: Date | null): boolean => {
+    if (min && date < min) return false
+    if (max && date > max) return false
+    return true
+}
+
+/**
  * Converte string DD/MM/YYYY para Date object (local time)
  * Retorna null se a string for inválida ou a data for impossível
  */

@@ -83,7 +83,7 @@ const selectDate = ref<Date | null>(null)
                     <Card title="Contact & Custom">
                         <div class="col">
                             <MaskInput v-model="phone" mask="PHONE" label="Phone (BR)" />
-                            <MaskInput v-model="customMask" mask="AAA-####" label="License Plate (Custom: AAA-####)" />
+                            <MaskInput v-model="customMask" mask="AAA-####" label="Placa Veículo (ABC-1234)" placeholder="AAA-1111" />
                         </div>
                         <div class="mt-4">
                             <p><strong>Phone:</strong> {{ phone }}</p>

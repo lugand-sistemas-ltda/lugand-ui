@@ -5,9 +5,9 @@
  * Inputs separados para Dia, Mês, Ano (e Hora/Min se necessário)
  * Resolve ambiguidade de parsing e permite UX mais clara para entrada manual
  * 
- * Usa o composable useDateInput para validação e conversão centralizada
+ * Validação integrada: campos ficam vermelhos quando combinação é inválida
  */
-import { ref, watch } from 'vue'
+import { ref, watch, computed } from 'vue'
 import { isValidDate } from '@/core/utils/formatters'
 
 interface Props {
@@ -15,11 +15,14 @@ interface Props {
     label?: string
     enableTime?: boolean
     disabled?: boolean
+    error?: boolean
+    errorMessage?: string
 }
 
 const props = withDefaults(defineProps<Props>(), {
     modelValue: null,
-    enableTime: false
+    enableTime: false,
+    error: false
 })
 
 const emit = defineEmits<{
@@ -33,6 +36,14 @@ const year = ref('')
 const hour = ref('')
 const minute = ref('')
 
+// Estado de validação interna
+const hasInternalError = ref(false)
+const internalErrorMessage = ref('')
+
+// Computed: erro combinado (interno + externo)
+const computedError = computed(() => props.error || hasInternalError.value)
+const computedErrorMessage = computed(() => props.errorMessage || internalErrorMessage.value)
+
 // Sincroniza modelo externo -> campos
 watch(() => props.modelValue, (val) => {
     if (val && !Number.isNaN(val.getTime())) {
@@ -43,6 +54,8 @@ watch(() => props.modelValue, (val) => {
             hour.value = String(val.getHours()).padStart(2, '0')
             minute.value = String(val.getMinutes()).padStart(2, '0')
         }
+        hasInternalError.value = false
+        internalErrorMessage.value = ''
     } else {
         day.value = ''
         month.value = ''
@@ -52,31 +65,52 @@ watch(() => props.modelValue, (val) => {
     }
 }, { immediate: true })
 
+// Verifica se campos estão completos
+const areFieldsComplete = computed(() => {
+    const hasDate = day.value.length > 0 && month.value.length > 0 && year.value.length >= 4
+    if (props.enableTime) {
+        return hasDate && hour.value.length > 0 && minute.value.length > 0
+    }
+    return hasDate
+})
+
 // Atualiza date quando campos mudam
 const updateDate = () => {
-    const d = Number.parseInt(day.value)
-    const m = Number.parseInt(month.value)
-    const y = Number.parseInt(year.value)
-
-    // Aguarda preenchimento completo
-    if (!day.value || !month.value || !year.value) {
+    // Limpa erro se campos vazios
+    if (!day.value && !month.value && !year.value) {
+        hasInternalError.value = false
+        internalErrorMessage.value = ''
         emit('update:modelValue', null)
         return
     }
 
-    // Validação básica de ranges
-    if (y < 1000) return // Aguarda 4 dígitos
+    // Não valida enquanto está incompleto
+    if (!areFieldsComplete.value) {
+        hasInternalError.value = false
+        internalErrorMessage.value = ''
+        return
+    }
 
+    const d = Number.parseInt(day.value)
+    const m = Number.parseInt(month.value)
+    const y = Number.parseInt(year.value)
     const h = props.enableTime ? Number.parseInt(hour.value || '0') : 0
     const min = props.enableTime ? Number.parseInt(minute.value || '0') : 0
 
     // Validação semântica usando função centralizada
     if (!isValidDate(d, m, y, h, min)) {
-        // Data inválida: não emite nada (mantém estado anterior)
+        // Data inválida: marca erro
+        hasInternalError.value = true
+        internalErrorMessage.value = props.enableTime
+            ? 'Data/hora inválida. Verifique os valores informados'
+            : 'Data inválida. Verifique dia, mês e ano'
+        emit('update:modelValue', null)
         return
     }
 
-    // Constrói Date com componentes locais
+    // Data válida: limpa erro e emite
+    hasInternalError.value = false
+    internalErrorMessage.value = ''
     const newDate = new Date(y, m - 1, d, h, min, 0, 0)
     emit('update:modelValue', newDate)
 }
@@ -108,7 +142,7 @@ const handleMinute = (v: string) => {
     <div class="date-segmented">
         <label v-if="label" class="date-segmented__label">{{ label }}</label>
 
-        <div class="date-segmented__wrapper">
+        <div class="date-segmented__wrapper" :class="{ 'date-segmented__wrapper--error': computedError }">
             <!-- Day -->
             <div class="segment segment--sm">
                 <input v-model="day" @input="(e: any) => handleDay(e.target.value)" placeholder="DD"
@@ -144,6 +178,11 @@ const handleMinute = (v: string) => {
                 </div>
             </template>
         </div>
+
+        <!-- Mensagem de erro -->
+        <span v-if="computedError && computedErrorMessage" class="date-segmented__error">
+            {{ computedErrorMessage }}
+        </span>
     </div>
 </template>
 
@@ -228,6 +267,7 @@ const handleMinute = (v: string) => {
     }
 
     -moz-appearance: textfield;
+    appearance: textfield;
 }
 </style>
 
@@ -253,11 +293,27 @@ const handleMinute = (v: string) => {
         border-radius: var(--radius-md);
         background: var(--input-bg);
         width: fit-content;
+        transition: all 0.2s ease;
 
         &:focus-within {
             border-color: var(--color-primary);
             box-shadow: 0 0 0 2px var(--color-primary-light);
         }
+
+        &--error {
+            border-color: var(--color-error);
+
+            &:focus-within {
+                border-color: var(--color-error);
+                box-shadow: 0 0 0 2px var(--color-error-light);
+            }
+        }
+    }
+
+    &__error {
+        font-size: var(--font-size-sm);
+        color: var(--color-error);
+        margin-top: var(--spacing-2xs);
     }
 }
 
@@ -308,5 +364,6 @@ const handleMinute = (v: string) => {
     }
 
     -moz-appearance: textfield;
+    appearance: textfield;
 }
 </style>

@@ -8,6 +8,13 @@ export {
 
     // Date & Time - Validação
     isValidDate,
+    isDateInRange,
+
+    // Date & Time - Dias da Semana
+    getDayOfWeek,
+    getDayOfWeekName,
+    isWeekday,
+    isWeekend,
 
     // Date & Time - Parsing
     parseDateBR,
@@ -28,4 +35,3 @@ export {
     applyMask,
     unmask
 } from './formatters'
-
