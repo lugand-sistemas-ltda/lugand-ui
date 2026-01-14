@@ -109,14 +109,12 @@ const selectDate = ref<Date | null>(null)
                     <Card title="Native Date Wrappers">
                         <div class="col">
                             <DateInput v-model="birthDate" type="date" label="Birth Date" />
-                            <DateInput v-model="appointment" type="datetime-local" label="Appointment" />
-                            <DateInput v-model="wakeUpTime" type="time" label="Wake Up Time" />
-                        </div>
-                        <div class="mt-4">
                             <p><strong>Birth:</strong> {{ formatDate(birthDate || '') }}</p>
+                            <DateInput v-model="appointment" type="datetime-local" label="Appointment" />
                             <p><strong>Appointment:</strong> {{ formatDate(appointment || '', {
                                 day: '2-digit', month:
                                     '2-digit', year: 'numeric', hour: '2-digit', minute: '2-digit' }) }}</p>
+                            <DateInput v-model="wakeUpTime" type="time" label="Wake Up Time" />
                             <p><strong>Wake Up:</strong> {{ wakeUpTime ? formatDate(wakeUpTime, {
                                 hour: '2-digit',
                                 minute: '2-digit' }) : '' }}</p>
@@ -126,11 +124,9 @@ const selectDate = ref<Date | null>(null)
                     <Card title="New: Segmented & Select">
                         <div class="col">
                             <DateSegmentedInput v-model="segmentedDate" label="Segmented Date (DD/MM/YYYY)" />
-                            <DateSelectInput v-model="selectDate" label="Select Drops" />
-                        </div>
-                        <div class="mt-4">
                             <p><strong>Segmented:</strong> {{ formatDate(segmentedDate || '') }}</p>
-                            <p><strong>Select:</strong> {{ formatDate(selectDate || '') }}</p>
+                            <DateSelectInput v-model="selectDate" label="Select Drops" />
+                            <p><strong>Select:</strong> {{ formatDate(selectDate || '') }}</p>                
                         </div>
                     </Card>
 

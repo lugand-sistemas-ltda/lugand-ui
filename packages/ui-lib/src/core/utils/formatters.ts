@@ -16,34 +16,224 @@ export const formatCurrency = (value: number, locale = 'pt-BR', currency = 'BRL'
 export const parseCurrency = (value: string): number => {
     // Remove non-numeric chars except comma/dot related to currency
     // For BRL (pt-BR), 1.000,00 -> remove dots, replace comma with dot -> 1000.00
-    // Simple naive parser for BRL
     const clean = value.replace(/[^\d,]/g, '').replace(',', '.')
-    return parseFloat(clean) || 0
+    return Number.parseFloat(clean) || 0
 }
 
-/* --- Date --- */
-export const formatDate = (value: string | Date, options: Intl.DateTimeFormatOptions = { day: '2-digit', month: '2-digit', year: 'numeric' }, locale = 'pt-BR'): string => {
-    let date: Date;
+/* --- Date & Time Utils --- */
+
+/**
+ * Valida se uma data é válida semanticamente
+ * Verifica se dia/mês/ano formam uma data real (lida com anos bissextos, meses com 30/31 dias, etc)
+ */
+export const isValidDate = (day: number, month: number, year: number, hour = 0, minute = 0): boolean => {
+    // Validações básicas de range
+    if (month < 1 || month > 12) return false
+    if (day < 1 || day > 31) return false
+    if (year < 1000 || year > 9999) return false
+    if (hour < 0 || hour > 23) return false
+    if (minute < 0 || minute > 59) return false
+
+    // Validação estrita usando JS Date (detecta rolagem de data - ex: 31/02 vira 03/03)
+    const date = new Date(year, month - 1, day, hour, minute, 0, 0)
+
+    // Se a data "rolou" (ex: 31 de Fev virou 3 de Mar), é inválida
+    return date.getFullYear() === year &&
+        date.getMonth() === (month - 1) &&
+        date.getDate() === day
+}
+
+/**
+ * Converte string DD/MM/YYYY para Date object (local time)
+ * Retorna null se a string for inválida ou a data for impossível
+ */
+export const parseDateBR = (value: string): Date | null => {
+    if (!value || value.length < 10) return null
+
+    const parts = value.split('/')
+    if (parts.length !== 3) return null
+
+    const day = Number(parts[0])
+    const month = Number(parts[1])
+    const year = Number(parts[2])
+
+    if (!isValidDate(day, month, year)) return null
+
+    return new Date(year, month - 1, day, 0, 0, 0, 0)
+}
+
+/**
+ * Converte string DD/MM/YYYY HH:mm para Date object (local time)
+ * Retorna null se a string for inválida ou a data/hora for impossível
+ */
+export const parseDateTimeBR = (value: string): Date | null => {
+    if (!value || value.length < 16) return null
+
+    const [datePart, timePart] = value.split(' ')
+    if (!datePart || !timePart) return null
+
+    const dateParts = datePart.split('/')
+    const timeParts = timePart.split(':')
+
+    if (dateParts.length !== 3 || timeParts.length !== 2) return null
+
+    const day = Number(dateParts[0])
+    const month = Number(dateParts[1])
+    const year = Number(dateParts[2])
+    const hour = Number(timeParts[0])
+    const minute = Number(timeParts[1])
+
+    if (!isValidDate(day, month, year, hour, minute)) return null
+
+    return new Date(year, month - 1, day, hour, minute, 0, 0)
+}
+
+/**
+ * Converte string HH:mm para Date object (hoje com o horário especificado)
+ * Retorna null se a string for inválida
+ */
+export const parseTimeBR = (value: string): Date | null => {
+    if (!value || value.length < 5) return null
+
+    const parts = value.split(':')
+    if (parts.length !== 2) return null
+
+    const hour = Number(parts[0])
+    const minute = Number(parts[1])
+
+    if (hour < 0 || hour > 23 || minute < 0 || minute > 59) return null
+
+    const date = new Date()
+    date.setHours(hour, minute, 0, 0)
+    return date
+}
+
+/**
+ * Converte string ISO (YYYY-MM-DD ou YYYY-MM-DDTHH:mm:ss) para Date (local time)
+ * Remove timezone info para tratar como local, evitando deslocamentos UTC
+ */
+export const parseISOToLocal = (isoString: string): Date | null => {
+    if (!isoString) return null
+
+    // Remove timezone indicators (Z, +03:00, etc) e trata como local
+    const cleanISO = isoString.replace(/[TZ]/g, ' ').replace(/[+-]\d{2}:\d{2}$/, '').trim()
+    const [datePart, timePart] = cleanISO.split(' ')
+
+    if (!datePart) return null
+
+    const dateParts = datePart.split('-').map(Number)
+    if (dateParts.length !== 3) return null
+
+    const year = dateParts[0] || 0
+    const month = dateParts[1] || 0
+    const day = dateParts[2] || 0
+
+    if (timePart) {
+        const timeParts = timePart.split(':').map(Number)
+        const hour = timeParts[0] || 0
+        const minute = timeParts[1] || 0
+
+        if (!isValidDate(day, month, year, hour, minute)) return null
+        return new Date(year, month - 1, day, hour, minute, 0, 0)
+    }
+
+    if (!isValidDate(day, month, year)) return null
+    return new Date(year, month - 1, day, 0, 0, 0, 0)
+}
+
+/**
+ * Formata Date para DD/MM/YYYY
+ */
+export const formatDateBR = (date: Date | null): string => {
+    if (!date || Number.isNaN(date.getTime())) return ''
+
+    const day = String(date.getDate()).padStart(2, '0')
+    const month = String(date.getMonth() + 1).padStart(2, '0')
+    const year = date.getFullYear()
+
+    return `${day}/${month}/${year}`
+}
+
+/**
+ * Formata Date para DD/MM/YYYY HH:mm
+ */
+export const formatDateTimeBR = (date: Date | null): string => {
+    if (!date || Number.isNaN(date.getTime())) return ''
+
+    const day = String(date.getDate()).padStart(2, '0')
+    const month = String(date.getMonth() + 1).padStart(2, '0')
+    const year = date.getFullYear()
+    const hour = String(date.getHours()).padStart(2, '0')
+    const minute = String(date.getMinutes()).padStart(2, '0')
+
+    return `${day}/${month}/${year} ${hour}:${minute}`
+}
+
+/**
+ * Formata Date para HH:mm
+ */
+export const formatTimeBR = (date: Date | null): string => {
+    if (!date || Number.isNaN(date.getTime())) return ''
+
+    const hour = String(date.getHours()).padStart(2, '0')
+    const minute = String(date.getMinutes()).padStart(2, '0')
+
+    return `${hour}:${minute}`
+}
+
+/**
+ * Formata Date para ISO (YYYY-MM-DD)
+ */
+export const toISODate = (date: Date | null): string => {
+    if (!date || Number.isNaN(date.getTime())) return ''
+
+    const year = date.getFullYear()
+    const month = String(date.getMonth() + 1).padStart(2, '0')
+    const day = String(date.getDate()).padStart(2, '0')
+
+    return `${year}-${month}-${day}`
+}
+
+/**
+ * Formata Date para ISO DateTime (YYYY-MM-DDTHH:mm:ss)
+ */
+export const toISODateTime = (date: Date | null): string => {
+    if (!date || Number.isNaN(date.getTime())) return ''
+    return date.toISOString()
+}
+
+/**
+ * Função genérica de formatação usando Intl.DateTimeFormat
+ * Mantida para compatibilidade com código existente
+ */
+export const formatDate = (
+    value: string | Date,
+    options?: Intl.DateTimeFormatOptions,
+    locale = 'pt-BR'
+): string => {
+    const defaultOptions: Intl.DateTimeFormatOptions = {
+        day: '2-digit',
+        month: '2-digit',
+        year: 'numeric'
+    }
+
+    const finalOptions = options || defaultOptions
+
+    let date: Date | null = null;
+
     if (typeof value === 'string') {
-        // Fix for ISO date strings (YYYY-MM-DD) - parse components to avoid UTC timezone shift
-        if (/^\d{4}-\d{2}-\d{2}$/.test(value)) {
-            const [y, m, d] = value.split('-').map(Number)
-            date = new Date(y || 0, (m || 1) - 1, d || 1)
-        } else {
-            date = new Date(value)
-        }
+        // Tenta parsear ISO primeiro
+        date = parseISOToLocal(value)
+        // Se falhar, tenta formato BR
+        date ??= parseDateBR(value)
+        // Se falhar, tenta DateTime BR
+        date ??= parseDateTimeBR(value)
     } else {
         date = value;
     }
 
-    if (isNaN(date.getTime())) return ''
-    return new Intl.DateTimeFormat(locale, options).format(date)
-}
-
-// ISO Format YYYY-MM-DD
-export const toISODate = (date: Date): string => {
-    if (isNaN(date.getTime())) return ''
-    return date.toISOString().split('T')[0] || ''
+    if (!date || Number.isNaN(date.getTime())) return ''
+    return new Intl.DateTimeFormat(locale, finalOptions).format(date)
 }
 
 /* --- Masks --- */
@@ -112,5 +302,5 @@ export const applyMask = (value: string, mask: string): string => {
 
 // Removes all non-alphanumeric characters
 export const unmask = (value: string): string => {
-    return value.replace(/[^a-zA-Z0-9]/g, '')
+    return value.replace(/[^a-zA-Z0-9]/g, '') // Keep .replace for compatibility
 }

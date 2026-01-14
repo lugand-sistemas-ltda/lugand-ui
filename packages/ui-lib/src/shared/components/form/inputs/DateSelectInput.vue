@@ -1,36 +1,49 @@
 <script setup lang="ts">
 /**
  * DateSelectInput
- * Seleção de data via listas (Selects)
- * Ideal para DOB, agendamentos simples, etc.
+ * 
+ * Seleção de data via dropdowns (Selects)
+ * Ideal para DOB (data de nascimento), agendamentos simples
+ * 
+ * Usa validação centralizada para garantir datas válidas (ex: ajusta 31/Fev para 28/29)
  */
 import { ref, computed, watch } from 'vue'
 import { Select } from '@/shared/components'
+import { isValidDate } from '@/core/utils/formatters'
 
 interface Props {
     modelValue: Date | null
     label?: string
     startYear?: number
     endYear?: number
+    disabled?: boolean
 }
 
 const props = withDefaults(defineProps<Props>(), {
     modelValue: null,
     startYear: 1900,
-    endYear: new Date().getFullYear() + 10
+    endYear: new Date().getFullYear() + 10,
+    disabled: false
 })
 
 const emit = defineEmits<{
     'update:modelValue': [value: Date | null]
 }>()
 
-// State
+// Estado dos selects
 const day = ref<string>('')
 const month = ref<string>('')
 const year = ref<string>('')
 
-// Options
-const days = computed(() => Array.from({ length: 31 }, (_, i) => ({ label: String(i + 1).padStart(2, '0'), value: String(i + 1) })))
+// Opções de dias (1-31)
+const days = computed(() =>
+    Array.from({ length: 31 }, (_, i) => ({
+        label: String(i + 1).padStart(2, '0'),
+        value: String(i + 1)
+    }))
+)
+
+// Opções de meses (pt-BR)
 const months = computed(() => [
     { label: 'Janeiro', value: '1' },
     { label: 'Fevereiro', value: '2' },
@@ -46,6 +59,7 @@ const months = computed(() => [
     { label: 'Dezembro', value: '12' },
 ])
 
+// Opções de anos (decrescente: mais recente primeiro)
 const years = computed(() => {
     const list = []
     for (let y = props.endYear; y >= props.startYear; y--) {
@@ -54,36 +68,54 @@ const years = computed(() => {
     return list
 })
 
-// Max day validator check (e.g. Feb 31)
+// Ajusta dia se exceder máximo do mês (ex: 31/Fev -> 28 ou 29)
 const adjustDay = () => {
     if (!day.value || !month.value || !year.value) return
-    const d = parseInt(day.value)
-    const m = parseInt(month.value)
-    const y = parseInt(year.value)
-    const date = new Date(y, m, 0) // Last day of month
-    if (d > date.getDate()) {
-        day.value = String(date.getDate())
+
+    const d = Number.parseInt(day.value)
+    const m = Number.parseInt(month.value)
+    const y = Number.parseInt(year.value)
+
+    // Valida se a data é possível
+    if (!isValidDate(d, m, y)) {
+        // Encontra o último dia válido do mês
+        const lastDayOfMonth = new Date(y, m, 0).getDate()
+        if (d > lastDayOfMonth) {
+            day.value = String(lastDayOfMonth)
+        }
     }
 }
 
+// Atualiza modelo quando qualquer campo muda
 watch([day, month, year], () => {
     adjustDay()
+
     if (day.value && month.value && year.value) {
-        emit('update:modelValue', new Date(parseInt(year.value), parseInt(month.value) - 1, parseInt(day.value)))
+        const d = Number.parseInt(day.value)
+        const m = Number.parseInt(month.value)
+        const y = Number.parseInt(year.value)
+
+        // Valida antes de emitir
+        if (isValidDate(d, m, y)) {
+            emit('update:modelValue', new Date(y, m - 1, d, 0, 0, 0, 0))
+        }
     } else {
-        // emit('update:modelValue', null) // Only clear if strictly needed
+        emit('update:modelValue', null)
     }
 })
 
-// Sync from Model
+// Sincroniza modelo externo -> campos
 watch(() => props.modelValue, (val) => {
-    if (val && !isNaN(val.getTime())) {
+    if (val && !Number.isNaN(val.getTime())) {
         day.value = String(val.getDate())
         month.value = String(val.getMonth() + 1)
         year.value = String(val.getFullYear())
+    } else {
+        day.value = ''
+        month.value = ''
+        year.value = ''
     }
 }, { immediate: true })
-
 </script>
 
 <template>
@@ -91,17 +123,38 @@ watch(() => props.modelValue, (val) => {
         <label v-if="label" class="label">{{ label }}</label>
         <div class="row">
             <div style="flex: 1.2;">
-                <Select v-model="day" :options="days" placeholder="Day" />
+                <Select v-model="day" :options="days" placeholder="Dia" :disabled="disabled" />
             </div>
             <div style="flex: 2;">
-                <Select v-model="month" :options="months" placeholder="Month" />
+                <Select v-model="month" :options="months" placeholder="Mês" :disabled="disabled" />
             </div>
             <div style="flex: 2;">
-                <Select v-model="year" :options="years" placeholder="Year" />
+                <Select v-model="year" :options="years" placeholder="Ano" :disabled="disabled" />
             </div>
         </div>
     </div>
 </template>
+
+<style lang="scss" scoped>
+.date-select-input {
+    display: flex;
+    flex-direction: column;
+    gap: var(--spacing-xs);
+}
+
+.label {
+    font-size: var(--font-size-sm);
+    font-weight: var(--font-weight-medium);
+    color: var(--color-text-primary);
+}
+
+.row {
+    display: flex;
+    gap: var(--spacing-sm);
+    width: 100%;
+}
+</style>
+
 
 <style lang="scss" scoped>
 .date-select-input {
