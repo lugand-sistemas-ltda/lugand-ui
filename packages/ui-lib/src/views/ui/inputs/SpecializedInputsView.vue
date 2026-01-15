@@ -23,20 +23,14 @@ const cpf = ref('')
 const cnpj = ref('')
 const phone = ref('')
 const customMask = ref('') // AAA-9999
-const unmaskedValue = ref('')
 
 // Dates
 const birthDate = ref<Date | null>(null) // Date object
 const appointment = ref<Date | null>(new Date('2023-12-25T14:30:00')) // Date object
-const wakeUpTime = ref(null) // Date/Time object
-const rawIsoDate = ref('') // ISO string mode
+const wakeUpTime = ref<Date | null>(null) // Date/Time object
 const segmentedDate = ref<Date | null>(null)
 const segmentedDateTime = ref<Date | null>(null)
 const selectDate = ref<Date | null>(null)
-
-// Test: Invalid dates to demonstrate validation
-const invalidDate = ref<Date | null>(null)
-const invalidSegmented = ref<Date | null>(null)
 </script>
 
 <template>
@@ -111,65 +105,100 @@ const invalidSegmented = ref<Date | null>(null)
         <ComponentShowcase title="Date & Time"
             description="Date parsing and formatting. Returns Date objects or ISO strings. Protected against invalid characters (letters, symbols, SQL injection).">
             <template #preview>
-                <GridContainer :cols="2">
-                    <Card title="DateInput (Masked: DD/MM/YYYY)">
-                        <div class="col">
-                            <DateInput v-model="birthDate" type="date" label="Birth Date" />
-                            <p><strong>Birth:</strong> {{ formatDate(birthDate || '') }}</p>
+                <!-- Normal Date (Masked Input) -->
+                <Card title="Normal Date (Masked Input)">
+                    <GridContainer :cols="3">
+                        <!-- Birth Date -->
+                        <Card title="Birth Date (DD/MM/YYYY)">
+                            <div class="col">
+                                <DateInput v-model="birthDate" type="date" label="Birth Date" />
+                                <div class="output-section">
+                                    <p><strong>Formatted:</strong> {{ formatDate(birthDate || '') }}</p>
+                                    <p><strong>ISO String:</strong>
+                                        <code>{{ birthDate?.toISOString() || 'null' }}</code></p>
+                                </div>
+                            </div>
+                        </Card>
 
-                            <DateInput v-model="appointment" type="datetime-local" label="Appointment" />
-                            <p><strong>Appointment:</strong> {{ formatDate(appointment || '', {
-                                day: '2-digit', month: '2-digit', year: 'numeric', hour: '2-digit', minute: '2-digit'
-                            })
-                                }}</p>
+                        <!-- Appointment (Date + Time) -->
+                        <Card title="Appointment (DD/MM/YYYY HH:mm)">
+                            <div class="col">
+                                <DateInput v-model="appointment" type="datetime-local" label="Appointment" />
+                                <div class="output-section">
+                                    <p><strong>Formatted:</strong> {{ formatDate(appointment || '', {
+                                        day: '2-digit', month: '2-digit', year: 'numeric', hour: '2-digit', minute:
+                                            '2-digit'
+                                        }) }}</p>
+                                    <p><strong>ISO String:</strong>
+                                        <code>{{ appointment?.toISOString() || 'null' }}</code></p>
+                                </div>
+                            </div>
+                        </Card>
 
-                            <DateInput v-model="wakeUpTime" type="time" label="Wake Up Time" />
-                            <p><strong>Wake Up:</strong> {{ wakeUpTime ? formatDate(wakeUpTime, {
-                                hour: '2-digit', minute: '2-digit'
-                            }) : '' }}</p>
+                        <!-- Wake Up Time -->
+                        <Card title="Wake Up Time (HH:mm)">
+                            <div class="col">
+                                <DateInput v-model="wakeUpTime" type="time" label="Wake Up Time" />
+                                <div class="output-section">
+                                    <p><strong>Formatted:</strong> {{ wakeUpTime ? formatDate(wakeUpTime, {
+                                        hour: '2-digit', minute: '2-digit'
+                                    }) : 'null' }}</p>
+                                    <p><strong>ISO String:</strong>
+                                        <code>{{ wakeUpTime?.toISOString() || 'null' }}</code></p>
+                                </div>
+                            </div>
+                        </Card>
+                    </GridContainer>
+                </Card>
 
-                            <DateInput v-model="invalidDate" type="date" label="🛡️ Test: Try 'aaa', '///', '31/02'" />
-                            <p v-if="invalidDate"><strong>Valid Date:</strong> {{ formatDate(invalidDate) }}</p>
-                            <p v-else style="color: var(--color-text-tertiary); font-style: italic;">Invalid input will
-                                show error</p>
-                        </div>
-                    </Card>
+                <!-- Segmented Date (Individual Fields) -->
+                <Card title="Segmented Date (Individual Fields)">
+                    <GridContainer :cols="2">
+                        <!-- Segmented Date Only -->
+                        <Card title="Segmented Date (DD | MM | YYYY)">
+                            <div class="col">
+                                <DateSegmentedInput v-model="segmentedDate" label="Segmented Date" />
+                                <div class="output-section">
+                                    <p><strong>Formatted:</strong> {{ formatDate(segmentedDate || '') }}</p>
+                                    <p><strong>ISO String:</strong>
+                                        <code>{{ segmentedDate?.toISOString() || 'null' }}</code></p>
+                                </div>
+                            </div>
+                        </Card>
 
-                    <Card title="DateSegmentedInput (DD | MM | YYYY)">
-                        <div class="col">
-                            <DateSegmentedInput v-model="segmentedDate" label="Segmented Date" />
-                            <p><strong>Segmented:</strong> {{ formatDate(segmentedDate || '') }}</p>
+                        <!-- Segmented With Time -->
+                        <Card title="With Time (DD | MM | YYYY | HH | mm)">
+                            <div class="col">
+                                <DateSegmentedInput v-model="segmentedDateTime" label="With Time" :enable-time="true" />
+                                <div class="output-section">
+                                    <p><strong>Formatted:</strong> {{ segmentedDateTime ? formatDate(segmentedDateTime,
+                                        {
+                                            day: '2-digit', month: '2-digit', year: 'numeric', hour: '2-digit', minute:
+                                        '2-digit'
+                                        }) : 'null' }}</p>
+                                    <p><strong>ISO String:</strong>
+                                        <code>{{ segmentedDateTime?.toISOString() || 'null' }}</code></p>
+                                </div>
+                            </div>
+                        </Card>
+                    </GridContainer>
+                </Card>
 
-                            <DateSegmentedInput v-model="segmentedDateTime" label="With Time" :enable-time="true" />
-                            <p><strong>DateTime:</strong> {{ segmentedDateTime ? formatDate(segmentedDateTime, {
-                                day: '2-digit', month: '2-digit', year: 'numeric', hour: '2-digit', minute: '2-digit'
-                            })
-                                : '' }}</p>
-
-                            <DateSegmentedInput v-model="invalidSegmented" label="🛡️ Test: Try letters in fields" />
-                            <p v-if="invalidSegmented"><strong>Valid:</strong> {{ formatDate(invalidSegmented) }}</p>
-                            <p v-else style="color: var(--color-text-tertiary); font-style: italic;">Only numbers
-                                accepted (0-9)</p>
-                        </div>
-                    </Card>
-
-                    <Card title="DateSelectInput (Dropdowns)">
-                        <div class="col">
-                            <DateSelectInput v-model="selectDate" label="Select Drops" />
-                            <p><strong>Select:</strong> {{ formatDate(selectDate || '') }}</p>
-                        </div>
-                    </Card>
-
-                    <Card title="ISO String Mode">
-                        <div class="col">
-                            <DateInput v-model="rawIsoDate" type="date" label="ISO Date" outputFormat="iso-string" />
-                        </div>
-                        <div class="mt-4">
-                            <p><strong>ISO Raw:</strong> {{ rawIsoDate }}</p>
-                            <p><strong>Formatted:</strong> {{ formatDate(rawIsoDate) }}</p>
-                        </div>
-                    </Card>
-                </GridContainer>
+                <!-- Select Drops (Dropdown Selects) -->
+                <Card title="Select Drops (Dropdown Selects)">
+                    <GridContainer :cols="1">
+                        <Card title="Select Date (Day / Month / Year)">
+                            <div class="col">
+                                <DateSelectInput v-model="selectDate" label="Select Date" />
+                                <div class="output-section">
+                                    <p><strong>Formatted:</strong> {{ formatDate(selectDate || '') }}</p>
+                                    <p><strong>ISO String:</strong>
+                                        <code>{{ selectDate?.toISOString() || 'null' }}</code></p>
+                                </div>
+                            </div>
+                        </Card>
+                    </GridContainer>
+                </Card>
 
                 <!-- Security Info -->
                 <Card title="🛡️ Security Features">
@@ -242,6 +271,33 @@ const invalidSegmented = ref<Date | null>(null)
     display: flex;
     flex-direction: column;
     gap: var(--spacing-md);
+}
+
+.output-section {
+    margin-top: var(--spacing-md);
+    padding: var(--spacing-sm);
+    background: var(--color-bg-tertiary);
+    border-radius: var(--radius-sm);
+    border-left: 3px solid var(--color-primary);
+
+    p {
+        margin: var(--spacing-xs) 0;
+        font-size: var(--font-size-sm);
+        color: var(--color-text-secondary);
+
+        &:first-child {
+            margin-top: 0;
+        }
+
+        &:last-child {
+            margin-bottom: 0;
+        }
+
+        strong {
+            color: var(--color-text-primary);
+            font-weight: var(--font-weight-semibold);
+        }
+    }
 }
 
 .mt-4 {
