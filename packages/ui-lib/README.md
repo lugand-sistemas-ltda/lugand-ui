@@ -1,103 +1,145 @@
-# UI Component Library 🎨
+# 🎨 Lugand UI Library
 
-> Biblioteca base de componentes UI construída com **Vue 3**, **TypeScript** e **Vite**  
-> Projetada para ser a fundação de múltiplos aplicativos
+> Modern Vue 3 component library built with TypeScript, featuring dynamic theming and secure input handling.
 
 ---
 
-## ✨ Características
+## ✨ Features
 
-- ⚡ **Vite** - Build rápido e HMR instantâneo
-- 🎯 **Vue 3 Composition API** - Moderna e reativa
-- 📘 **TypeScript** - Type-safe
-- 🎨 **Sistema de Design Atômico** - Variáveis CSS customizáveis
-- 🌓 **Temas Dinâmicos** - Light/Dark mode ready
-- 📦 **Feature-based** - Arquitetura modular
-- ♿ **Acessível** - Padrões de acessibilidade
-- 🚀 **Performance** - Lazy loading e otimizações
+- ⚡ **Vue 3 + Vite** - Fast builds and instant HMR
+- 📘 **TypeScript** - Fully typed components
+- 🎨 **10 Built-in Themes** - Dynamic theme switching
+- 🔒 **Secure Inputs** - Date inputs with validation and sanitization
+- ♿ **Accessible** - WCAG 2.1 compliant
+- 📦 **Tree-shakeable** - Import only what you need
+- 🚀 **Performance** - Optimized for production
 
 ---
 
 ## 🚀 Quick Start
 
+### Development
+
 ```bash
-# Instalar dependências
+# Install dependencies
 npm install
 
-# Rodar em desenvolvimento
+# Run showcase (development)
 npm run dev
 
-# Build para produção
-npm run build
+# Build library for distribution
+npm run build:lib
 
-# Preview do build
+# Preview production build
 npm run preview
 ```
 
----
+### Installation (NPM)
 
-## 📖 Documentação
-
-Consulte **[ARCHITECTURE.md](./ARCHITECTURE.md)** para:
-
-- Estrutura detalhada de pastas
-- Sistema de design (variáveis CSS, mixins)
-- Padrões de desenvolvimento
-- Roadmap e próximos passos
-
----
-
-## 🎨 Sistema de Estilos
-
-### Variáveis CSS Disponíveis
-
-```css
-/* Spacing */
---spacing-xs, --spacing-sm, --spacing-md, --spacing-lg...
-
-/* Typography */
---font-size-xs, --font-size-sm, --font-size-md...
---font-weight-regular, --font-weight-medium...
-
-/* Colors */
---color-bg-primary, --color-text-primary...
---color-primary, --color-secondary...
-
-/* Outros */
---radius-sm, --radius-md, --radius-lg...
---transition-fast, --transition-base...
+```bash
+npm install @lugand/vue-ui-lib
 ```
 
-### Mixins SCSS
+### Usage
 
-```scss
-@import "@/styles/utils/mixins.scss";
+```vue
+<script setup lang="ts">
+import { Btn, Input, DateInput, Card } from "@lugand/vue-ui-lib";
+import "@lugand/vue-ui-lib/style.css";
+import { ref } from "vue";
 
-.component {
-  @include flex-center;
-  @include mobile {
-    // Mobile styles
-  }
-}
+const name = ref("");
+const birthDate = ref<Date | null>(null);
+</script>
+
+<template>
+  <Card title="User Form">
+    <Input v-model="name" label="Name" />
+    <DateInput v-model="birthDate" type="date" label="Birth Date" />
+    <Btn @click="submit">Submit</Btn>
+  </Card>
+</template>
 ```
 
 ---
 
-Contém a lógica fundamental e configurações que sustentam toda a aplicação.
+## � Documentation
 
-### Shared
+Complete documentation available in the `/docs` folder:
 
-Recursos verdadeiramente genéricos que podem ser usados em qualquer lugar.
+- **[README](./docs/README.md)** - Overview and getting started
+- **[ARCHITECTURE](./docs/ARCHITECTURE.md)** - Project structure and patterns
+- **[COMPONENTS](./docs/COMPONENTS.md)** - Component API reference
+- **[THEMES](./docs/THEMES.md)** - Theming system guide
+- **[CHANGELOG](./docs/CHANGELOG.md)** - Version history
 
-### Features
+---
 
-Cada feature representa um tipo de componente UI (botões, cards, etc.) e é auto-contida com seus próprios components, composables e types.
+## 🎯 Component Highlights
 
-### Layouts
+### Secure Date Inputs
 
-Sistema de layouts hierárquicos e reutilizáveis.
+```vue
+<!-- Blocks letters, validates ranges, returns Date objects -->
+<DateInput v-model="date" type="date" label="Birth Date" />
+<DateSegmentedInput v-model="dateTime" enable-time />
+```
 
-### Views
+### Dynamic Theming
+
+```vue
+<script setup>
+import { useTheme } from "@lugand/vue-ui-lib";
+const { setTheme } = useTheme();
+setTheme("dark"); // 10 themes available
+</script>
+```
+
+### Form Components
+
+```vue
+<CurrencyInput v-model="price" label="Price" />
+<MaskInput v-model="cpf" mask="CPF" label="CPF" />
+<Input v-model="email" type="email" label="Email" />
+```
+
+---
+
+## 📦 Project Structure
+
+```
+packages/ui-lib/
+├── src/               # Source code
+├── lib/               # Build output (library)
+├── dist/              # Build output (showcase)
+└── docs/              # Documentation
+    ├── README.md      # Getting started
+    ├── ARCHITECTURE.md
+    ├── COMPONENTS.md
+    ├── THEMES.md
+    └── CHANGELOG.md
+```
+
+---
+
+## 🤝 Contributing
+
+See [CONTRIBUTING.md](./CONTRIBUTING.md) for development guidelines.
+
+---
+
+## 📝 License
+
+MIT © Lugand Sistemas
+
+---
+
+## 🔗 Links
+
+- [NPM Package](https://www.npmjs.com/package/@lugand/vue-ui-lib)
+- [GitHub Repository](https://github.com/lugand-sistemas-ltda/lugand-ui)
+- [Documentation](./docs/README.md)
+- [Changelog](./docs/CHANGELOG.md)
 
 Páginas da aplicação com suporte a rotas pai/filho em múltiplas camadas.
 

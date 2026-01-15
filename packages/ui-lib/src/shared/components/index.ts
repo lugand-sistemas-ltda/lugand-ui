@@ -9,6 +9,12 @@
 export { default as Btn } from './primitives/Btn.vue'
 export { default as BtnToggle } from './primitives/BtnToggle.vue'
 export { default as Scrollable } from './primitives/Scrollable.vue'
+
+// ============================================
+// FORM PRIMITIVES - Inputs base especializados
+// ============================================
+export { default as NumericTextInput } from './form/primitives/NumericTextInput.vue'
+
 // ============================================
 // FORM COMPONENTS - Inputs, Selects, Checks
 // ============================================

@@ -2,10 +2,14 @@
 /**
  * MaskInput - Campo com máscara
  * Suporta máscaras predefinidas (CPF, CNPJ, etc) ou personalizadas
+ * 
+ * Usa NumericTextInput para máscaras numéricas (garantindo type="text")
+ * Usa Input genérico para máscaras alfanuméricas
  */
 import { computed, ref, watch } from 'vue'
 import { MASKS, applyMask, unmask } from '@/core/utils/formatters'
 import Input from './Input.vue'
+import NumericTextInput from '../primitives/NumericTextInput.vue'
 
 interface Props {
     modelValue: string
@@ -33,14 +37,22 @@ const maskPattern = computed(() => {
     return (MASKS as any)[props.mask] || props.mask
 })
 
+// Detecta se é máscara numérica (não contém 'A')
+const isNumericMask = computed(() => !maskPattern.value.includes('A'))
+
+// Caracteres permitidos para NumericTextInput (inclui separadores de máscara)
+const allowedChars = computed(() => {
+    if (isNumericMask.value) {
+        return '0-9/:.-' // Números + separadores comuns de datas/documentos
+    }
+    return '0-9a-zA-Z' // Alfanumérico
+})
+
 // Local display value
 const displayValue = ref('')
 
 // Watch model changes to update display
 watch(() => props.modelValue, (newVal) => {
-    // If model is unmasked (which is the goal), we masker it for display
-    // If model is already masked, applyMask should handle it gracefully if we strip first
-    // Usually we assume model comes in clean if emitUnmasked is true
     if (newVal === undefined || newVal === null) {
         displayValue.value = ''
         return
@@ -58,11 +70,13 @@ const handleInput = (val: string | number) => {
     const isAlphanumeric = maskPattern.value.includes('A')
 
     // Clean input respecting the mask type
+    // SECURITY: Remove all non-allowed characters to prevent injection attacks
     let clean = ''
     if (isAlphanumeric) {
+        // Allow letters and numbers only (no symbols, no SQL, no scripts)
         clean = newVal.replace(/[^a-zA-Z0-9]/g, '')
     } else {
-        // Strict numeric masking if mask has only #
+        // Strict numeric masking: ONLY digits (prevents 'aaa', '////', 'drop db', etc)
         clean = newVal.replace(/\D/g, '')
     }
 
@@ -79,10 +93,24 @@ const handleInput = (val: string | number) => {
         emit('update:modelValue', masked)
     }
 }
+
+// Computed: Atributos de segurança para inputs numéricos (date, time, etc)
+const inputSecurityAttrs = computed(() => {
+    return {
+        type: 'text' as const
+    }
+})
+
 </script>
 
 <template>
-    <Input :model-value="displayValue" @update:model-value="handleInput" :label="label" :placeholder="placeholder"
+    <!-- Usa NumericTextInput para máscaras numéricas (datas, CPF, etc) -->
+    <NumericTextInput v-if="isNumericMask" :model-value="displayValue" :label="label" :placeholder="placeholder"
         :error="error" :error-message="errorMessage" :disabled="disabled" :size="size" :hint="hint"
-        :maxlength="maskPattern.length" />
+        :maxlength="maskPattern.length" :allowed-chars="allowedChars" @update:model-value="handleInput" />
+
+    <!-- Usa Input genérico para máscaras alfanuméricas (placas, etc) -->
+    <Input v-else v-bind="inputSecurityAttrs" :model-value="displayValue" :label="label" :placeholder="placeholder"
+        :error="error" :error-message="errorMessage" :disabled="disabled" :size="size" :hint="hint"
+        :maxlength="maskPattern.length" @update:model-value="handleInput" />
 </template>

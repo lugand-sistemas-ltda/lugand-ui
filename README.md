@@ -1,310 +1,249 @@
-# Lugand UI - Monorepo
+# 🎨 Lugand UI - Monorepo
 
-> Sistema de componentes UI Vue 3 + TypeScript organizado como monorepo usando **npm workspaces**.
+> Modern Vue 3 component library built with TypeScript, featuring dynamic theming and secure inputs.
 
-## 📁 Estrutura
+---
+
+## � Packages
 
 ```
 lugand-ui/
 ├── packages/
-│   ├── ui-lib/          # 📦 Biblioteca de componentes (publicável)
-│   └── test-ui-lib/     # 🧪 App de testes e validação
-└── docs/                # 📚 Documentação
+│   ├── ui-lib/          # Component library (publishable to NPM)
+│   └── test-ui-lib/     # Test application
+└── docs/                # Monorepo documentation
 ```
+
+### **[@lugand/vue-ui-lib](./packages/ui-lib/)**
+
+The main component library with:
+
+- 🎯 40+ Vue 3 components
+- 🎨 10 built-in themes
+- � Secure date/currency inputs
+- ♿ WCAG 2.1 accessible
+- 📦 Tree-shakeable
+
+**[View Library Documentation →](./packages/ui-lib/docs/README.md)**
+
+### **[@lugand/test-ui-lib](./packages/test-ui-lib/)**
+
+Test application for integration testing and development.
 
 ---
 
-## 🚀 Início Rápido
+## 🚀 Quick Start
 
-### 1️⃣ Instalar Dependências
+### Installation
 
 ```bash
+# Install all workspace dependencies
 npm install
 ```
 
-### 2️⃣ Desenvolvimento
+### Development
 
 ```bash
-# App de testes (builda lib automaticamente)
-npm run dev
-# → http://localhost:5173
-
-# Showcase da biblioteca
+# Run library showcase (recommended)
 npm run dev:lib
 # → http://localhost:5174
+
+# Run test application
+npm run dev:test
+# → http://localhost:5173
 ```
 
-### 3️⃣ Build
+### Build
 
 ```bash
-# Build da biblioteca (para publicação)
+# Build library for NPM
 npm run build:lib
 
-# Build do app de testes
+# Build test application
 npm run build:test
 
-# Build de tudo
+# Build everything
 npm run build:all
 ```
 
 ---
 
-## 📦 Pacotes
+## 📚 Documentation
 
-### @lugand/vue-ui-lib
-
-Biblioteca principal de componentes Vue 3.
-
-- **Path**: `packages/ui-lib/`
-- **Entry**: `lib/index.ts`
-- **Output**: `dist/vue-ui-lib.js` + `dist/style.css`
-- **Bundle**: ~28 KB (gzipped: ~7.5 KB)
-
-**Exports:**
-
-- Componentes (Btn, Input, Navbar, etc)
-- Módulos (DynamicForm, DataTable, AppLayout)
-- Composables (useTheme)
-- Tipos TypeScript
-- 10 temas pré-configurados
-
-### test-ui-lib
-
-Aplicação para testar e validar componentes em ambiente real.
-
-- **Path**: `packages/test-ui-lib/`
-- **Dependência**: `@lugand/vue-ui-lib: "*"` (symlink local)
+- **[Library Docs](./packages/ui-lib/docs/README.md)** - Getting started, components, theming
+- **[Architecture](./packages/ui-lib/docs/ARCHITECTURE.md)** - Project structure and patterns
+- **[Components](./packages/ui-lib/docs/COMPONENTS.md)** - Complete API reference
+- **[Themes](./packages/ui-lib/docs/THEMES.md)** - Theming system
+- **[Changelog](./packages/ui-lib/docs/CHANGELOG.md)** - Version history
 
 ---
 
-## 🛠️ Comandos
+## 🎯 Features
 
-### Workspace Raiz
+### Secure Date Inputs
+
+```vue
+<!-- Blocks letters, validates ranges, returns Date objects -->
+<DateInput v-model="date" type="date" label="Birth Date" />
+<DateSegmentedInput v-model="dateTime" enable-time />
+```
+
+### Dynamic Theming
+
+```vue
+<script setup>
+import { useTheme } from "@lugand/vue-ui-lib";
+const { setTheme } = useTheme();
+setTheme("dark"); // 10 themes: default, dark, ocean, forest, cyberpunk...
+</script>
+```
+
+### Form Components
+
+```vue
+<CurrencyInput v-model="price" label="Price" />
+<MaskInput v-model="cpf" mask="CPF" label="CPF" />
+<Input v-model="email" type="email" label="Email" />
+```
+
+---
+
+## �️ Development Commands
+
+### Workspace Root
 
 ```bash
-# Desenvolvimento
-npm run dev              # App de testes (builda lib antes)
-npm run dev:lib          # Showcase da biblioteca
+# Development
+npm run dev:lib          # Library showcase (recommended)
+npm run dev:test         # Test application
 
 # Build
-npm run build:lib        # Build apenas da biblioteca
-npm run build:test       # Build apenas do app de testes
-npm run build:all        # Build de tudo
+npm run build:lib        # Build library for NPM
+npm run build:test       # Build test application
+npm run build:all        # Build everything
 
-# Manutenção
-npm run type-check       # Verificar tipos TypeScript
-npm run clean            # Limpar builds e caches
-
-# Instalar em workspace específico
-npm install <package> --workspace=@lugand/vue-ui-lib
-npm install <package> --workspace=test-ui-lib
+# Maintenance
+npm run type-check       # TypeScript type checking
+npm run lint             # Code linting
+npm run format           # Code formatting
 ```
 
-### Workspaces Individuais
+### Package-specific Commands
 
 ```bash
-# ui-lib
+# Navigate to package
 cd packages/ui-lib
-npm run dev          # Showcase (dev)
-npm run build:lib    # Build da biblioteca
-npm run preview      # Preview do build
 
-# test-ui-lib
-cd packages/test-ui-lib
-npm run dev          # Dev server
-npm run build        # Build de produção
+# Run package commands
+npm run dev              # Development server
+npm run build:lib        # Build library
+npm run preview          # Preview production build
 ```
 
 ---
 
-## 🎨 Temas Disponíveis
+## 📋 Workspace Configuration
 
-A biblioteca inclui 10 temas prontos:
+### NPM Workspaces
 
-- `default` - Tema padrão clean
-- `dark` - Tema escuro moderno
-- `cyberpunk` - Neon futurista
-- `dracula` - Roxo elegante
-- `forest` - Verde natural
-- `ocean` - Azul profundo
-- `pcpr` - Polícia Civil do Paraná
-- `pretona` - Polícia Militar
-- `bombeiros` - Corpo de Bombeiros
-- `viatura` - Tema operacional
-
----
-
-## 📚 Documentação
-
-- **[Início Rápido](docs/QUICK_START.md)** - Guia de primeiros passos
-- **[Comandos](docs/COMMANDS.md)** - Referência completa de comandos
-- **[Workflow](docs/WORKFLOW.md)** - Guias de desenvolvimento
-- **[Arquitetura](packages/ui-lib/ARCHITECTURE.md)** - Estrutura da biblioteca
-- **[Design Tokens](packages/ui-lib/DESIGN_TOKENS.md)** - Sistema de tokens
-- **[Temas](packages/ui-lib/THEMES.md)** - Customização de temas
-
----
-
-## ✅ Checklist Pré-Commit
-
-- [ ] `npm run build:lib` executa sem erros
-- [ ] `npm run dev` funciona (ui-lib e test-ui-lib)
-- [ ] `npm run type-check` sem erros TypeScript
-- [ ] Navegador sem erros de console
-- [ ] Componentes renderizam corretamente
-- [ ] Estilos CSS aplicados
-
----
-
-## 🔄 Workflow de Desenvolvimento
-
-1. **Desenvolver** componentes em `packages/ui-lib/src/`
-2. **Testar** no showcase (`npm run dev:lib`)
-3. **Validar** no contexto real (`npm run dev` em test-ui-lib)
-4. **Build** da biblioteca (`npm run build:lib`)
-5. **Commit** quando estável
-
----
-
-## 📄 Licença
-
-MIT - Lugand Sistemas
-
-# Build da biblioteca
-
-npm run build:lib
-
-# Build do app de testes
-
-npm run build:test
-
-# Build de tudo
-
-npm run build:all
-
-# Verificar tipos TypeScript
-
-npm run type-check
-
-# Limpar tudo
-
-npm run clean
-
-# Instalar dependência em um workspace específico
-
-npm install <package> --workspace=@lugand/vue-ui-lib
-npm install <package> --workspace=test-ui-lib
-
-# Rodar comando em todos os workspaces
-
-npm run <script> --workspaces
-
-````
-
-### Em cada workspace:
-
-```bash
-cd packages/ui-lib
-npm run dev          # Showcase da biblioteca
-npm run build        # Build completo (showcase)
-npm run build:lib    # Build da biblioteca (publicação)
-npm run preview      # Preview do build
-
-cd packages/test-ui-lib
-npm run dev          # Servidor de desenvolvimento
-npm run build        # Build de produção
-npm run type-check   # Verificar tipos TypeScript
-````
-
-## 🔗 Dependências entre Workspaces
-
-O `test-ui-lib` usa a biblioteca local:
+Defined in root `package.json`:
 
 ```json
 {
+  "workspaces": ["packages/*"]
+}
+```
+
+**Benefits:**
+
+- ✅ Shared `node_modules` (hoisting)
+- ✅ Local package symlinks (no `npm link`)
+- ✅ Unified dependency management
+- ✅ Parallel builds
+
+### Package Linking
+
+Test app automatically uses latest library code:
+
+```json
+// packages/test-ui-lib/package.json
+{
   "dependencies": {
-    "@lugand/vue-ui-lib": "*"
+    "@lugand/vue-ui-lib": "*" // ← Symlink to local package
   }
 }
 ```
 
-O npm workspaces cria um symlink automático entre os pacotes.
+---
 
-## 📝 Arquivos Importantes
+## 📊 Package Details
 
-### Configuração do Monorepo
+### @lugand/vue-ui-lib
 
-- `package.json` - Configuração do workspace raiz
-- `packages/*/package.json` - Configuração de cada workspace
+**Purpose:** Component library for NPM distribution
 
-### TypeScript
+**Location:** `packages/ui-lib/`
 
-- `packages/ui-lib/tsconfig.json` - Config base da biblioteca
-- `packages/ui-lib/tsconfig.app.json` - Config da aplicação
-- `packages/ui-lib/tsconfig.node.json` - Config do Node (Vite)
+**Build Output:**
 
-### Vite
+- `lib/index.js` - ES module
+- `lib/style.css` - Compiled styles
+- `lib/*.d.ts` - TypeScript declarations
 
-- `packages/ui-lib/vite.config.ts` - Dev server (showcase)
-- `packages/ui-lib/vite.config.lib.ts` - Build da biblioteca
-- `packages/test-ui-lib/vite.config.ts` - App de testes
+**Bundle Size:** ~28 KB (gzipped: ~7.5 KB)
 
-## 🎨 Temas
+**Exports:**
 
-A biblioteca suporta múltiplos temas:
+- Components (40+)
+- Composables (useTheme, useDateInput)
+- Types (Theme, FormField, TableColumn)
+- Themes (10 pre-built)
 
-- default
-- dark
-- cyberpunk
-- dracula
-- forest
-- ocean
-- pcpr
-- pretona
-- bombeiros
-- viatura
+### @lugand/test-ui-lib
 
-## 📚 Documentação Adicional
+**Purpose:** Integration testing and development
 
-- [ui-lib/README.md](packages/ui-lib/README.md) - Documentação da biblioteca
-- [ui-lib/ARCHITECTURE.md](packages/ui-lib/ARCHITECTURE.md) - Arquitetura detalhada
-- [ui-lib/DESIGN_TOKENS.md](packages/ui-lib/DESIGN_TOKENS.md) - Sistema de tokens
-- [ui-lib/THEMES.md](packages/ui-lib/THEMES.md) - Sistema de temas
+**Location:** `packages/test-ui-lib/`
 
-## � Documentação
+**Features:**
 
-- **[Documentação Completa](docs/INDEX.md)** - Índice de toda documentação
-- **[Guia de Comandos](docs/COMMANDS.md)** - Referência de comandos
-- **[Workflows](docs/WORKFLOW.md)** - Guias de desenvolvimento
-- **[Arquitetura](packages/ui-lib/ARCHITECTURE.md)** - Arquitetura da biblioteca
-- **[Design Tokens](packages/ui-lib/DESIGN_TOKENS.md)** - Sistema de tokens
-- **[Temas](packages/ui-lib/THEMES.md)** - Sistema de temas
+- Real-world usage scenarios
+- Component integration tests
+- Development playground
 
-## �🔄 Workflow de Desenvolvimento
+---
 
-1. **Desenvolver componentes** em `packages/ui-lib/`
-2. **Testar em tempo real** no showcase (`npm run dev` em ui-lib)
-3. **Validar em contexto real** no `test-ui-lib`
-4. **Build da biblioteca** com `npm run build:lib`
-5. **Publicar** quando estiver pronto
+## 🎨 Tech Stack
 
-## 📋 Checklist antes do Commit
+- **Vue 3** - Progressive JavaScript framework
+- **TypeScript** - Type-safe development
+- **Vite** - Fast build tool
+- **SCSS** - CSS preprocessor
+- **NPM Workspaces** - Monorepo management
 
-- [ ] `npm run build:lib` executa sem erros
-- [ ] `npm run dev` funciona em ambos os workspaces
-- [ ] TypeScript compila sem erros (`npm run type-check`)
-- [ ] Estilos CSS são gerados corretamente
-- [ ] Componentes são exportados em `lib/index.ts`
-- [ ] Documentação atualizada
+---
 
-## 🚧 Próximos Passos
+## 🤝 Contributing
 
-- [ ] Adicionar testes unitários (Vitest)
-- [ ] Configurar CI/CD
-- [ ] Adicionar Storybook (opcional)
-- [ ] Configurar linting e formatting (ESLint + Prettier)
-- [ ] Adicionar pre-commit hooks (Husky)
+1. Clone repository
+2. Install dependencies: `npm install`
+3. Create feature branch: `git checkout -b feature/my-feature`
+4. Make changes in `packages/ui-lib/`
+5. Test in showcase: `npm run dev:lib`
+6. Commit: `git commit -m "feat: add feature"`
+7. Push and open PR
 
-## 📄 Licença
+---
 
-MIT - Lugand Sistemas
+## 📝 License
+
+MIT © Lugand Sistemas
+
+---
+
+## 🔗 Links
+
+- [NPM Package](https://www.npmjs.com/package/@lugand/vue-ui-lib)
+- [GitHub Repository](https://github.com/lugand-sistemas-ltda/lugand-ui)
+- [Documentation](./packages/ui-lib/docs/README.md)
+- [Changelog](./packages/ui-lib/docs/CHANGELOG.md)

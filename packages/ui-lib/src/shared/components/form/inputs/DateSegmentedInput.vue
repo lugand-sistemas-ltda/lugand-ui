@@ -6,9 +6,11 @@
  * Resolve ambiguidade de parsing e permite UX mais clara para entrada manual
  * 
  * Validação integrada: campos ficam vermelhos quando combinação é inválida
+ * Usa NumericTextInput para garantir que apenas números sejam aceitos
  */
 import { ref, watch, computed } from 'vue'
 import { isValidDate } from '@/core/utils/formatters'
+import NumericTextInput from '../primitives/NumericTextInput.vue'
 
 interface Props {
     modelValue: Date | null
@@ -115,25 +117,65 @@ const updateDate = () => {
     emit('update:modelValue', newDate)
 }
 
-// Handlers com limitação de caracteres
+// Handlers com validação de range
 const handleDay = (v: string) => {
-    day.value = v.slice(0, 2)
+    const sanitized = v.slice(0, 2)
+    const num = Number.parseInt(sanitized)
+
+    // Permite 0-3 como primeiro dígito, mas limita range completo a 01-31
+    if (sanitized.length === 2 && (num < 1 || num > 31)) {
+        day.value = sanitized.slice(0, 1) // Mantém apenas primeiro dígito
+        return
+    }
+
+    day.value = sanitized
     updateDate()
 }
+
 const handleMonth = (v: string) => {
-    month.value = v.slice(0, 2)
+    const sanitized = v.slice(0, 2)
+    const num = Number.parseInt(sanitized)
+
+    // Permite 0-1 como primeiro dígito, mas limita range completo a 01-12
+    if (sanitized.length === 2 && (num < 1 || num > 12)) {
+        month.value = sanitized.slice(0, 1) // Mantém apenas primeiro dígito
+        return
+    }
+
+    month.value = sanitized
     updateDate()
 }
+
 const handleYear = (v: string) => {
     year.value = v.slice(0, 4)
     updateDate()
 }
+
 const handleHour = (v: string) => {
-    hour.value = v.slice(0, 2)
+    const sanitized = v.slice(0, 2)
+    const num = Number.parseInt(sanitized)
+
+    // Permite 0-2 como primeiro dígito, mas limita range completo a 00-23
+    if (sanitized.length === 2 && num > 23) {
+        hour.value = sanitized.slice(0, 1) // Mantém apenas primeiro dígito
+        return
+    }
+
+    hour.value = sanitized
     updateDate()
 }
+
 const handleMinute = (v: string) => {
-    minute.value = v.slice(0, 2)
+    const sanitized = v.slice(0, 2)
+    const num = Number.parseInt(sanitized)
+
+    // Permite 0-5 como primeiro dígito, mas limita range completo a 00-59
+    if (sanitized.length === 2 && num > 59) {
+        minute.value = sanitized.slice(0, 1) // Mantém apenas primeiro dígito
+        return
+    }
+
+    minute.value = sanitized
     updateDate()
 }
 </script>
@@ -144,38 +186,28 @@ const handleMinute = (v: string) => {
 
         <div class="date-segmented__wrapper" :class="{ 'date-segmented__wrapper--error': computedError }">
             <!-- Day -->
-            <div class="segment segment--sm">
-                <input v-model="day" @input="(e: any) => handleDay(e.target.value)" placeholder="DD"
-                    class="segment-input" type="number" :disabled="disabled" />
-            </div>
+            <NumericTextInput :model-value="day" placeholder="DD" :disabled="disabled" :maxlength="2"
+                @update:model-value="handleDay" />
             <span class="separator">/</span>
 
             <!-- Month -->
-            <div class="segment segment--sm">
-                <input v-model="month" @input="(e: any) => handleMonth(e.target.value)" placeholder="MM"
-                    class="segment-input" type="number" :disabled="disabled" />
-            </div>
+            <NumericTextInput :model-value="month" placeholder="MM" :disabled="disabled" :maxlength="2"
+                @update:model-value="handleMonth" />
             <span class="separator">/</span>
 
             <!-- Year -->
-            <div class="segment segment--lg">
-                <input v-model="year" @input="(e: any) => handleYear(e.target.value)" placeholder="YYYY"
-                    class="segment-input" type="number" :disabled="disabled" />
-            </div>
+            <NumericTextInput :model-value="year" placeholder="YYYY" :disabled="disabled" :maxlength="4"
+                @update:model-value="handleYear" />
 
             <!-- Time (opcional) -->
             <template v-if="enableTime">
                 <span class="separator separator--space">às</span>
 
-                <div class="segment segment--sm">
-                    <input v-model="hour" @input="(e: any) => handleHour(e.target.value)" placeholder="HH"
-                        class="segment-input" type="number" :disabled="disabled" />
-                </div>
+                <NumericTextInput :model-value="hour" placeholder="HH" :disabled="disabled" :maxlength="2"
+                    @update:model-value="handleHour" />
                 <span class="separator">:</span>
-                <div class="segment segment--sm">
-                    <input v-model="minute" @input="(e: any) => handleMinute(e.target.value)" placeholder="mm"
-                        class="segment-input" type="number" :disabled="disabled" />
-                </div>
+                <NumericTextInput :model-value="minute" placeholder="mm" :disabled="disabled" :maxlength="2"
+                    @update:model-value="handleMinute" />
             </template>
         </div>
 
@@ -185,92 +217,6 @@ const handleMinute = (v: string) => {
         </span>
     </div>
 </template>
-
-<style lang="scss" scoped>
-.date-segmented {
-    display: flex;
-    flex-direction: column;
-    gap: var(--spacing-xs);
-
-    &__label {
-        font-size: var(--font-size-sm);
-        font-weight: var(--font-weight-medium);
-        color: var(--color-text-primary);
-    }
-
-    &__wrapper {
-        display: flex;
-        align-items: center;
-        gap: var(--spacing-xs);
-        padding: var(--spacing-xs);
-        border: 1px solid var(--color-border-base);
-        border-radius: var(--radius-md);
-        background: var(--input-bg);
-        width: fit-content;
-
-        &:focus-within {
-            border-color: var(--color-primary);
-            box-shadow: 0 0 0 2px var(--color-primary-light);
-        }
-    }
-}
-
-.separator {
-    color: var(--color-text-tertiary);
-    font-weight: bold;
-
-    &--space {
-        margin: 0 var(--spacing-xs);
-        font-size: 0.8em;
-        text-transform: uppercase;
-    }
-}
-
-.segment {
-    position: relative;
-
-    &--sm {
-        width: 32px;
-    }
-
-    &--lg {
-        width: 48px;
-    }
-}
-
-.segment-input {
-    width: 100%;
-    border: none;
-    background: transparent;
-    text-align: center;
-    font-size: var(--font-size-md);
-    color: var(--color-text-primary);
-    padding: 0;
-    margin: 0;
-
-    &:focus {
-        outline: none;
-        background: var(--color-bg-tertiary);
-        border-radius: var(--radius-sm);
-    }
-
-    &:disabled {
-        opacity: 0.6;
-        cursor: not-allowed;
-    }
-
-    // Hide number spinners
-    &::-webkit-outer-spin-button,
-    &::-webkit-inner-spin-button {
-        -webkit-appearance: none;
-        margin: 0;
-    }
-
-    -moz-appearance: textfield;
-    appearance: textfield;
-}
-</style>
-
 
 <style lang="scss" scoped>
 .date-segmented {
@@ -308,6 +254,38 @@ const handleMinute = (v: string) => {
                 box-shadow: 0 0 0 2px var(--color-error-light);
             }
         }
+
+        // Override NumericTextInput styles for inline display
+        :deep(.numeric-input-wrapper) {
+            width: auto;
+            min-width: 0;
+        }
+
+        :deep(.numeric-input) {
+            width: 32px; // Day, Month, Hour, Minute
+            border: none;
+            background: transparent;
+            text-align: center;
+            padding: 0;
+            margin: 0;
+            box-shadow: none !important;
+
+            &:focus {
+                outline: none;
+                background: var(--color-bg-tertiary);
+                border-radius: var(--radius-sm);
+            }
+
+            &:disabled {
+                opacity: 0.6;
+                cursor: not-allowed;
+            }
+        }
+
+        // Year field is wider
+        :deep(.numeric-input-wrapper:nth-child(5) .numeric-input) {
+            width: 48px;
+        }
     }
 
     &__error {
@@ -326,44 +304,5 @@ const handleMinute = (v: string) => {
         font-size: 0.8em;
         text-transform: uppercase;
     }
-}
-
-.segment {
-    position: relative;
-
-    &--sm {
-        width: 32px;
-    }
-
-    &--lg {
-        width: 48px;
-    }
-}
-
-.segment-input {
-    width: 100%;
-    border: none;
-    background: transparent;
-    text-align: center;
-    font-size: var(--font-size-md);
-    color: var(--color-text-primary);
-    padding: 0;
-    margin: 0;
-
-    &:focus {
-        outline: none;
-        background: var(--color-bg-tertiary);
-        border-radius: var(--radius-sm);
-    }
-
-    // Hide number spinners
-    &::-webkit-outer-spin-button,
-    &::-webkit-inner-spin-button {
-        -webkit-appearance: none;
-        margin: 0;
-    }
-
-    -moz-appearance: textfield;
-    appearance: textfield;
 }
 </style>

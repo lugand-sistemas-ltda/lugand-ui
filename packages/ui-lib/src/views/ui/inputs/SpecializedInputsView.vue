@@ -31,7 +31,12 @@ const appointment = ref<Date | null>(new Date('2023-12-25T14:30:00')) // Date ob
 const wakeUpTime = ref(null) // Date/Time object
 const rawIsoDate = ref('') // ISO string mode
 const segmentedDate = ref<Date | null>(null)
+const segmentedDateTime = ref<Date | null>(null)
 const selectDate = ref<Date | null>(null)
+
+// Test: Invalid dates to demonstrate validation
+const invalidDate = ref<Date | null>(null)
+const invalidSegmented = ref<Date | null>(null)
 </script>
 
 <template>
@@ -83,7 +88,8 @@ const selectDate = ref<Date | null>(null)
                     <Card title="Contact & Custom">
                         <div class="col">
                             <MaskInput v-model="phone" mask="PHONE" label="Phone (BR)" />
-                            <MaskInput v-model="customMask" mask="AAA-####" label="Placa Veículo (ABC-1234)" placeholder="AAA-1111" />
+                            <MaskInput v-model="customMask" mask="AAA-####" label="Placa Veículo (ABC-1234)"
+                                placeholder="AAA-1111" />
                         </div>
                         <div class="mt-4">
                             <p><strong>Phone:</strong> {{ phone }}</p>
@@ -103,30 +109,54 @@ const selectDate = ref<Date | null>(null)
 
         <!-- Date / Time -->
         <ComponentShowcase title="Date & Time"
-            description="Date parsing and formatting. Returns Date objects or ISO strings.">
+            description="Date parsing and formatting. Returns Date objects or ISO strings. Protected against invalid characters (letters, symbols, SQL injection).">
             <template #preview>
                 <GridContainer :cols="2">
-                    <Card title="Native Date Wrappers">
+                    <Card title="DateInput (Masked: DD/MM/YYYY)">
                         <div class="col">
                             <DateInput v-model="birthDate" type="date" label="Birth Date" />
                             <p><strong>Birth:</strong> {{ formatDate(birthDate || '') }}</p>
+
                             <DateInput v-model="appointment" type="datetime-local" label="Appointment" />
                             <p><strong>Appointment:</strong> {{ formatDate(appointment || '', {
-                                day: '2-digit', month:
-                                    '2-digit', year: 'numeric', hour: '2-digit', minute: '2-digit' }) }}</p>
+                                day: '2-digit', month: '2-digit', year: 'numeric', hour: '2-digit', minute: '2-digit'
+                            })
+                                }}</p>
+
                             <DateInput v-model="wakeUpTime" type="time" label="Wake Up Time" />
                             <p><strong>Wake Up:</strong> {{ wakeUpTime ? formatDate(wakeUpTime, {
-                                hour: '2-digit',
-                                minute: '2-digit' }) : '' }}</p>
+                                hour: '2-digit', minute: '2-digit'
+                            }) : '' }}</p>
+
+                            <DateInput v-model="invalidDate" type="date" label="🛡️ Test: Try 'aaa', '///', '31/02'" />
+                            <p v-if="invalidDate"><strong>Valid Date:</strong> {{ formatDate(invalidDate) }}</p>
+                            <p v-else style="color: var(--color-text-tertiary); font-style: italic;">Invalid input will
+                                show error</p>
                         </div>
                     </Card>
 
-                    <Card title="New: Segmented & Select">
+                    <Card title="DateSegmentedInput (DD | MM | YYYY)">
                         <div class="col">
-                            <DateSegmentedInput v-model="segmentedDate" label="Segmented Date (DD/MM/YYYY)" />
+                            <DateSegmentedInput v-model="segmentedDate" label="Segmented Date" />
                             <p><strong>Segmented:</strong> {{ formatDate(segmentedDate || '') }}</p>
+
+                            <DateSegmentedInput v-model="segmentedDateTime" label="With Time" :enable-time="true" />
+                            <p><strong>DateTime:</strong> {{ segmentedDateTime ? formatDate(segmentedDateTime, {
+                                day: '2-digit', month: '2-digit', year: 'numeric', hour: '2-digit', minute: '2-digit'
+                            })
+                                : '' }}</p>
+
+                            <DateSegmentedInput v-model="invalidSegmented" label="🛡️ Test: Try letters in fields" />
+                            <p v-if="invalidSegmented"><strong>Valid:</strong> {{ formatDate(invalidSegmented) }}</p>
+                            <p v-else style="color: var(--color-text-tertiary); font-style: italic;">Only numbers
+                                accepted (0-9)</p>
+                        </div>
+                    </Card>
+
+                    <Card title="DateSelectInput (Dropdowns)">
+                        <div class="col">
                             <DateSelectInput v-model="selectDate" label="Select Drops" />
-                            <p><strong>Select:</strong> {{ formatDate(selectDate || '') }}</p>                
+                            <p><strong>Select:</strong> {{ formatDate(selectDate || '') }}</p>
                         </div>
                     </Card>
 
@@ -140,17 +170,45 @@ const selectDate = ref<Date | null>(null)
                         </div>
                     </Card>
                 </GridContainer>
+
+                <!-- Security Info -->
+                <Card title="🛡️ Security Features">
+                    <div
+                        style="padding: var(--spacing-md); background: var(--color-bg-tertiary); border-radius: var(--radius-md);">
+                        <h4 style="margin-bottom: var(--spacing-sm); color: var(--color-primary);">Protected Against:
+                        </h4>
+                        <ul
+                            style="list-style: none; padding: 0; display: flex; flex-direction: column; gap: var(--spacing-xs);">
+                            <li>❌ Letters: <code>'aaaaaaaaaa'</code> → Removed automatically</li>
+                            <li>❌ Symbols: <code>'//////////'</code> → Removed automatically</li>
+                            <li>❌ SQL Injection: <code>'drop database'</code> → Removed automatically</li>
+                            <li>❌ XSS: <code>&lt;script&gt;alert()&lt;/script&gt;</code> → Removed automatically</li>
+                            <li>⚠️ Invalid Dates: <code>'99/99/9999'</code>, <code>'31/02/2024'</code> → Visual error
+                                (red border + message)</li>
+                        </ul>
+                    </div>
+                </Card>
             </template>
             <template #code>
                 <CodeBlock language="html" code='
-<!-- Standard Wrapper -->
+<!-- Standard Wrapper (Masked Input) -->
 <DateInput v-model="date" type="date" />
+<DateInput v-model="datetime" type="datetime-local" />
+<DateInput v-model="time" type="time" />
 
-<!-- Segmented (Inputs) -->
+<!-- Segmented (Individual Fields) -->
 <DateSegmentedInput v-model="date" />
+<DateSegmentedInput v-model="datetime" :enable-time="true" />
 
 <!-- Dropdown Selects -->
 <DateSelectInput v-model="date" />
+
+<!-- All components automatically:
+     - Block non-numeric characters (a-z, symbols, etc)
+     - Validate calendar dates (31/02 marked as error)
+     - Show visual feedback (red border + message)
+     - Return Date objects or ISO strings
+-->
                 ' />
             </template>
         </ComponentShowcase>
@@ -190,5 +248,22 @@ const selectDate = ref<Date | null>(null)
     margin-top: var(--spacing-md);
     font-size: 0.9em;
     color: var(--color-text-secondary);
+}
+
+code {
+    font-family: 'Courier New', monospace;
+    background: var(--color-bg-secondary);
+    padding: 2px 6px;
+    border-radius: 4px;
+    font-size: 0.9em;
+}
+
+ul {
+    margin-left: var(--spacing-md);
+}
+
+h4 {
+    font-size: var(--font-size-lg);
+    font-weight: var(--font-weight-semibold);
 }
 </style>

@@ -21,7 +21,7 @@ defineOptions({
     inheritAttrs: false
 })
 
-withDefaults(defineProps<Props>(), {
+const props = withDefaults(defineProps<Props>(), {
     modelValue: '',
     type: 'text',
     disabled: false,
@@ -46,10 +46,40 @@ const inputAttrs = computed(() => {
     return rest
 })
 
+// Computed: Tipo de input (prioriza attrs.type sobre props.type)
+const inputType = computed(() => {
+    // Se passou type via v-bind (como MaskInput faz), usa esse
+    if (attrs.type) {
+        return attrs.type as string
+    }
+    // Senão usa a prop type
+    return props.type
+})
+
 const handleInput = (event: Event) => {
     const target = event.target as HTMLInputElement
-    emit('update:modelValue', target.value)
+    let value: string | number = target.value
+
+    // SECURITY: For number inputs, sanitize to prevent injection
+    if (inputType.value === 'number' && typeof value === 'string') {
+        // Remove all non-numeric characters (except decimal point and minus sign)
+        value = value.replace(/[^\d.-]/g, '')
+    }
+
+    emit('update:modelValue', value)
 }
+
+// Computed: Atributos adicionais de segurança para inputs numéricos
+const inputSecurityAttrs = computed(() => {
+    if (inputType.value === 'number') {
+        return {
+            inputmode: 'numeric' as const,
+            pattern: '[0-9]*'
+        }
+    }
+    return {}
+})
+
 </script>
 
 <template>
@@ -58,9 +88,9 @@ const handleInput = (event: Event) => {
             {{ label }}
         </label>
 
-        <input v-bind="inputAttrs" :class="['input', `input--${size}`, { 'input--error': error }]" :type="type"
-            :value="modelValue" :placeholder="placeholder" :disabled="disabled" :readonly="readonly"
-            @input="handleInput" />
+        <input v-bind="{ ...inputAttrs, ...inputSecurityAttrs }"
+            :class="['input', `input--${size}`, { 'input--error': error }]" :type="inputType" :value="modelValue"
+            :placeholder="placeholder" :disabled="disabled" :readonly="readonly" @input="handleInput" />
 
         <span v-if="hint && !error" class="input-wrapper__hint">
             {{ hint }}
@@ -107,27 +137,12 @@ const handleInput = (event: Event) => {
 
 .input {
     width: 100%;
-
     background: var(--input-bg);
     border: 1px solid var(--input-border);
     border-radius: var(--input-radius);
-
     color: var(--input-text);
     font-family: inherit;
     font-weight: var(--font-weight-normal);
-    transition: all var(--transition-fast);
-
-    &::placeholder {
-        color: var(--input-placeholder);
-    }
-
-    &:focus {
-        outline: none;
-        border-color: var(--input-focus-border);
-        box-shadow: 0 0 0 3px var(--input-focus-ring);
-    }
-
-
     transition: all var(--transition-fast);
 
     &::placeholder {
