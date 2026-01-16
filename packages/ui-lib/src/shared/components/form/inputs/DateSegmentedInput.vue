@@ -65,12 +65,13 @@ watch(() => props.modelValue, (val, oldVal) => {
 
     if (val && !Number.isNaN(val.getTime())) {
         // Aplica padding APENAS quando sincroniza de fora (props externa mudou)
-        day.value = String(val.getDate()).padStart(2, '0')
-        month.value = String(val.getMonth() + 1).padStart(2, '0')
-        year.value = String(val.getFullYear())
+        // Lê valores em UTC para manter consistência com Date.UTC()
+        day.value = String(val.getUTCDate()).padStart(2, '0')
+        month.value = String(val.getUTCMonth() + 1).padStart(2, '0')
+        year.value = String(val.getUTCFullYear())
         if (props.enableTime) {
-            hour.value = String(val.getHours()).padStart(2, '0')
-            minute.value = String(val.getMinutes()).padStart(2, '0')
+            hour.value = String(val.getUTCHours()).padStart(2, '0')
+            minute.value = String(val.getUTCMinutes()).padStart(2, '0')
         }
         hasInternalError.value = false
         internalErrorMessage.value = ''
@@ -131,10 +132,21 @@ const updateDate = () => {
         return
     }
 
-    // Se não mostra campos de data, usa data atual
-    const d = props.showDateFields ? Number.parseInt(day.value) : 1
-    const m = props.showDateFields ? Number.parseInt(month.value) : 1
-    const y = props.showDateFields ? Number.parseInt(year.value) : 1970
+    // Se não mostra campos de data, usa data padrão (hoje, mas com hora zerada em UTC)
+    let d: number, m: number, y: number
+
+    if (props.showDateFields) {
+        d = Number.parseInt(day.value)
+        m = Number.parseInt(month.value)
+        y = Number.parseInt(year.value)
+    } else {
+        // Time Only: usa data atual (UTC) para evitar timezone issues
+        const now = new Date()
+        d = now.getUTCDate()
+        m = now.getUTCMonth() + 1
+        y = now.getUTCFullYear()
+    }
+
     const h = props.enableTime ? Number.parseInt(hour.value || '0') : 0
     const min = props.enableTime ? Number.parseInt(minute.value || '0') : 0
 
@@ -154,7 +166,10 @@ const updateDate = () => {
     // Data válida: limpa erro e emite
     hasInternalError.value = false
     internalErrorMessage.value = ''
-    const newDate = new Date(y, m - 1, d, h, min, 0, 0)
+
+    // Cria Date em UTC para evitar problemas de timezone
+    // Date.UTC() retorna timestamp, new Date() converte para objeto Date
+    const newDate = new Date(Date.UTC(y, m - 1, d, h, min, 0, 0))
 
     // Sinaliza que é update interno (evita watch reagir)
     isInternalUpdate.value = true

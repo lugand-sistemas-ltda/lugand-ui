@@ -257,10 +257,11 @@ export const formatDate = (
     const defaultOptions: Intl.DateTimeFormatOptions = {
         day: '2-digit',
         month: '2-digit',
-        year: 'numeric'
+        year: 'numeric',
+        timeZone: 'UTC' // SEMPRE usa UTC para evitar problemas de timezone
     }
 
-    const finalOptions = options || defaultOptions
+    const finalOptions = { ...defaultOptions, ...options }
 
     let date: Date | null = null;
 
