@@ -30,6 +30,7 @@ const appointment = ref<Date | null>(new Date('2023-12-25T14:30:00')) // Date ob
 const wakeUpTime = ref<Date | null>(null) // Date/Time object
 const segmentedDate = ref<Date | null>(null)
 const segmentedDateTime = ref<Date | null>(null)
+const segmentedTimeOnly = ref<Date | null>(null) // Teste: apenas HH:mm
 const selectDate = ref<Date | null>(null)
 </script>
 
@@ -115,7 +116,8 @@ const selectDate = ref<Date | null>(null)
                                 <div class="output-section">
                                     <p><strong>Formatted:</strong> {{ formatDate(birthDate || '') }}</p>
                                     <p><strong>ISO String:</strong>
-                                        <code>{{ birthDate?.toISOString() || 'null' }}</code></p>
+                                        <code>{{ birthDate?.toISOString() || 'null' }}</code>
+                                    </p>
                                 </div>
                             </div>
                         </Card>
@@ -128,9 +130,10 @@ const selectDate = ref<Date | null>(null)
                                     <p><strong>Formatted:</strong> {{ formatDate(appointment || '', {
                                         day: '2-digit', month: '2-digit', year: 'numeric', hour: '2-digit', minute:
                                             '2-digit'
-                                        }) }}</p>
+                                    }) }}</p>
                                     <p><strong>ISO String:</strong>
-                                        <code>{{ appointment?.toISOString() || 'null' }}</code></p>
+                                        <code>{{ appointment?.toISOString() || 'null' }}</code>
+                                    </p>
                                 </div>
                             </div>
                         </Card>
@@ -144,7 +147,8 @@ const selectDate = ref<Date | null>(null)
                                         hour: '2-digit', minute: '2-digit'
                                     }) : 'null' }}</p>
                                     <p><strong>ISO String:</strong>
-                                        <code>{{ wakeUpTime?.toISOString() || 'null' }}</code></p>
+                                        <code>{{ wakeUpTime?.toISOString() || 'null' }}</code>
+                                    </p>
                                 </div>
                             </div>
                         </Card>
@@ -153,7 +157,7 @@ const selectDate = ref<Date | null>(null)
 
                 <!-- Segmented Date (Individual Fields) -->
                 <Card title="Segmented Date (Individual Fields)">
-                    <GridContainer :cols="2">
+                    <GridContainer :cols="3">
                         <!-- Segmented Date Only -->
                         <Card title="Segmented Date (DD | MM | YYYY)">
                             <div class="col">
@@ -161,7 +165,8 @@ const selectDate = ref<Date | null>(null)
                                 <div class="output-section">
                                     <p><strong>Formatted:</strong> {{ formatDate(segmentedDate || '') }}</p>
                                     <p><strong>ISO String:</strong>
-                                        <code>{{ segmentedDate?.toISOString() || 'null' }}</code></p>
+                                        <code>{{ segmentedDate?.toISOString() || 'null' }}</code>
+                                    </p>
                                 </div>
                             </div>
                         </Card>
@@ -174,10 +179,28 @@ const selectDate = ref<Date | null>(null)
                                     <p><strong>Formatted:</strong> {{ segmentedDateTime ? formatDate(segmentedDateTime,
                                         {
                                             day: '2-digit', month: '2-digit', year: 'numeric', hour: '2-digit', minute:
-                                        '2-digit'
+                                                '2-digit'
                                         }) : 'null' }}</p>
                                     <p><strong>ISO String:</strong>
-                                        <code>{{ segmentedDateTime?.toISOString() || 'null' }}</code></p>
+                                        <code>{{ segmentedDateTime?.toISOString() || 'null' }}</code>
+                                    </p>
+                                </div>
+                            </div>
+                        </Card>
+
+                        <!-- Time Only Test -->
+                        <Card title="Time Only (HH | mm)">
+                            <div class="col">
+                                <DateSegmentedInput v-model="segmentedTimeOnly" label="Time Only (Hours and Minutes)"
+                                    :enable-time="true" :show-date-fields="false" />
+                                <div class="output-section">
+                                    <p><strong>Formatted:</strong> {{ segmentedTimeOnly ? formatDate(segmentedTimeOnly,
+                                        {
+                                            hour: '2-digit', minute: '2-digit'
+                                        }) : 'null' }}</p>
+                                    <p><strong>ISO String:</strong>
+                                        <code>{{ segmentedTimeOnly?.toISOString() || 'null' }}</code>
+                                    </p>
                                 </div>
                             </div>
                         </Card>
@@ -193,7 +216,8 @@ const selectDate = ref<Date | null>(null)
                                 <div class="output-section">
                                     <p><strong>Formatted:</strong> {{ formatDate(selectDate || '') }}</p>
                                     <p><strong>ISO String:</strong>
-                                        <code>{{ selectDate?.toISOString() || 'null' }}</code></p>
+                                        <code>{{ selectDate?.toISOString() || 'null' }}</code>
+                                    </p>
                                 </div>
                             </div>
                         </Card>

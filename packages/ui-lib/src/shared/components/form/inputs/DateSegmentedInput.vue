@@ -8,7 +8,7 @@
  * Validação integrada: campos ficam vermelhos quando combinação é inválida
  * Usa NumericTextInput para garantir que apenas números sejam aceitos
  */
-import { ref, watch, computed } from 'vue'
+import { ref, watch, computed, nextTick } from 'vue'
 import { isValidDate } from '@/core/utils/formatters'
 import NumericTextInput from '../primitives/NumericTextInput.vue'
 
@@ -16,6 +16,7 @@ interface Props {
     modelValue: Date | null
     label?: string
     enableTime?: boolean
+    showDateFields?: boolean // Controla exibição de DD/MM/YYYY
     disabled?: boolean
     error?: boolean
     errorMessage?: string
@@ -24,6 +25,7 @@ interface Props {
 const props = withDefaults(defineProps<Props>(), {
     modelValue: null,
     enableTime: false,
+    showDateFields: true, // Por padrão, mostra campos de data
     error: false
 })
 
@@ -42,13 +44,27 @@ const minute = ref('')
 const hasInternalError = ref(false)
 const internalErrorMessage = ref('')
 
+// Flag para evitar que watch sobrescreva entrada do usuário
+const isInternalUpdate = ref(false)
+
 // Computed: erro combinado (interno + externo)
 const computedError = computed(() => props.error || hasInternalError.value)
 const computedErrorMessage = computed(() => props.errorMessage || internalErrorMessage.value)
 
-// Sincroniza modelo externo -> campos
-watch(() => props.modelValue, (val) => {
+// Sincroniza modelo externo -> campos (apenas quando mudança vem de fora)
+watch(() => props.modelValue, (val, oldVal) => {
+    // Ignora mudanças internas (vindas de updateDate)
+    if (isInternalUpdate.value) {
+        return
+    }
+
+    // Evita re-sincronizar se a data não mudou
+    if (val && oldVal && val.getTime() === oldVal.getTime()) {
+        return
+    }
+
     if (val && !Number.isNaN(val.getTime())) {
+        // Aplica padding APENAS quando sincroniza de fora (props externa mudou)
         day.value = String(val.getDate()).padStart(2, '0')
         month.value = String(val.getMonth() + 1).padStart(2, '0')
         year.value = String(val.getFullYear())
@@ -69,20 +85,42 @@ watch(() => props.modelValue, (val) => {
 
 // Verifica se campos estão completos
 const areFieldsComplete = computed(() => {
-    const hasDate = day.value.length > 0 && month.value.length > 0 && year.value.length >= 4
-    if (props.enableTime) {
-        return hasDate && hour.value.length > 0 && minute.value.length > 0
+    // Se mostra campos de data, precisa validá-los
+    if (props.showDateFields) {
+        const hasDate = day.value.length > 0 && month.value.length > 0 && year.value.length >= 4
+        if (props.enableTime) {
+            return hasDate && hour.value.length > 0 && minute.value.length > 0
+        }
+        return hasDate
     }
-    return hasDate
+
+    // Se não mostra campos de data, só valida time (se habilitado)
+    if (props.enableTime) {
+        return hour.value.length > 0 && minute.value.length > 0
+    }
+
+    return false
 })
 
 // Atualiza date quando campos mudam
 const updateDate = () => {
-    // Limpa erro se campos vazios
-    if (!day.value && !month.value && !year.value) {
+    // Se mostra campos de data, limpa erro se campos vazios
+    if (props.showDateFields && !day.value && !month.value && !year.value) {
         hasInternalError.value = false
         internalErrorMessage.value = ''
+        isInternalUpdate.value = true
         emit('update:modelValue', null)
+        nextTick(() => { isInternalUpdate.value = false })
+        return
+    }
+
+    // Se não mostra campos de data (Time Only), limpa erro se time vazio
+    if (!props.showDateFields && !hour.value && !minute.value) {
+        hasInternalError.value = false
+        internalErrorMessage.value = ''
+        isInternalUpdate.value = true
+        emit('update:modelValue', null)
+        nextTick(() => { isInternalUpdate.value = false })
         return
     }
 
@@ -93,20 +131,23 @@ const updateDate = () => {
         return
     }
 
-    const d = Number.parseInt(day.value)
-    const m = Number.parseInt(month.value)
-    const y = Number.parseInt(year.value)
+    // Se não mostra campos de data, usa data atual
+    const d = props.showDateFields ? Number.parseInt(day.value) : 1
+    const m = props.showDateFields ? Number.parseInt(month.value) : 1
+    const y = props.showDateFields ? Number.parseInt(year.value) : 1970
     const h = props.enableTime ? Number.parseInt(hour.value || '0') : 0
     const min = props.enableTime ? Number.parseInt(minute.value || '0') : 0
 
-    // Validação semântica usando função centralizada
-    if (!isValidDate(d, m, y, h, min)) {
+    // Validação semântica (só valida data se estiver mostrando campos de data)
+    if (props.showDateFields && !isValidDate(d, m, y, h, min)) {
         // Data inválida: marca erro
         hasInternalError.value = true
         internalErrorMessage.value = props.enableTime
             ? 'Data/hora inválida. Verifique os valores informados'
             : 'Data inválida. Verifique dia, mês e ano'
+        isInternalUpdate.value = true
         emit('update:modelValue', null)
+        nextTick(() => { isInternalUpdate.value = false })
         return
     }
 
@@ -114,10 +155,17 @@ const updateDate = () => {
     hasInternalError.value = false
     internalErrorMessage.value = ''
     const newDate = new Date(y, m - 1, d, h, min, 0, 0)
+
+    // Sinaliza que é update interno (evita watch reagir)
+    isInternalUpdate.value = true
     emit('update:modelValue', newDate)
+    // Reset na próxima iteração do event loop
+    nextTick(() => {
+        isInternalUpdate.value = false
+    })
 }
 
-// Handlers com validação de range
+// Handlers com validação de range (SEM auto-padding)
 const handleDay = (v: string) => {
     const sanitized = v.slice(0, 2)
     const num = Number.parseInt(sanitized)
@@ -178,6 +226,18 @@ const handleMinute = (v: string) => {
     minute.value = sanitized
     updateDate()
 }
+
+// Aplica padding quando o usuário sai do campo (blur ou tab)
+const handleBlur = (field: 'day' | 'month' | 'hour' | 'minute') => {
+    const refMap = { day, month, hour, minute }
+    const ref = refMap[field]
+
+    if (ref.value && ref.value.length === 1) {
+        ref.value = ref.value.padStart(2, '0')
+        updateDate()
+    }
+}
+
 </script>
 
 <template>
@@ -185,29 +245,32 @@ const handleMinute = (v: string) => {
         <label v-if="label" class="date-segmented__label">{{ label }}</label>
 
         <div class="date-segmented__wrapper" :class="{ 'date-segmented__wrapper--error': computedError }">
-            <!-- Day -->
-            <NumericTextInput :model-value="day" placeholder="DD" :disabled="disabled" :maxlength="2"
-                @update:model-value="handleDay" />
-            <span class="separator">/</span>
+            <!-- Date Fields (opcional) -->
+            <template v-if="showDateFields">
+                <!-- Day -->
+                <NumericTextInput :model-value="day" placeholder="DD" :disabled="disabled" :maxlength="2"
+                    @update:model-value="handleDay" @blur="() => handleBlur('day')" />
+                <span class="separator">/</span>
 
-            <!-- Month -->
-            <NumericTextInput :model-value="month" placeholder="MM" :disabled="disabled" :maxlength="2"
-                @update:model-value="handleMonth" />
-            <span class="separator">/</span>
+                <!-- Month -->
+                <NumericTextInput :model-value="month" placeholder="MM" :disabled="disabled" :maxlength="2"
+                    @update:model-value="handleMonth" @blur="() => handleBlur('month')" />
+                <span class="separator">/</span>
 
-            <!-- Year -->
-            <NumericTextInput :model-value="year" placeholder="YYYY" :disabled="disabled" :maxlength="4"
-                @update:model-value="handleYear" />
+                <!-- Year -->
+                <NumericTextInput :model-value="year" placeholder="YYYY" :disabled="disabled" :maxlength="4"
+                    @update:model-value="handleYear" />
+            </template>
 
             <!-- Time (opcional) -->
             <template v-if="enableTime">
-                <span class="separator separator--space">às</span>
+                <span v-if="showDateFields" class="separator separator--space">às</span>
 
                 <NumericTextInput :model-value="hour" placeholder="HH" :disabled="disabled" :maxlength="2"
-                    @update:model-value="handleHour" />
+                    @update:model-value="handleHour" @blur="() => handleBlur('hour')" />
                 <span class="separator">:</span>
                 <NumericTextInput :model-value="minute" placeholder="mm" :disabled="disabled" :maxlength="2"
-                    @update:model-value="handleMinute" />
+                    @update:model-value="handleMinute" @blur="() => handleBlur('minute')" />
             </template>
         </div>
 
