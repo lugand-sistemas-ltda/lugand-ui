@@ -128,8 +128,7 @@ const selectDate = ref<Date | null>(null)
                                 <DateInput v-model="appointment" type="datetime-local" label="Appointment" />
                                 <div class="output-section">
                                     <p><strong>Formatted:</strong> {{ formatDate(appointment || '', {
-                                        day: '2-digit', month: '2-digit', year: 'numeric', hour: '2-digit', minute:
-                                            '2-digit'
+                                        day: '2-digit', month: '2-digit', year: 'numeric', hour: '2-digit', minute: '2-digit'
                                     }) }}</p>
                                     <p><strong>ISO String:</strong>
                                         <code>{{ appointment?.toISOString() || 'null' }}</code>
