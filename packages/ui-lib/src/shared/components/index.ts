@@ -71,3 +71,8 @@ export { default as ScrollContainer } from './layout/ScrollContainer.vue'
 export { default as ToastProvider } from './feedback/Toast/ToastProvider.vue'
 export { default as ToastItem } from './feedback/Toast/ToastItem.vue'
 export * from './feedback/Toast/types'
+
+export { default as Modal } from './feedback/Modal/Modal.vue'
+export * from './feedback/Modal/types'
+
+export { default as Spinner } from './feedback/Spinner.vue'

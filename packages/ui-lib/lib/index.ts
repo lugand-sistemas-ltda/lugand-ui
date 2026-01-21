@@ -54,6 +54,8 @@ export {
     // Feedback
     ToastProvider,
     ToastItem,
+    Modal,
+    Spinner,
 
     // Layout
     ComponentShowcase,
@@ -72,7 +74,9 @@ export {
 // ============================================
 export {
     useTheme,
-    useToast
+    useToast,
+    useModal,
+    useConfirmModal
 } from '../src/shared/composables/index.ts'
 
 // ============================================
@@ -81,6 +85,8 @@ export {
 export type { ThemeName } from '../src/core/types/theme.types.ts'
 export type { Theme } from '../src/core/config/themes.config.ts'
 export type { ToastOptions, ToastType, ToastPosition, ToastAction } from '../src/shared/components/feedback/Toast/types.ts'
+export type { ModalSize, ModalVariant, ModalProps, ModalEmits } from '../src/shared/components/feedback/Modal/types.ts'
+export type { UseModalOptions, UseModalReturn, ConfirmModalOptions } from '../src/shared/composables/useModal.ts'
 
 // ============================================
 // CONFIGS & CONSTANTS
