@@ -7,3 +7,5 @@ export type { UseDateInputOptions, UseDateInputReturn, DateInputType, DateOutput
 export { useToast } from './useToast'
 export { useModal, useConfirmModal } from './useModal'
 export type { UseModalOptions, UseModalReturn, ConfirmModalOptions } from './useModal'
+export { useLoading } from './useLoading'
+export type { UseLoadingOptions, UseLoadingReturn } from './useLoading'

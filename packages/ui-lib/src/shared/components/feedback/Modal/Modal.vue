@@ -11,9 +11,10 @@
  * - Slots flexíveis (header, body, footer)
  * - Variantes e tamanhos
  */
-import { ref, watch, onMounted, onBeforeUnmount, nextTick } from 'vue'
+import { ref, watch, onMounted, onBeforeUnmount, nextTick, computed } from 'vue'
 import { Btn, Icon } from '@/shared/components'
 import type { ModalSize, ModalVariant } from './types'
+import { registerModal, unregisterModal, getModalZIndex } from './modalStack'
 
 interface Props {
     modelValue?: boolean
@@ -28,7 +29,6 @@ interface Props {
     showFooter?: boolean
     loading?: boolean
     fullscreen?: boolean
-    zIndex?: number
 }
 
 const props = withDefaults(defineProps<Props>(), {
@@ -42,8 +42,7 @@ const props = withDefaults(defineProps<Props>(), {
     showHeader: true,
     showFooter: true,
     loading: false,
-    fullscreen: false,
-    zIndex: 1000
+    fullscreen: false
 })
 
 const emit = defineEmits<{
@@ -57,6 +56,16 @@ const emit = defineEmits<{
 // State
 const isOpen = ref(props.modelValue)
 const modalRef = ref<HTMLElement | null>(null)
+const modalId = ref<symbol | null>(null)
+const dynamicZIndex = ref<number>(1000)
+
+// Computed z-index - usa o dinamico do stack
+const computedZIndex = computed(() => {
+    if (modalId.value) {
+        return getModalZIndex(modalId.value) || dynamicZIndex.value
+    }
+    return dynamicZIndex.value
+})
 
 // Controle de abertura/fechamento
 const open = () => {
@@ -72,7 +81,7 @@ const open = () => {
 // Close interno - respeitando persistent e loading
 const close = () => {
     if (props.persistent || props.loading) return
-    
+
     isOpen.value = false
     emit('update:modelValue', false)
     emit('close')
@@ -134,11 +143,11 @@ const getScrollbarWidth = () => {
 // Focus trap (acessibilidade)
 const focusFirstElement = () => {
     if (!modalRef.value) return
-    
+
     const focusable = modalRef.value.querySelectorAll<HTMLElement>(
         'button, [href], input, select, textarea, [tabindex]:not([tabindex="-1"])'
     )
-    
+
     if (focusable.length > 0 && focusable[0]) {
         focusable[0].focus()
     }
@@ -158,6 +167,12 @@ watch(() => props.modelValue, (newVal) => {
 // Lifecycle
 onMounted(() => {
     window.addEventListener('keydown', handleEscKey)
+
+    // Registra o modal no stack e obtém seu z-index
+    const registration = registerModal()
+    modalId.value = registration.id
+    dynamicZIndex.value = registration.zIndex
+
     if (props.modelValue) {
         open()
     }
@@ -166,33 +181,26 @@ onMounted(() => {
 onBeforeUnmount(() => {
     window.removeEventListener('keydown', handleEscKey)
     unlockScroll()
+
+    // Remove o modal do stack
+    if (modalId.value) {
+        unregisterModal(modalId.value)
+    }
 })
 </script>
 
 <template>
     <Teleport to="body">
         <Transition name="modal-fade">
-            <div
-                v-if="isOpen"
-                class="modal-overlay"
-                :style="{ zIndex }"
-                @click.self="handleOverlayClick"
-            >
+            <div v-if="isOpen" class="modal-overlay" :style="{ zIndex: computedZIndex }"
+                @click.self="handleOverlayClick">
                 <Transition name="modal-scale">
-                    <div
-                        v-if="isOpen"
-                        ref="modalRef"
-                        class="modal"
-                        :class="[
-                            `modal--${size}`,
-                            `modal--${variant}`,
-                            { 'modal--fullscreen': fullscreen, 'modal--loading': loading }
-                        ]"
-                        role="dialog"
-                        aria-modal="true"
-                        :aria-labelledby="title ? 'modal-title' : undefined"
-                        @click.stop
-                    >
+                    <div v-if="isOpen" ref="modalRef" class="modal" :class="[
+                        `modal--${size}`,
+                        `modal--${variant}`,
+                        { 'modal--fullscreen': fullscreen, 'modal--loading': loading }
+                    ]" role="dialog" aria-modal="true" :aria-labelledby="title ? 'modal-title' : undefined"
+                        @click.stop>
                         <!-- Header -->
                         <header v-if="showHeader || $slots.header" class="modal__header">
                             <slot name="header">
@@ -200,14 +208,9 @@ onBeforeUnmount(() => {
                                     {{ title }}
                                 </h2>
                             </slot>
-                            
-                            <button
-                                v-if="closable && !persistent"
-                                class="modal__close"
-                                type="button"
-                                aria-label="Fechar modal"
-                                @click="close"
-                            >
+
+                            <button v-if="closable && !persistent" class="modal__close" type="button"
+                                aria-label="Fechar modal" @click="close">
                                 <Icon name="x" />
                             </button>
                         </header>
@@ -220,18 +223,11 @@ onBeforeUnmount(() => {
                         <!-- Footer -->
                         <footer v-if="showFooter || $slots.footer" class="modal__footer">
                             <slot name="footer">
-                                <Btn
-                                    variant="ghost"
-                                    :disabled="loading"
-                                    @click="handleCancel"
-                                >
+                                <Btn variant="ghost" :disabled="loading" @click="handleCancel">
                                     Cancelar
                                 </Btn>
-                                <Btn
-                                    :variant="variant === 'danger' ? 'danger' : 'primary'"
-                                    :loading="loading"
-                                    @click="handleConfirm"
-                                >
+                                <Btn :variant="variant === 'danger' ? 'danger' : 'primary'" :loading="loading"
+                                    @click="handleConfirm">
                                     Confirmar
                                 </Btn>
                             </slot>
