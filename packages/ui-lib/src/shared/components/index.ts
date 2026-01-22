@@ -76,3 +76,8 @@ export { default as Modal } from './feedback/Modal/Modal.vue'
 export * from './feedback/Modal/types'
 
 export { default as Spinner } from './feedback/Spinner.vue'
+
+// ============================================
+// VISUALIZATION - Gráficos e Data Viz
+// ============================================
+export * from './visualization'

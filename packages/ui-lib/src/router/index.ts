@@ -95,6 +95,12 @@ const routes: RouteRecordRaw[] = [
     name: 'ui-feedback-toasts',
     component: () => import('@/views/ui/feedback/ToastsView.vue'),
   },
+  // UI Visualization Components
+  {
+    path: '/ui/visualization/charts',
+    name: 'ui-visualization-charts',
+    component: () => import('@/views/ui/visualization/ChartsView.vue'),
+  },
   // Docs
   {
     path: '/docs/get-started',

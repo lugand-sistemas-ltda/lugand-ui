@@ -25,6 +25,38 @@ export { default as AppFooter } from '@/modules/AppShell/components/AppFooter.vu
 export { default as ThemeSelector } from '@/modules/AppShell/components/ThemeSelector.vue'
 
 // ============================================
+// VISUALIZATION - Componentes de Gráficos
+// ============================================
+export {
+    BaseChart,
+    ChartLegend,
+    LineChart,
+    BarChart,
+    PieChart,
+    AreaChart,
+    ScatterChart,
+    GraphChart,
+    useChart
+} from '../src/shared/components/visualization/index'
+
+export type {
+    BaseChartProps,
+    ChartOptions,
+    ChartVariant,
+    LegendPosition,
+    LineChartData,
+    BarChartData,
+    PieChartData,
+    AreaChartData,
+    ScatterChartData,
+    GraphChartData,
+    Dataset,
+    ChartEvents,
+    ChartEventData,
+    ExportFormat
+} from '../src/shared/components/visualization/types'
+
+// ============================================
 // SHARED - Componentes Atômicos e Utilitários
 // ============================================
 export {

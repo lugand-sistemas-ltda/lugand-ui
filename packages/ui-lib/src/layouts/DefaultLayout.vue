@@ -64,7 +64,9 @@ watch(
             <NavLink to="/ui/feedback/toasts">Toasts</NavLink>
           </NavItem>
 
-
+          <NavItem label="Visualization" :default-expanded="true">
+            <NavLink to="/ui/visualization/charts">Charts</NavLink>
+          </NavItem>
 
           <NavItem label="Icons" :default-expanded="true">
             <NavLink to="/ui/icons/emojis">Emojis</NavLink>
