@@ -36,7 +36,7 @@ watch(
         </NavLink>
 
         <NavItem label="UI" icon="🎨" :default-expanded="false">
-          <NavItem label="Inputs" :default-expanded="true">
+          <NavItem label="Inputs" :default-expanded="false">
             <NavLink to="/ui/inputs/text">Text Inputs</NavLink>
             <NavLink to="/ui/inputs/selection">Selection Inputs</NavLink>
             <NavLink to="/ui/inputs/specialized">Specialized Inputs</NavLink>
@@ -59,16 +59,16 @@ watch(
             <NavLink to="/ui/complex/modals">Modals</NavLink>
           </NavItem>
 
-          <NavItem label="Feedback" :default-expanded="true">
+          <NavItem label="Feedback" :default-expanded="false">
             <NavLink to="/ui/feedback/alerts">Alerts</NavLink>
             <NavLink to="/ui/feedback/toasts">Toasts</NavLink>
           </NavItem>
 
-          <NavItem label="Visualization" :default-expanded="true">
+          <NavItem label="Visualization" :default-expanded="false">
             <NavLink to="/ui/visualization/charts">Charts</NavLink>
           </NavItem>
 
-          <NavItem label="Icons" :default-expanded="true">
+          <NavItem label="Icons" :default-expanded="false">
             <NavLink to="/ui/icons/emojis">Emojis</NavLink>
             <NavLink to="/ui/icons/brands">Brands</NavLink>
             <NavLink to="/ui/icons/ui">UI Icons</NavLink>
