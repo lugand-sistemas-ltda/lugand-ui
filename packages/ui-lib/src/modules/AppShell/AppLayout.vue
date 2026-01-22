@@ -4,7 +4,7 @@
  * Fornece estrutura com Navbar lateral, Header e área de conteúdo
  */
 import { ref } from 'vue'
-import { Navbar } from '@/shared/components'
+import { Navbar } from '@/modules/layouts/DefaultLayout/components'
 import AppHeader from './components/AppHeader.vue'
 
 interface Props {

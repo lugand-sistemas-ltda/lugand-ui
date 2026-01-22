@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { useToast } from '@/shared/composables/useToast'
+import { useToast } from '../composables/useToast'
 import ToastItem from './ToastItem.vue'
 import type { ToastPosition } from './types'
 

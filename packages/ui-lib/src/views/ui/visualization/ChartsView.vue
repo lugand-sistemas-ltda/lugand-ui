@@ -18,6 +18,8 @@ import {
   AreaChart,
   ScatterChart,
   GraphChart,
+} from '@/modules/charts'
+import {
   ComponentShowcase,
   CodeBlock,
   Card,

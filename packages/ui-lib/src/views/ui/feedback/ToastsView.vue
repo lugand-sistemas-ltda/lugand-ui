@@ -9,8 +9,8 @@ import {
     Checkbox,
     CodeBlock
 } from '@/shared/components'
-import { useToast } from '@/shared/composables/useToast'
-import type { ToastPosition, ToastType } from '@/shared/components/feedback/Toast/types'
+import { useToast } from '@/modules/toast'
+import type { ToastPosition, ToastType } from '@/modules/toast/components/types'
 
 const toast = useToast()
 
@@ -138,7 +138,7 @@ function showCustomClass() {
             </template>
             <template #code>
                 <CodeBlock language="typescript" :code="`
-import { useToast } from '@/shared/composables'
+import { useToast } from '@/modules/toast'
 
 const toast = useToast()
 

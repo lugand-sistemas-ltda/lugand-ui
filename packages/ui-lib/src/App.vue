@@ -2,8 +2,8 @@
 /**
  * App root - inicializa configurações globais
  */
-import DefaultLayout from '@/layouts/DefaultLayout.vue'
-import { ToastProvider } from '@/shared/components'
+import DefaultLayout from '@/modules/layouts/DefaultLayout/DefaultLayout.vue'
+import { ToastProvider } from '@/modules/toast'
 import { useTheme } from '@/shared/composables'
 
 // Inicializa tema (carrega do localStorage e aplica)

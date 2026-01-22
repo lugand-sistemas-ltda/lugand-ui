@@ -2,7 +2,7 @@
 import { computed } from 'vue'
 import { Icon } from '@/shared/components'
 import type { ToastInstance } from './types'
-import { useToast } from '@/shared/composables/useToast'
+import { useToast } from '../composables/useToast'
 
 const props = defineProps<{
     toast: ToastInstance

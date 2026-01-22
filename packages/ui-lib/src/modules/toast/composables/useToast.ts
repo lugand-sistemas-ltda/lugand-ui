@@ -1,5 +1,5 @@
 import { ref, computed } from 'vue'
-import type { ToastOptions, ToastInstance, ToastPosition } from '../components/feedback/Toast/types'
+import type { ToastOptions, ToastInstance, ToastPosition } from '../components/types'
 
 // Singleton State - Persists across navigation
 const toasts = ref<ToastInstance[]>([])
@@ -43,7 +43,7 @@ export function useToast() {
      * Remove um Toast pelo ID
      */
     function remove(id: string) {
-        const index = toasts.value.findIndex(t => t.id === id)
+        const index = toasts.value.findIndex((t: ToastInstance) => t.id === id)
         if (index !== -1) {
             toasts.value.splice(index, 1)
         }
@@ -85,7 +85,7 @@ export function useToast() {
      * Computed helpers para filtrar toasts por posição (usado pelo Provider)
      */
     function getToastsByPosition(pos: ToastPosition) {
-        return toasts.value.filter(t => (t.position || defaultOptions.position) === pos)
+        return toasts.value.filter((t: ToastInstance) => (t.position || defaultOptions.position) === pos)
     }
 
     return {

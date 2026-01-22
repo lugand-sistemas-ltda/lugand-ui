@@ -3,8 +3,8 @@
  * ModalsView - Showcase de componentes Modal
  */
 import { ref } from 'vue'
-import { Modal, Btn, Input, Card, ComponentShowcase, CodeBlock, Spinner } from '@/shared/components'
-import { useModal, useConfirmModal } from '@/shared/composables'
+import { Btn, Input, Card, ComponentShowcase, CodeBlock, Spinner } from '@/shared/components'
+import { Modal, useModal, useConfirmModal } from '@/modules/modal'
 
 // Basic Modal
 const showBasicModal = ref(false)

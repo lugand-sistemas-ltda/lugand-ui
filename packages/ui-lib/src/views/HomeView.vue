@@ -3,7 +3,7 @@
  * HomeView - Página inicial de boas-vindas
  * Minimalista e focada em direcionar o usuário
  */
-import { NavLink } from '@/shared/components'
+import { NavLink } from '@/modules/layouts/DefaultLayout/components'
 </script>
 
 <template>

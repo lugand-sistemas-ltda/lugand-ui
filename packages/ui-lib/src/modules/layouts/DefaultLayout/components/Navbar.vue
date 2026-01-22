@@ -9,9 +9,9 @@
  * - Responsivo: overlay em mobile
  */
 import { ref, onMounted, onUnmounted } from 'vue'
-import Scrollable from '../primitives/Scrollable.vue'
+import Scrollable from '@/shared/components/primitives/Scrollable.vue'
 
-interface Props {
+export interface Props {
   position?: 'left' | 'right'
   width?: string
   defaultVisible?: boolean

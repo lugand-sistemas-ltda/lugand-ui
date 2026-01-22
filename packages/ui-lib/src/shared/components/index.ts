@@ -39,13 +39,6 @@ export { default as RadioGroup } from './form/selection/Radio/RadioGroup.vue'
 
 
 // ============================================
-// NAVIGATION - Componentes de navegação
-// ============================================
-export { default as NavLink } from './navigation/NavLink.vue'
-export { default as NavItem } from './navigation/NavItem.vue'
-export { default as Navbar } from './navigation/Navbar.vue'
-
-// ============================================
 // DISPLAY - Visualização de dados
 // ============================================
 export { default as Card } from './display/Card.vue'
@@ -68,16 +61,7 @@ export { default as ScrollContainer } from './layout/ScrollContainer.vue'
 // ============================================
 // FEEDBACK - Componentes de alerta e notificação
 // ============================================
-export { default as ToastProvider } from './feedback/Toast/ToastProvider.vue'
-export { default as ToastItem } from './feedback/Toast/ToastItem.vue'
-export * from './feedback/Toast/types'
-
-export { default as Modal } from './feedback/Modal/Modal.vue'
-export * from './feedback/Modal/types'
+// Toast movido para modules/toast
+// Modal movido para modules/modal
 
 export { default as Spinner } from './feedback/Spinner.vue'
-
-// ============================================
-// VISUALIZATION - Gráficos e Data Viz
-// ============================================
-export * from './visualization'

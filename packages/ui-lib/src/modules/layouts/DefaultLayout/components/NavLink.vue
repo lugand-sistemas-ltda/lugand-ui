@@ -7,7 +7,7 @@
  */
 import { computed, inject } from 'vue'
 
-interface Props {
+export interface Props {
   to: string
   exact?: boolean
   disabled?: boolean

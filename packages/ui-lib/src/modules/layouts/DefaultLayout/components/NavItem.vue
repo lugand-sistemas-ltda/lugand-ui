@@ -5,7 +5,7 @@
  */
 import { ref } from 'vue'
 
-interface Props {
+export interface Props {
   label: string
   icon?: string
   collapsible?: boolean

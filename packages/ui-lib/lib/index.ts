@@ -13,20 +13,16 @@ import './styles.scss'
 // ============================================
 // MODULES - Componentes Complexos e Modulares
 // ============================================
-export { default as DynamicForm } from '@/modules/DynamicForm/DynamicForm.vue'
-export type { FormField } from '@/modules/DynamicForm/DynamicForm.vue'
 
-export { default as DataTable } from '@/modules/DataTable/DataTable.vue'
-export type { DataTableProps, TableColumn } from '@/modules/DataTable/types'
+// Modal Module
+export { Modal, useModal, useConfirmModal } from '../src/modules/modal'
+export type { ModalSize, ModalVariant, ModalProps, ModalEmits } from '../src/modules/modal/components/types'
 
-export { default as AppLayout } from '@/modules/AppShell/AppLayout.vue'
-export { default as AppHeader } from '@/modules/AppShell/components/AppHeader.vue'
-export { default as AppFooter } from '@/modules/AppShell/components/AppFooter.vue'
-export { default as ThemeSelector } from '@/modules/AppShell/components/ThemeSelector.vue'
+// Toast Module
+export { ToastItem, ToastProvider, useToast } from '../src/modules/toast'
+export type { ToastOptions, ToastType, ToastPosition, ToastAction } from '../src/modules/toast/components/types'
 
-// ============================================
-// VISUALIZATION - Componentes de Gráficos
-// ============================================
+// Charts Module
 export {
     BaseChart,
     ChartLegend,
@@ -37,7 +33,7 @@ export {
     ScatterChart,
     GraphChart,
     useChart
-} from '../src/shared/components/visualization/index'
+} from '../src/modules/charts'
 
 export type {
     BaseChartProps,
@@ -54,7 +50,23 @@ export type {
     ChartEvents,
     ChartEventData,
     ExportFormat
-} from '../src/shared/components/visualization/types'
+} from '../src/modules/charts/types'
+
+// Data Modules
+export { default as DynamicForm } from '../src/modules/DynamicForm/DynamicForm.vue'
+export type { FormField } from '../src/modules/DynamicForm/DynamicForm.vue'
+
+export { default as DataTable } from '../src/modules/DataTable/DataTable.vue'
+export type { DataTableProps, TableColumn } from '../src/modules/DataTable/types'
+
+// Layout Modules
+export { DefaultLayout, Navbar, NavItem, NavLink } from '../src/modules/layouts'
+
+// AppShell Module
+export { default as AppLayout } from '../src/modules/AppShell/AppLayout.vue'
+export { default as AppHeader } from '../src/modules/AppShell/components/AppHeader.vue'
+export { default as AppFooter } from '../src/modules/AppShell/components/AppFooter.vue'
+export { default as ThemeSelector } from '../src/modules/AppShell/components/ThemeSelector.vue'
 
 // ============================================
 // SHARED - Componentes Atômicos e Utilitários
@@ -69,11 +81,6 @@ export {
     Select,
     Scrollable,
 
-    // Navigation
-    NavLink,
-    NavItem,
-    Navbar,
-
     // Display
     Icon,
     Avatar,
@@ -84,9 +91,6 @@ export {
     Tooltip,
 
     // Feedback
-    ToastProvider,
-    ToastItem,
-    Modal,
     Spinner,
 
     // Layout
@@ -106,9 +110,8 @@ export {
 // ============================================
 export {
     useTheme,
-    useToast,
-    useModal,
-    useConfirmModal
+    useLoading,
+    useDateInput
 } from '../src/shared/composables/index.ts'
 
 // ============================================
@@ -116,9 +119,6 @@ export {
 // ============================================
 export type { ThemeName } from '../src/core/types/theme.types.ts'
 export type { Theme } from '../src/core/config/themes.config.ts'
-export type { ToastOptions, ToastType, ToastPosition, ToastAction } from '../src/shared/components/feedback/Toast/types.ts'
-export type { ModalSize, ModalVariant, ModalProps, ModalEmits } from '../src/shared/components/feedback/Modal/types.ts'
-export type { UseModalOptions, UseModalReturn, ConfirmModalOptions } from '../src/shared/composables/useModal.ts'
 
 // ============================================
 // CONFIGS & CONSTANTS

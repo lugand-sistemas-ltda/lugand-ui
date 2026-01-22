@@ -21,10 +21,12 @@ export default defineConfig({
                 'src/shared/**/*.vue',
                 'src/shared/**/*.ts',
                 'src/core/**/*.ts',
+                'src/modules/**/*.vue',
+                'src/modules/**/*.ts',
             ],
             exclude: [
                 'src/views/**/*',
-                'src/layouts/**/*',
+                'src/layouts/**/*', // Antigo layouts (agora em modules/layouts/)
                 'src/router/**/*',
                 'src/App.vue',
                 'src/main.ts',
