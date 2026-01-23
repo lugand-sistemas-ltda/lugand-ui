@@ -57,6 +57,18 @@ import {
 // Loading states para demonstração
 const loading = ref(false)
 
+// Event handlers para demonstração de interatividade
+const handlePointClick = (data: any) => {
+  console.log('📍 Point clicked:', data)
+  // Aqui você poderia abrir um modal, navegar, etc.
+}
+
+const handlePointHover = (data: any) => {
+  if (data) {
+    console.log('🖱️ Point hovered:', data)
+  }
+}
+
 // Code examples
 const lineChartBasicCode = `<script setup lang="ts">
 import { LineChart } from '@lugand/vue-ui-lib'
@@ -615,15 +627,11 @@ const data = {
       </p>
 
       <!-- Simple Line Chart -->
-      <ComponentShowcase title="Linha Simples" description="Gráfico de linha básico com um único dataset">
+      <ComponentShowcase title="Linha Simples"
+        description="Gráfico de linha básico com um único dataset (hover nos pontos para ver tooltip, clique para evento)">
         <template #preview>
-          <LineChart 
-            :data="simpleLineData" 
-            title="Vendas Mensais"
-            subtitle="Dados de 2024"
-            :loading="loading"
-            height="400px"
-          />
+          <LineChart :data="simpleLineData" title="Vendas Mensais" subtitle="Dados de 2024" :loading="loading"
+            height="400px" @point-click="handlePointClick" @point-hover="handlePointHover" />
         </template>
         <template #code>
           <CodeBlock :code="lineChartBasicCode" language="vue" />
@@ -633,12 +641,8 @@ const data = {
       <!-- Multiple Lines -->
       <ComponentShowcase title="Múltiplas Linhas" description="Comparação entre vários datasets com legenda">
         <template #preview>
-            <LineChart 
-              :data="multiLineData" 
-              title="Comparação de Produtos"
-              subtitle="Performance mensal"              legend-position="bottom"
-            height="400px"
-          />
+          <LineChart :data="multiLineData" title="Comparação de Produtos" subtitle="Performance mensal"
+            legend-position="bottom" height="400px" />
         </template>
         <template #code>
           <CodeBlock :code="lineChartMultiCode" language="vue" />
@@ -648,11 +652,8 @@ const data = {
       <!-- Smooth Line with Fill -->
       <ComponentShowcase title="Linha Suave com Preenchimento" description="Curva suavizada com área preenchida">
         <template #preview>
-            <LineChart 
-              :data="smoothLineData" 
-              title="Temperatura ao longo do dia"              subtitle="Medições a cada 4 horas"
-            height="400px"
-          />
+          <LineChart :data="smoothLineData" title="Temperatura ao longo do dia" subtitle="Medições a cada 4 horas"
+            height="400px" />
         </template>
         <template #code>
           <CodeBlock :code="lineChartSmoothCode" language="vue" />
@@ -673,11 +674,7 @@ const data = {
       <!-- Simple Bar Chart -->
       <ComponentShowcase title="Barra Vertical Simples" description="Gráfico de barras básico">
         <template #preview>
-            <BarChart 
-              :data="simpleBarData" 
-              title="Receita Mensal"              subtitle="Em milhares de reais"
-            height="400px"
-          />
+          <BarChart :data="simpleBarData" title="Receita Mensal" subtitle="Em milhares de reais" height="400px" />
         </template>
         <template #code>
           <CodeBlock :code="barChartBasicCode" language="vue" />
@@ -687,12 +684,8 @@ const data = {
       <!-- Multiple Bars -->
       <ComponentShowcase title="Múltiplas Barras" description="Comparação entre vários anos">
         <template #preview>
-            <BarChart 
-              :data="multiBarData" 
-              title="Comparação Anual"
-              subtitle="Receita por trimestre"              legend-position="top"
-            height="400px"
-          />
+          <BarChart :data="multiBarData" title="Comparação Anual" subtitle="Receita por trimestre" legend-position="top"
+            height="400px" />
         </template>
         <template #code>
           <CodeBlock :code="barChartMultiCode" language="vue" />
@@ -702,13 +695,8 @@ const data = {
       <!-- Stacked Bar Chart -->
       <ComponentShowcase title="Barras Empilhadas" description="Visualização de composição com barras stacked">
         <template #preview>
-            <BarChart 
-              :data="stackedBarData" 
-              title="Horas por Atividade"
-              subtitle="Distribuição semanal"
-              stacked              legend-position="bottom"
-            height="400px"
-          />
+          <BarChart :data="stackedBarData" title="Horas por Atividade" subtitle="Distribuição semanal" stacked
+            legend-position="bottom" height="400px" />
         </template>
         <template #code>
           <CodeBlock :code="barChartStackedCode" language="vue" />
@@ -718,12 +706,8 @@ const data = {
       <!-- Horizontal Bar Chart -->
       <ComponentShowcase title="Barra Horizontal" description="Ideal para labels longos ou comparações">
         <template #preview>
-            <BarChart 
-              :data="horizontalBarData" 
-              title="Distribuição da Equipe"
-              subtitle="Número de pessoas por área"              horizontal
-            height="400px"
-          />
+          <BarChart :data="horizontalBarData" title="Distribuição da Equipe" subtitle="Número de pessoas por área"
+            horizontal height="400px" />
         </template>
         <template #code>
           <CodeBlock :code="barChartHorizontalCode" language="vue" />
@@ -744,12 +728,8 @@ const data = {
       <!-- Simple Pie Chart -->
       <ComponentShowcase title="Pizza Simples" description="Gráfico de pizza padrão com percentuais">
         <template #preview>
-            <PieChart 
-              :data="simplePieData" 
-              title="Navegadores mais usados"
-              subtitle="Dados de 2024"              legend-position="right"
-            height="400px"
-          />
+          <PieChart :data="simplePieData" title="Navegadores mais usados" subtitle="Dados de 2024"
+            legend-position="right" height="400px" />
         </template>
         <template #code>
           <CodeBlock :code="pieChartBasicCode" language="vue" />
@@ -759,13 +739,8 @@ const data = {
       <!-- Donut Chart -->
       <ComponentShowcase title="Donut Chart" description="Variação com buraco no centro">
         <template #preview>
-            <PieChart 
-              :data="donutData" 
-              title="Departamentos"
-              subtitle="Distribuição da empresa"
-              donut              legend-position="bottom"
-            height="400px"
-          />
+          <PieChart :data="donutData" title="Departamentos" subtitle="Distribuição da empresa" donut
+            legend-position="bottom" height="400px" />
         </template>
         <template #code>
           <CodeBlock :code="pieChartDonutCode" language="vue" />
@@ -775,12 +750,8 @@ const data = {
       <!-- Market Share Pie -->
       <ComponentShowcase title="Market Share" description="Múltiplas fatias com cores personalizadas">
         <template #preview>
-            <PieChart 
-              :data="marketShareData" 
-              title="Market Share - Produtos"
-              subtitle="Participação de mercado em 2024"              legend-position="right"
-            height="400px"
-          />
+          <PieChart :data="marketShareData" title="Market Share - Produtos" subtitle="Participação de mercado em 2024"
+            legend-position="right" height="400px" />
         </template>
         <template #code>
           <CodeBlock :code="pieChartBasicCode" language="vue" />
@@ -801,11 +772,8 @@ const data = {
       <!-- Simple Area Chart -->
       <ComponentShowcase title="Área Simples" description="Gráfico de área básico">
         <template #preview>
-            <AreaChart 
-              :data="simpleAreaData" 
-              title="Crescimento de Usuários"              subtitle="Usuários ativos por mês"
-            height="400px"
-          />
+          <AreaChart :data="simpleAreaData" title="Crescimento de Usuários" subtitle="Usuários ativos por mês"
+            height="400px" />
         </template>
         <template #code>
           <CodeBlock :code="areaChartBasicCode" language="vue" />
@@ -815,12 +783,8 @@ const data = {
       <!-- Multiple Areas -->
       <ComponentShowcase title="Múltiplas Áreas" description="Comparação entre plataformas">
         <template #preview>
-            <AreaChart 
-              :data="multiAreaData" 
-              title="Usuários por Plataforma"
-              subtitle="Crescimento em diferentes dispositivos"              legend-position="bottom"
-            height="400px"
-          />
+          <AreaChart :data="multiAreaData" title="Usuários por Plataforma"
+            subtitle="Crescimento em diferentes dispositivos" legend-position="bottom" height="400px" />
         </template>
         <template #code>
           <CodeBlock :code="areaChartMultiCode" language="vue" />
@@ -830,13 +794,8 @@ const data = {
       <!-- Stacked Area Chart -->
       <ComponentShowcase title="Áreas Empilhadas" description="Visualização de composição total ao longo do tempo">
         <template #preview>
-            <AreaChart 
-              :data="stackedAreaData" 
-              title="Uso de Recursos"
-              subtitle="CPU, Memória e Disco ao longo do dia"
-              stacked              legend-position="top"
-            height="400px"
-          />
+          <AreaChart :data="stackedAreaData" title="Uso de Recursos" subtitle="CPU, Memória e Disco ao longo do dia"
+            stacked legend-position="top" height="400px" />
         </template>
         <template #code>
           <CodeBlock :code="areaChartStackedCode" language="vue" />
@@ -858,11 +817,8 @@ const data = {
       <!-- Simple Scatter -->
       <ComponentShowcase title="Dispersão Simples" description="Scatter plot básico">
         <template #preview>
-            <ScatterChart 
-              :data="simpleScatterData" 
-              title="Dispersão Simples"              subtitle="Dados de exemplo"
-            height="400px"
-          />
+          <ScatterChart :data="simpleScatterData" title="Dispersão Simples" subtitle="Dados de exemplo"
+            height="400px" />
         </template>
         <template #code>
           <CodeBlock :code="scatterChartBasicCode" language="vue" />
@@ -872,12 +828,8 @@ const data = {
       <!-- Multiple Scatter Groups -->
       <ComponentShowcase title="Múltiplos Grupos" description="Comparação entre diferentes grupos">
         <template #preview>
-            <ScatterChart 
-              :data="multiScatterData" 
-              title="Múltiplos Grupos"
-              subtitle="Três conjuntos de dados"              legend-position="right"
-            height="400px"
-          />
+          <ScatterChart :data="multiScatterData" title="Múltiplos Grupos" subtitle="Três conjuntos de dados"
+            legend-position="right" height="400px" />
         </template>
         <template #code>
           <CodeBlock :code="scatterChartMultiCode" language="vue" />
@@ -887,11 +839,8 @@ const data = {
       <!-- Correlation Scatter -->
       <ComponentShowcase title="Análise de Correlação" description="Visualização de correlação positiva">
         <template #preview>
-            <ScatterChart 
-              :data="correlationData" 
-              title="Correlação: Altura x Peso"              subtitle="Demonstração de correlação positiva"
-            height="400px"
-          />
+          <ScatterChart :data="correlationData" title="Correlação: Altura x Peso"
+            subtitle="Demonstração de correlação positiva" height="400px" />
         </template>
         <template #code>
           <CodeBlock :code="scatterChartCorrelationCode" language="vue" />
@@ -913,11 +862,8 @@ const data = {
       <!-- Simple Graph -->
       <ComponentShowcase title="Grafo Simples" description="Network básico com 4 nós">
         <template #preview>
-            <GraphChart 
-              :data="simpleGraphData" 
-              title="Grafo Simples"              subtitle="Estrutura básica de grafo"
-            height="500px"
-          />
+          <GraphChart :data="simpleGraphData" title="Grafo Simples" subtitle="Estrutura básica de grafo"
+            height="500px" />
         </template>
         <template #code>
           <CodeBlock :code="graphChartBasicCode" language="vue" />
@@ -927,11 +873,8 @@ const data = {
       <!-- Directed Graph -->
       <ComponentShowcase title="Grafo Direcionado" description="Fluxo de processo com setas e labels">
         <template #preview>
-            <GraphChart 
-              :data="directedGraphData" 
-              title="Fluxo de Processo"              subtitle="Grafo direcionado com labels nas arestas"
-            height="500px"
-          />
+          <GraphChart :data="directedGraphData" title="Fluxo de Processo"
+            subtitle="Grafo direcionado com labels nas arestas" height="500px" />
         </template>
         <template #code>
           <CodeBlock :code="graphChartDirectedCode" language="vue" />
@@ -941,11 +884,8 @@ const data = {
       <!-- Network Graph -->
       <ComponentShowcase title="Arquitetura de Sistema" description="Network complexo com diferentes tamanhos de nós">
         <template #preview>
-            <GraphChart 
-              :data="networkGraphData" 
-              title="Arquitetura de Sistema"              subtitle="Infraestrutura com clientes, API, servidor e banco"
-            height="500px"
-          />
+          <GraphChart :data="networkGraphData" title="Arquitetura de Sistema"
+            subtitle="Infraestrutura com clientes, API, servidor e banco" height="500px" />
         </template>
         <template #code>
           <CodeBlock :code="graphChartNetworkCode" language="vue" />
@@ -955,11 +895,8 @@ const data = {
       <!-- Social Network Graph -->
       <ComponentShowcase title="Rede Social" description="Conexões sociais com labels nas relações">
         <template #preview>
-            <GraphChart 
-              :data="socialGraphData" 
-              title="Rede Social"              subtitle="Conexões entre pessoas com tipos de relação"
-            height="500px"
-          />
+          <GraphChart :data="socialGraphData" title="Rede Social" subtitle="Conexões entre pessoas com tipos de relação"
+            height="500px" />
         </template>
         <template #code>
           <CodeBlock :code="graphChartSocialCode" language="vue" />
@@ -1114,7 +1051,7 @@ const data = {
     list-style: none;
     padding: 0;
 
-    > li {
+    >li {
       padding: 0.75rem 0;
       border-bottom: 1px solid var(--border-color);
 

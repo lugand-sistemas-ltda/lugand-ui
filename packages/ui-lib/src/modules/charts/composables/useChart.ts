@@ -7,7 +7,7 @@
  * - Sistema de coordenadas
  * - Cores do theme
  */
-import { ref, computed, onMounted, onBeforeUnmount, type Ref } from 'vue'
+import { ref, computed, onMounted, onBeforeUnmount, nextTick, type Ref } from 'vue'
 import type { ChartDimensions, ChartScale, ChartOptions } from '../types'
 
 export interface UseChartOptions {
@@ -26,6 +26,8 @@ export interface UseChartOptions {
     }
     /** Opções do gráfico */
     options?: ChartOptions
+    /** Callback chamado quando o gráfico está pronto para desenhar */
+    onReady?: () => void
 }
 
 export interface UseChartReturn {
@@ -51,7 +53,7 @@ export interface UseChartReturn {
 }
 
 export function useChart(options: UseChartOptions): UseChartReturn {
-    const { canvasRef, width: initialWidth = 600, height: initialHeight = 400, padding = {} } = options
+    const { canvasRef, width: initialWidth = 600, height: initialHeight = 400, padding = {}, onReady } = options
 
     const ctx = ref<CanvasRenderingContext2D | null>(null)
 
@@ -148,11 +150,29 @@ export function useChart(options: UseChartOptions): UseChartReturn {
     // Observer de redimensionamento
     let resizeObserver: ResizeObserver | null = null
 
-    onMounted(() => {
+    onMounted(async () => {
         if (!canvasRef.value) return
 
         ctx.value = canvasRef.value.getContext('2d')
+
+        // Resize inicial
         resize()
+
+        // Aguarda o próximo tick do Vue + um frame de animação para garantir 
+        // que o CSS foi aplicado e as dimensões foram calculadas
+        await nextTick()
+
+        // Chama resize novamente para garantir dimensões corretas
+        resize()
+
+        // Aguarda mais um frame antes de notificar que está pronto
+        if (onReady) {
+            requestAnimationFrame(() => {
+                requestAnimationFrame(() => {
+                    onReady()
+                })
+            })
+        }
 
         // Observa mudanças no tamanho do container
         if (options.options?.responsive !== false) {

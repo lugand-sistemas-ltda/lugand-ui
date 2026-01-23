@@ -7,11 +7,15 @@
  * - Vertical ou horizontal
  * - Empilhado (stacked)
  * - Largura de barra configurável
+ * - Tooltip interativo
+ * - Click events
  */
-import { ref, watch, onMounted, computed } from 'vue'
+import { ref, watch, computed } from 'vue'
 import BaseChart from '../../BaseChart/BaseChart.vue'
 import ChartLegend from '../../BaseChart/components/ChartLegend.vue'
+import ChartTooltip from '../../BaseChart/components/ChartTooltip.vue'
 import { useChart } from '../../composables/useChart'
+import { useChartInteraction, type ChartPoint } from '../../composables/useChartInteraction'
 import type { BarChartData, ChartOptions } from '../../types'
 
 interface Props {
@@ -33,12 +37,24 @@ interface Props {
     // Props específicas do BarChart
     data: BarChartData
     options?: ChartOptions
+
+    // Props de interatividade
+    enableTooltip?: boolean
+    enableClick?: boolean
 }
 
 const props = withDefaults(defineProps<Props>(), {
     showLegend: true,
-    legendPosition: 'top'
+    legendPosition: 'top',
+    enableTooltip: true,
+    enableClick: true
 })
+
+// Eventos
+const emit = defineEmits<{
+    'bar-click': [data: { datasetIndex: number; dataIndex: number; value: number; label: string; color?: string }]
+    'bar-hover': [data: { datasetIndex: number; dataIndex: number; value: number; label: string; color?: string } | null]
+}>()
 
 const canvasRef = ref<HTMLCanvasElement | null>(null)
 
@@ -51,7 +67,65 @@ const {
     getThemeColors
 } = useChart({
     canvasRef,
-    options: props.options
+    options: props.options,
+    onReady: () => {
+        draw()
+    }
+})
+
+// Array para armazenar barras renderizadas (para hit detection)
+const renderedBars = ref<ChartPoint[]>([])
+
+// Sistema de interação
+const {
+    tooltipData,
+    tooltipX,
+    tooltipY,
+    hoveredPoint,
+    onPointClick
+} = useChartInteraction({
+    canvasRef,
+    getPoints: () => renderedBars.value,
+    enableTooltip: props.enableTooltip,
+    enableClick: props.enableClick,
+    hitRadius: 20, // Maior para barras
+    tooltipFormatter: (point) => {
+        const dataset = props.data.datasets[point.datasetIndex]
+        return {
+            title: point.label,
+            items: [
+                {
+                    label: dataset?.label || `Dataset ${point.datasetIndex + 1}`,
+                    value: point.value.toFixed(2),
+                    color: point.color
+                }
+            ]
+        }
+    }
+})
+
+onPointClick((point) => {
+    emit('bar-click', {
+        datasetIndex: point.datasetIndex,
+        dataIndex: point.dataIndex,
+        value: point.value,
+        label: point.label,
+        color: point.color
+    })
+})
+
+watch(hoveredPoint, (point) => {
+    if (point) {
+        emit('bar-hover', {
+            datasetIndex: point.datasetIndex,
+            dataIndex: point.dataIndex,
+            value: point.value,
+            label: point.label,
+            color: point.color
+        })
+    } else {
+        emit('bar-hover', null)
+    }
 })
 
 // Controle de visibilidade dos datasets
@@ -80,6 +154,9 @@ const draw = () => {
     if (!ctx.value) return
 
     clear()
+
+    // Limpar barras renderizadas
+    renderedBars.value = []
 
     const area = drawArea.value
     const isHorizontal = props.data.datasets[0]?.orientation === 'horizontal'
@@ -121,11 +198,14 @@ const draw = () => {
     const barWidth = 0.8 / (props.data.stacked ? 1 : visibleData.length)
 
     visibleData.forEach((dataset, datasetIndex) => {
-        if (!datasetVisibility.value[props.data.datasets.indexOf(dataset)]) return
+        const originalIndex = props.data.datasets.indexOf(dataset)
+        if (!datasetVisibility.value[originalIndex]) return
 
         const color = dataset.color || themeColors[datasetIndex % themeColors.length] || '#000000'
 
         dataset.data.forEach((value, index) => {
+            let barCenterX, barCenterY, barWidthPx, barHeightPx
+
             if (props.data.stacked) {
                 // Empilhado: calcular offset baseado em datasets anteriores
                 const offset = visibleData
@@ -142,9 +222,29 @@ const draw = () => {
                     barWidth,
                     isHorizontal
                 )
+
+                // Calcular dimensões da barra para hit detection
+                const categoryPos = categoryScale.toPixel(index)
+                const valueStartPos = valueScale.toPixel(offset)
+                const valueEndPos = valueScale.toPixel(offset + value)
+                const categorySize = Math.abs(categoryScale.toPixel(1) - categoryScale.toPixel(0)) * barWidth
+
+                if (isHorizontal) {
+                    barCenterX = (valueStartPos + valueEndPos) / 2
+                    barCenterY = categoryPos
+                    barWidthPx = Math.abs(valueEndPos - valueStartPos)
+                    barHeightPx = categorySize
+                } else {
+                    barCenterX = categoryPos
+                    barCenterY = (valueStartPos + valueEndPos) / 2
+                    barWidthPx = categorySize
+                    barHeightPx = Math.abs(valueEndPos - valueStartPos)
+                }
             } else {
                 // Lado a lado
                 const barOffset = (datasetIndex - (visibleData.length - 1) / 2) * barWidth
+                const actualBarWidth = barWidth * 0.9
+
                 drawBar(
                     index + barOffset,
                     0,
@@ -152,10 +252,42 @@ const draw = () => {
                     color,
                     categoryScale,
                     valueScale,
-                    barWidth * 0.9,
+                    actualBarWidth,
                     isHorizontal
                 )
+
+                // Calcular dimensões da barra
+                const categoryPos = categoryScale.toPixel(index + barOffset)
+                const valueStartPos = valueScale.toPixel(0)
+                const valueEndPos = valueScale.toPixel(value)
+                const categorySize = Math.abs(categoryScale.toPixel(1) - categoryScale.toPixel(0)) * actualBarWidth
+
+                if (isHorizontal) {
+                    barCenterX = (valueStartPos + valueEndPos) / 2
+                    barCenterY = categoryPos
+                    barWidthPx = Math.abs(valueEndPos - valueStartPos)
+                    barHeightPx = categorySize
+                } else {
+                    barCenterX = categoryPos
+                    barCenterY = (valueStartPos + valueEndPos) / 2
+                    barWidthPx = categorySize
+                    barHeightPx = Math.abs(valueEndPos - valueStartPos)
+                }
             }
+
+            // Adicionar ao array de hit detection com dimensões retangulares
+            renderedBars.value.push({
+                x: barCenterX,
+                y: barCenterY,
+                width: barWidthPx,
+                height: barHeightPx,
+                shape: 'rect',
+                datasetIndex: originalIndex,
+                dataIndex: index,
+                value,
+                label: props.data.labels[index] || `Bar ${index + 1}`,
+                color
+            })
         })
     })
 }
@@ -283,9 +415,9 @@ const drawBar = (
 }
 
 // Lifecycle
-onMounted(() => {
-    draw()
-})
+// onMounted(() => {
+//     draw() // Agora é chamado via onReady callback
+// })
 
 watch([() => props.data, dimensions], () => {
     draw()
@@ -302,6 +434,9 @@ watch([() => props.data, dimensions], () => {
 
         <template #default>
             <canvas ref="canvasRef" />
+
+            <!-- Tooltip interativo -->
+            <ChartTooltip :data="tooltipData" :x="tooltipX" :y="tooltipY" />
         </template>
 
         <template #footer>

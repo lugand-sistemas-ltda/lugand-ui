@@ -7,12 +7,16 @@
  * - Suavização (smooth curves)
  * - Preenchimento de área (fill)
  * - Pontos interativos
+ * - Tooltip interativo
+ * - Click events
  * - Animações
  */
-import { ref, watch, onMounted, computed } from 'vue'
+import { ref, watch, computed } from 'vue'
 import BaseChart from '../../BaseChart/BaseChart.vue'
 import ChartLegend from '../../BaseChart/components/ChartLegend.vue'
+import ChartTooltip from '../../BaseChart/components/ChartTooltip.vue'
 import { useChart } from '../../composables/useChart'
+import { useChartInteraction, type ChartPoint } from '../../composables/useChartInteraction'
 import type { LineChartData, ChartOptions } from '../../types'
 
 interface Props {
@@ -34,18 +38,24 @@ interface Props {
     // Props específicas do LineChart
     data: LineChartData
     options?: ChartOptions
+
+    // Props de interatividade
+    enableTooltip?: boolean
+    enableClick?: boolean
 }
 
 const props = withDefaults(defineProps<Props>(), {
     showLegend: true,
-    legendPosition: 'top'
+    legendPosition: 'top',
+    enableTooltip: true,
+    enableClick: true
 })
 
-// Eventos (para implementar em futuras versões)
-// const emit = defineEmits<{
-//     'point-click': [data: { datasetIndex: number; dataIndex: number; value: number; label: string }]
-//     'point-hover': [data: { datasetIndex: number; dataIndex: number; value: number; label: string } | null]
-// }>()
+// Eventos
+const emit = defineEmits<{
+    'point-click': [data: { datasetIndex: number; dataIndex: number; value: number; label: string; color?: string }]
+    'point-hover': [data: { datasetIndex: number; dataIndex: number; value: number; label: string; color?: string } | null]
+}>()
 
 const canvasRef = ref<HTMLCanvasElement | null>(null)
 
@@ -58,7 +68,68 @@ const {
     getThemeColors
 } = useChart({
     canvasRef,
-    options: props.options
+    options: props.options,
+    onReady: () => {
+        // Desenha apenas quando o canvas estiver pronto
+        draw()
+    }
+})
+
+// Array para armazenar todos os pontos renderizados (para hit detection)
+const renderedPoints = ref<ChartPoint[]>([])
+
+// Sistema de interação (tooltip + click)
+const {
+    tooltipData,
+    tooltipX,
+    tooltipY,
+    hoveredPoint,
+    onPointClick
+} = useChartInteraction({
+    canvasRef,
+    getPoints: () => renderedPoints.value,
+    enableTooltip: props.enableTooltip,
+    enableClick: props.enableClick,
+    tooltipFormatter: (point) => {
+        // Formatter customizado para LineChart
+        const dataset = props.data.datasets[point.datasetIndex]
+        return {
+            title: point.label,
+            items: [
+                {
+                    label: dataset?.label || `Dataset ${point.datasetIndex + 1}`,
+                    value: point.value.toFixed(2),
+                    color: point.color
+                }
+            ]
+        }
+    }
+})
+
+// Registrar callback de click para emitir evento
+onPointClick((point) => {
+    emit('point-click', {
+        datasetIndex: point.datasetIndex,
+        dataIndex: point.dataIndex,
+        value: point.value,
+        label: point.label,
+        color: point.color
+    })
+})
+
+// Watch hover para emitir evento
+watch(hoveredPoint, (point) => {
+    if (point) {
+        emit('point-hover', {
+            datasetIndex: point.datasetIndex,
+            dataIndex: point.dataIndex,
+            value: point.value,
+            label: point.label,
+            color: point.color
+        })
+    } else {
+        emit('point-hover', null)
+    }
 })
 
 // Controle de visibilidade dos datasets
@@ -87,6 +158,9 @@ const draw = () => {
     if (!ctx.value) return
 
     clear()
+
+    // Limpar pontos renderizados
+    renderedPoints.value = []
 
     const area = drawArea.value
 
@@ -127,6 +201,19 @@ const draw = () => {
             x: xScale.toPixel(index),
             y: yScale.toPixel(value)
         }))
+
+        // Adicionar pontos ao array de hit detection
+        dataset.data.forEach((value, index) => {
+            renderedPoints.value.push({
+                x: xScale.toPixel(index),
+                y: yScale.toPixel(value),
+                datasetIndex,
+                dataIndex: index,
+                value,
+                label: props.data.labels[index] || `Point ${index + 1}`,
+                color
+            })
+        })
 
         // Desenhar área preenchida
         if (dataset.fill) {
@@ -286,9 +373,9 @@ const drawPoints = (points: { x: number; y: number }[], color: string, radius: n
 }
 
 // Lifecycle
-onMounted(() => {
-    draw()
-})
+// onMounted(() => {
+//     draw() // Agora é chamado via onReady callback
+// })
 
 watch([() => props.data, dimensions], () => {
     draw()
@@ -305,6 +392,9 @@ watch([() => props.data, dimensions], () => {
 
         <template #default>
             <canvas ref="canvasRef" />
+
+            <!-- Tooltip interativo -->
+            <ChartTooltip :data="tooltipData" :x="tooltipX" :y="tooltipY" />
         </template>
 
         <template #footer>

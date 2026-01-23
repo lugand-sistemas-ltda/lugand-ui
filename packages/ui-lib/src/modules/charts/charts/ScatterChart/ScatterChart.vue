@@ -6,12 +6,15 @@
  * - Pontos (x, y)
  * - Múltiplos datasets
  * - Tamanhos configuráveis
- * - Ideal para correlações
+ * - Tooltip interativo
+ * - Click events
  */
-import { ref, watch, onMounted, computed } from 'vue'
+import { ref, watch, computed } from 'vue'
 import BaseChart from '../../BaseChart/BaseChart.vue'
 import ChartLegend from '../../BaseChart/components/ChartLegend.vue'
+import ChartTooltip from '../../BaseChart/components/ChartTooltip.vue'
 import { useChart } from '../../composables/useChart'
+import { useChartInteraction, type ChartPoint } from '../../composables/useChartInteraction'
 import type { ScatterChartData, ChartOptions } from '../../types'
 
 interface Props {
@@ -33,12 +36,24 @@ interface Props {
     // Props específicas do ScatterChart
     data: ScatterChartData
     options?: ChartOptions
+
+    // Props de interatividade
+    enableTooltip?: boolean
+    enableClick?: boolean
 }
 
 const props = withDefaults(defineProps<Props>(), {
     showLegend: true,
-    legendPosition: 'top'
+    legendPosition: 'top',
+    enableTooltip: true,
+    enableClick: true
 })
+
+// Eventos
+const emit = defineEmits<{
+    'point-click': [data: { datasetIndex: number; dataIndex: number; x: number; y: number; label: string; color?: string }]
+    'point-hover': [data: { datasetIndex: number; dataIndex: number; x: number; y: number; label: string; color?: string } | null]
+}>()
 
 const canvasRef = ref<HTMLCanvasElement | null>(null)
 
@@ -51,7 +66,71 @@ const {
     getThemeColors
 } = useChart({
     canvasRef,
-    options: props.options
+    options: props.options,
+    onReady: () => {
+        draw()
+    }
+})
+
+// Array para armazenar pontos renderizados
+const renderedPoints = ref<ChartPoint[]>([])
+
+// Sistema de interação
+const {
+    tooltipData,
+    tooltipX,
+    tooltipY,
+    hoveredPoint,
+    onPointClick
+} = useChartInteraction({
+    canvasRef,
+    getPoints: () => renderedPoints.value,
+    enableTooltip: props.enableTooltip,
+    enableClick: props.enableClick,
+    tooltipFormatter: (point) => {
+        const dataset = props.data.datasets[point.datasetIndex]
+        return {
+            title: dataset?.label || `Dataset ${point.datasetIndex + 1}`,
+            items: [
+                {
+                    label: 'X',
+                    value: point.value.toFixed(2),
+                    color: point.color
+                },
+                {
+                    label: 'Y',
+                    value: (point.y || 0).toFixed(2),
+                    color: point.color
+                }
+            ]
+        }
+    }
+})
+
+onPointClick((point) => {
+    emit('point-click', {
+        datasetIndex: point.datasetIndex,
+        dataIndex: point.dataIndex,
+        x: point.value,
+        y: point.y || 0,
+        label: point.label,
+        color: point.color
+    })
+})
+
+watch(hoveredPoint, (point) => {
+    if (point) {
+        emit('point-hover', {
+            datasetIndex: point.datasetIndex,
+            dataIndex: point.dataIndex,
+            x: point.value,
+            y: point.y || 0,
+            label: point.label,
+            color: point.color
+        })
+    } else {
+        emit('point-hover', null)
+    }
 })
 
 // Controle de visibilidade dos datasets
@@ -80,6 +159,9 @@ const draw = () => {
     if (!ctx.value) return
 
     clear()
+
+    // Limpar pontos renderizados
+    renderedPoints.value = []
 
     const area = drawArea.value
 
@@ -125,16 +207,28 @@ const draw = () => {
     const themeColors = getThemeColors()
 
     visibleData.forEach((dataset, datasetIndex) => {
-        if (!datasetVisibility.value[props.data.datasets.indexOf(dataset)]) return
+        const originalIndex = props.data.datasets.indexOf(dataset)
+        if (!datasetVisibility.value[originalIndex]) return
 
         const color = dataset.color || themeColors[datasetIndex % themeColors.length] || '#000000'
         const pointRadius = dataset.pointRadius ?? 4
 
-        dataset.data.forEach(point => {
+        dataset.data.forEach((point, pointIndex) => {
             const x = xScale.toPixel(point.x)
             const y = yScale.toPixel(point.y)
 
             drawPoint(x, y, pointRadius, color)
+
+            // Adicionar ao array de hit detection
+            renderedPoints.value.push({
+                x,
+                y,
+                datasetIndex: originalIndex,
+                dataIndex: pointIndex,
+                value: point.x, // Valor X principal
+                label: point.label || `(${point.x.toFixed(1)}, ${point.y.toFixed(1)})`,
+                color
+            })
         })
     })
 }
@@ -229,9 +323,9 @@ const drawPoint = (x: number, y: number, radius: number, color: string) => {
 }
 
 // Lifecycle
-onMounted(() => {
-    draw()
-})
+// onMounted(() => {
+//     draw() // Agora é chamado via onReady callback
+// })
 
 watch([() => props.data, dimensions], () => {
     draw()
@@ -248,6 +342,9 @@ watch([() => props.data, dimensions], () => {
 
         <template #default>
             <canvas ref="canvasRef" />
+
+            <!-- Tooltip interativo -->
+            <ChartTooltip :data="tooltipData" :x="tooltipX" :y="tooltipY" />
         </template>
 
         <template #footer>

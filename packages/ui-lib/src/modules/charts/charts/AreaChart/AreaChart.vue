@@ -2,13 +2,19 @@
 /**
  * AreaChart - Gráfico de área
  * 
- * Basicamente um LineChart com fill=true por padrão
- * Suporta stacked (áreas empilhadas)
+ * Features:
+ * - Múltiplas áreas (datasets)
+ * - Empilhado (stacked)
+ * - Preenchimento gradiente
+ * - Tooltip interativo
+ * - Click events
  */
-import { ref, watch, onMounted, computed } from 'vue'
+import { ref, watch, computed } from 'vue'
 import BaseChart from '../../BaseChart/BaseChart.vue'
 import ChartLegend from '../../BaseChart/components/ChartLegend.vue'
+import ChartTooltip from '../../BaseChart/components/ChartTooltip.vue'
 import { useChart } from '../../composables/useChart'
+import { useChartInteraction, type ChartPoint } from '../../composables/useChartInteraction'
 import type { AreaChartData, ChartOptions } from '../../types'
 
 interface Props {
@@ -30,12 +36,24 @@ interface Props {
     // Props específicas do AreaChart
     data: AreaChartData
     options?: ChartOptions
+
+    // Props de interatividade
+    enableTooltip?: boolean
+    enableClick?: boolean
 }
 
 const props = withDefaults(defineProps<Props>(), {
     showLegend: true,
-    legendPosition: 'top'
+    legendPosition: 'top',
+    enableTooltip: true,
+    enableClick: true
 })
+
+// Eventos
+const emit = defineEmits<{
+    'point-click': [data: { datasetIndex: number; dataIndex: number; value: number; label: string; color?: string }]
+    'point-hover': [data: { datasetIndex: number; dataIndex: number; value: number; label: string; color?: string } | null]
+}>()
 
 const canvasRef = ref<HTMLCanvasElement | null>(null)
 
@@ -48,7 +66,64 @@ const {
     getThemeColors
 } = useChart({
     canvasRef,
-    options: props.options
+    options: props.options,
+    onReady: () => {
+        draw()
+    }
+})
+
+// Array para armazenar pontos renderizados
+const renderedPoints = ref<ChartPoint[]>([])
+
+// Sistema de interação
+const {
+    tooltipData,
+    tooltipX,
+    tooltipY,
+    hoveredPoint,
+    onPointClick
+} = useChartInteraction({
+    canvasRef,
+    getPoints: () => renderedPoints.value,
+    enableTooltip: props.enableTooltip,
+    enableClick: props.enableClick,
+    tooltipFormatter: (point) => {
+        const dataset = props.data.datasets[point.datasetIndex]
+        return {
+            title: point.label,
+            items: [
+                {
+                    label: dataset?.label || `Dataset ${point.datasetIndex + 1}`,
+                    value: point.value.toFixed(2),
+                    color: point.color
+                }
+            ]
+        }
+    }
+})
+
+onPointClick((point) => {
+    emit('point-click', {
+        datasetIndex: point.datasetIndex,
+        dataIndex: point.dataIndex,
+        value: point.value,
+        label: point.label,
+        color: point.color
+    })
+})
+
+watch(hoveredPoint, (point) => {
+    if (point) {
+        emit('point-hover', {
+            datasetIndex: point.datasetIndex,
+            dataIndex: point.dataIndex,
+            value: point.value,
+            label: point.label,
+            color: point.color
+        })
+    } else {
+        emit('point-hover', null)
+    }
 })
 
 // Controle de visibilidade dos datasets
@@ -77,6 +152,9 @@ const draw = () => {
     if (!ctx.value) return
 
     clear()
+
+    // Limpar pontos renderizados
+    renderedPoints.value = []
 
     const area = drawArea.value
 
@@ -113,7 +191,8 @@ const draw = () => {
         const cumulativeData: number[][] = []
 
         visibleData.forEach((dataset, datasetIndex) => {
-            if (!datasetVisibility.value[props.data.datasets.indexOf(dataset)]) return
+            const originalIndex = props.data.datasets.indexOf(dataset)
+            if (!datasetVisibility.value[originalIndex]) return
 
             const color = dataset.color || themeColors[datasetIndex % themeColors.length] || '#000000'
 
@@ -133,6 +212,19 @@ const draw = () => {
                 y: yScale.toPixel(value)
             }))
 
+            // Adicionar pontos ao array de hit detection
+            accumulated.forEach((value, index) => {
+                renderedPoints.value.push({
+                    x: xScale.toPixel(index),
+                    y: yScale.toPixel(value),
+                    datasetIndex: originalIndex,
+                    dataIndex: index,
+                    value: dataset.data[index] || 0,
+                    label: props.data.labels[index] || `Point ${index + 1}`,
+                    color
+                })
+            })
+
             // Pontos inferiores (camada anterior ou baseline)
             const bottomPoints = dataset.data.map((_, index) => {
                 const prevValue = datasetIndex > 0 && cumulativeData[datasetIndex - 1]
@@ -149,7 +241,8 @@ const draw = () => {
     } else {
         // Normal: cada área independente
         visibleData.forEach((dataset, datasetIndex) => {
-            if (!datasetVisibility.value[props.data.datasets.indexOf(dataset)]) return
+            const originalIndex = props.data.datasets.indexOf(dataset)
+            if (!datasetVisibility.value[originalIndex]) return
 
             const color = dataset.color || themeColors[datasetIndex % themeColors.length] || '#000000'
             const lineWidth = dataset.lineWidth ?? 2
@@ -159,6 +252,19 @@ const draw = () => {
                 x: xScale.toPixel(index),
                 y: yScale.toPixel(value)
             }))
+
+            // Adicionar pontos ao array de hit detection
+            dataset.data.forEach((value, index) => {
+                renderedPoints.value.push({
+                    x: xScale.toPixel(index),
+                    y: yScale.toPixel(value),
+                    datasetIndex: originalIndex,
+                    dataIndex: index,
+                    value,
+                    label: props.data.labels[index] || `Point ${index + 1}`,
+                    color
+                })
+            })
 
             // Desenhar área
             drawFilledArea(points, yScale.toPixel(0), color)
@@ -308,9 +414,9 @@ const drawStackedArea = (
 }
 
 // Lifecycle
-onMounted(() => {
-    draw()
-})
+// onMounted(() => {
+//     draw() // Agora é chamado via onReady callback
+// })
 
 watch([() => props.data, dimensions], () => {
     draw()
@@ -327,6 +433,9 @@ watch([() => props.data, dimensions], () => {
 
         <template #default>
             <canvas ref="canvasRef" />
+
+            <!-- Tooltip interativo -->
+            <ChartTooltip :data="tooltipData" :x="tooltipX" :y="tooltipY" />
         </template>
 
         <template #footer>

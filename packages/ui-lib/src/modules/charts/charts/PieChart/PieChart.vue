@@ -5,13 +5,15 @@
  * Features:
  * - Pie ou Donut
  * - Cores automáticas do theme
- * - Labels com valores/percentuais
- * - Interativo (hover futuro)
+ * - Tooltip interativo
+ * - Click events
  */
-import { ref, watch, onMounted, computed } from 'vue'
+import { ref, watch, computed } from 'vue'
 import BaseChart from '../../BaseChart/BaseChart.vue'
 import ChartLegend from '../../BaseChart/components/ChartLegend.vue'
+import ChartTooltip from '../../BaseChart/components/ChartTooltip.vue'
 import { useChart } from '../../composables/useChart'
+import { useChartInteraction, type ChartPoint } from '../../composables/useChartInteraction'
 import type { PieChartData, ChartOptions } from '../../types'
 
 interface Props {
@@ -33,12 +35,24 @@ interface Props {
     // Props específicas do PieChart
     data: PieChartData
     options?: ChartOptions
+
+    // Props de interatividade
+    enableTooltip?: boolean
+    enableClick?: boolean
 }
 
 const props = withDefaults(defineProps<Props>(), {
     showLegend: true,
-    legendPosition: 'right'
+    legendPosition: 'right',
+    enableTooltip: true,
+    enableClick: true
 })
+
+// Eventos
+const emit = defineEmits<{
+    'sector-click': [data: { sectorIndex: number; value: number; label: string; percentage: number; color?: string }]
+    'sector-hover': [data: { sectorIndex: number; value: number; label: string; percentage: number; color?: string } | null]
+}>()
 
 const canvasRef = ref<HTMLCanvasElement | null>(null)
 
@@ -50,7 +64,75 @@ const {
     getThemeColors
 } = useChart({
     canvasRef,
-    options: props.options
+    options: props.options,
+    onReady: () => {
+        draw()
+    }
+})
+
+// Array para armazenar setores renderizados (centro de cada setor)
+const renderedSectors = ref<ChartPoint[]>([])
+
+// Sistema de interação
+const {
+    tooltipData,
+    tooltipX,
+    tooltipY,
+    hoveredPoint,
+    onPointClick
+} = useChartInteraction({
+    canvasRef,
+    getPoints: () => renderedSectors.value,
+    enableTooltip: props.enableTooltip,
+    enableClick: props.enableClick,
+    hitRadius: 100, // Maior para setores
+    tooltipFormatter: (point) => {
+        const total = totalValue.value
+        const percentage = total > 0 ? (point.value / total) * 100 : 0
+        return {
+            title: point.label,
+            items: [
+                {
+                    label: 'Value',
+                    value: point.value.toFixed(0),
+                    color: point.color
+                },
+                {
+                    label: 'Percentage',
+                    value: `${percentage.toFixed(1)}%`,
+                    color: point.color
+                }
+            ]
+        }
+    }
+})
+
+onPointClick((point) => {
+    const total = totalValue.value
+    const percentage = total > 0 ? (point.value / total) * 100 : 0
+    emit('sector-click', {
+        sectorIndex: point.dataIndex,
+        value: point.value,
+        label: point.label,
+        percentage,
+        color: point.color
+    })
+})
+
+watch(hoveredPoint, (point) => {
+    if (point) {
+        const total = totalValue.value
+        const percentage = total > 0 ? (point.value / total) * 100 : 0
+        emit('sector-hover', {
+            sectorIndex: point.dataIndex,
+            value: point.value,
+            label: point.label,
+            percentage,
+            color: point.color
+        })
+    } else {
+        emit('sector-hover', null)
+    }
 })
 
 // Controle de visibilidade dos setores
@@ -87,6 +169,9 @@ const draw = () => {
 
     clear()
 
+    // Limpar setores renderizados
+    renderedSectors.value = []
+
     const area = drawArea.value
 
     // Calcular centro e raio
@@ -113,6 +198,22 @@ const draw = () => {
 
         // Desenhar setor
         drawSector(centerX, centerY, radius, holeRadius, startAngle, endAngle, color)
+
+        // Adicionar centro do setor ao array de hit detection
+        const sectorCenterAngle = startAngle + sweepAngle / 2
+        const sectorCenterRadius = holeRadius + (radius - holeRadius) / 2
+        const sectorCenterX = centerX + Math.cos(sectorCenterAngle) * sectorCenterRadius
+        const sectorCenterY = centerY + Math.sin(sectorCenterAngle) * sectorCenterRadius
+
+        renderedSectors.value.push({
+            x: sectorCenterX,
+            y: sectorCenterY,
+            datasetIndex: 0,
+            dataIndex: index,
+            value,
+            label: props.data.labels[index] || `Sector ${index + 1}`,
+            color
+        })
 
         // Desenhar label (se houver espaço)
         if (percentage > 0.05) { // Só mostra label se > 5%
@@ -184,9 +285,9 @@ const drawLabel = (x: number, y: number, text: string) => {
 }
 
 // Lifecycle
-onMounted(() => {
-    draw()
-})
+// onMounted(() => {
+//     draw() // Agora é chamado via onReady callback
+// })
 
 watch([() => props.data, dimensions, sectorVisibility], () => {
     draw()
@@ -202,6 +303,9 @@ watch([() => props.data, dimensions, sectorVisibility], () => {
 
         <template #default>
             <canvas ref="canvasRef" />
+
+            <!-- Tooltip interativo -->
+            <ChartTooltip :data="tooltipData" :x="tooltipX" :y="tooltipY" />
         </template>
 
         <template #footer>

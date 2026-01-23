@@ -6,11 +6,14 @@
  * - Nós e arestas
  * - Force-directed layout (simulação de física)
  * - Direcionado ou não-direcionado
- * - Dragging de nós (futuro)
+ * - Tooltip interativo (nós + linhas)
+ * - Click events
  */
-import { ref, watch, onMounted } from 'vue'
+import { ref, watch } from 'vue'
 import BaseChart from '../../BaseChart/BaseChart.vue'
+import ChartTooltip from '../../BaseChart/components/ChartTooltip.vue'
 import { useChart } from '../../composables/useChart'
+import { useChartInteraction, type ChartPoint } from '../../composables/useChartInteraction'
 import type { GraphChartData, ChartOptions } from '../../types'
 
 interface Props {
@@ -32,24 +35,128 @@ interface Props {
     // Props específicas do GraphChart
     data: GraphChartData
     options?: ChartOptions
+
+    // Props de interatividade
+    enableTooltip?: boolean
+    enableClick?: boolean
 }
 
 const props = withDefaults(defineProps<Props>(), {
     showLegend: false,
-    legendPosition: 'top'
+    legendPosition: 'top',
+    enableTooltip: true,
+    enableClick: true
 })
+
+// Eventos
+const emit = defineEmits<{
+    'node-click': [data: { nodeId: string; label: string; connections: number }]
+    'edge-click': [data: { source: string; target: string }]
+    'node-hover': [data: { nodeId: string; label: string; connections: number } | null]
+    'edge-hover': [data: { source: string; target: string } | null]
+}>()
 
 const canvasRef = ref<HTMLCanvasElement | null>(null)
 
 const {
     ctx,
-    dimensions,
     drawArea,
     clear,
     getThemeColors
 } = useChart({
     canvasRef,
-    options: props.options
+    options: props.options,
+    onReady: () => {
+        initializePositions()
+        simulatePhysics(100)
+        draw()
+    }
+})
+
+// Array para armazenar nós e linhas renderizadas
+const renderedElements = ref<ChartPoint[]>([])
+
+// Sistema de interação
+const {
+    tooltipData,
+    tooltipX,
+    tooltipY,
+    hoveredPoint,
+    onPointClick
+} = useChartInteraction({
+    canvasRef,
+    getPoints: () => renderedElements.value,
+    enableTooltip: props.enableTooltip,
+    enableClick: props.enableClick,
+    hitRadius: 15,
+    tooltipFormatter: (point) => {
+        // Detectar se é nó ou linha pelo label
+        if (point.label.includes('→') || point.label.includes('↔')) {
+            // É uma linha
+            return {
+                title: 'Connection',
+                items: [
+                    {
+                        label: point.label,
+                        value: '',
+                        color: point.color
+                    }
+                ]
+            }
+        } else {
+            // É um nó
+            return {
+                title: point.label,
+                items: [
+                    {
+                        label: 'Connections',
+                        value: point.value.toString(),
+                        color: point.color
+                    }
+                ]
+            }
+        }
+    }
+})
+
+onPointClick((point) => {
+    // Detectar se é nó ou linha
+    if (point.label.includes('→') || point.label.includes('↔')) {
+        // É uma linha
+        const parts = point.label.split(/\s*[→↔]\s*/)
+        emit('edge-click', {
+            source: parts[0] || '',
+            target: parts[1] || ''
+        })
+    } else {
+        // É um nó
+        emit('node-click', {
+            nodeId: point.label,
+            label: point.label,
+            connections: point.value
+        })
+    }
+})
+
+watch(hoveredPoint, (point) => {
+    if (point) {
+        if (point.label.includes('→') || point.label.includes('↔')) {
+            const parts = point.label.split(/\s*[→↔]\s*/)
+            emit('edge-hover', {
+                source: parts[0] || '',
+                target: parts[1] || ''
+            })
+        } else {
+            emit('node-hover', {
+                nodeId: point.label,
+                label: point.label,
+                connections: point.value
+            })
+        }
+    } else {
+        emit('node-hover', null)
+        emit('edge-hover', null)
+    }
 })
 
 // Posições dos nós (calculadas ou fornecidas)
@@ -108,7 +215,7 @@ const simulatePhysics = (iterations: number = 50) => {
 
                 const dx = nodeB.x - nodeA.x
                 const dy = nodeB.y - nodeA.y
-                const distance = Math.sqrt(dx * dx + dy * dy) || 1
+                const distance = Math.hypot(dx, dy) || 1
                 const force = 500 / (distance * distance)
 
                 const fx = (dx / distance) * force
@@ -129,7 +236,7 @@ const simulatePhysics = (iterations: number = 50) => {
 
             const dx = nodeB.x - nodeA.x
             const dy = nodeB.y - nodeA.y
-            const distance = Math.sqrt(dx * dx + dy * dy) || 1
+            const distance = Math.hypot(dx, dy) || 1
             const force = distance * 0.01
 
             const fx = (dx / distance) * force
@@ -167,13 +274,16 @@ const draw = () => {
         simulatePhysics(100)
     }
 
+    // Limpar elementos renderizados
+    renderedElements.value = []
+
     const themeColors = getThemeColors()
     const defaultNodeColor = themeColors[0] || '#3b82f6'
     const defaultEdgeColor = getComputedStyle(document.documentElement)
         .getPropertyValue('--color-text-secondary').trim()
 
     // Desenhar arestas primeiro (para ficarem atrás dos nós)
-    props.data.edges.forEach(edge => {
+    props.data.edges.forEach((edge, edgeIndex) => {
         const nodeA = nodePositions.value.find(n => n.id === edge.from)
         const nodeB = nodePositions.value.find(n => n.id === edge.to)
         if (!nodeA || !nodeB) return
@@ -181,11 +291,36 @@ const draw = () => {
         const color = edge.color || defaultEdgeColor
         const width = edge.width || 2
 
-        drawEdge(nodeA.x, nodeA.y, nodeB.x, nodeB.y, color, width, edge.directed, edge.label)
+        drawEdge({
+            x1: nodeA.x,
+            y1: nodeA.y,
+            x2: nodeB.x,
+            y2: nodeB.y,
+            color,
+            width,
+            directed: edge.directed,
+            label: edge.label
+        })
+
+        // Adicionar ponto médio da aresta aos elementos renderizados
+        const midX = (nodeA.x + nodeB.x) / 2
+        const midY = (nodeA.y + nodeB.y) / 2
+        const arrowSymbol = edge.directed ? '→' : '↔'
+
+        renderedElements.value.push({
+            x: midX,
+            y: midY,
+            datasetIndex: 1, // 1 para edges
+            dataIndex: edgeIndex,
+            value: edge.width || 1,
+            label: `${edge.from} ${arrowSymbol} ${edge.to}`,
+            color,
+            shape: 'point' // Hit detection circular para edges
+        })
     })
 
     // Desenhar nós
-    props.data.nodes.forEach(node => {
+    props.data.nodes.forEach((node, nodeIndex) => {
         const position = nodePositions.value.find(n => n.id === node.id)
         if (!position) return
 
@@ -193,20 +328,39 @@ const draw = () => {
         const size = node.size || 20
 
         drawNode(position.x, position.y, size, color, node.label)
+
+        // Calcular número de conexões deste nó
+        const connectionsCount = props.data.edges.filter(
+            edge => edge.from === node.id || edge.to === node.id
+        ).length
+
+        // Adicionar nó aos elementos renderizados
+        renderedElements.value.push({
+            x: position.x,
+            y: position.y,
+            datasetIndex: 0, // 0 para nodes
+            dataIndex: nodeIndex,
+            value: connectionsCount,
+            label: node.label,
+            color,
+            shape: 'point' // Hit detection circular para nodes
+        })
     })
 }
 
-const drawEdge = (
-    x1: number,
-    y1: number,
-    x2: number,
-    y2: number,
-    color: string,
-    width: number,
-    directed?: boolean,
+const drawEdge = (params: {
+    x1: number
+    y1: number
+    x2: number
+    y2: number
+    color: string
+    width: number
+    directed?: boolean
     label?: string
-) => {
+}) => {
     if (!ctx.value) return
+
+    const { x1, y1, x2, y2, color, width, directed, label } = params
 
     ctx.value.strokeStyle = color
     ctx.value.lineWidth = width
@@ -293,14 +447,7 @@ const drawNode = (x: number, y: number, size: number, color: string, label: stri
     ctx.value.shadowBlur = 0
 }
 
-// Lifecycle
-onMounted(() => {
-    initializePositions()
-    simulatePhysics(100)
-    draw()
-})
-
-watch([() => props.data, dimensions], () => {
+watch(() => props.data, () => {
     nodePositions.value = []
     initializePositions()
     simulatePhysics(100)
@@ -317,6 +464,9 @@ watch([() => props.data, dimensions], () => {
 
         <template #default>
             <canvas ref="canvasRef" />
+
+            <!-- Tooltip interativo -->
+            <ChartTooltip v-if="enableTooltip" :data="tooltipData" :x="tooltipX" :y="tooltipY" />
         </template>
     </BaseChart>
 </template>

@@ -4,7 +4,7 @@
  * Integra Navbar, Header, Footer e área de conteúdo principal
  */
 import { ref, watch } from 'vue'
-import { Navbar, NavItem, NavLink } from '@/shared/components'
+import { Navbar, NavItem, NavLink } from '@/mo'
 import AppHeader from '@/modules/AppShell/components/AppHeader.vue'
 import AppFooter from '@/modules/AppShell/components/AppFooter.vue'
 import ThemeSelector from '@/modules/AppShell/components/ThemeSelector.vue'
