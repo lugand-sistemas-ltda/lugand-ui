@@ -5,13 +5,13 @@
  * Responsabilidades:
  * - Container responsivo
  * - Header (título, subtítulo, ações)
- * - Toolbar (zoom, export, fullscreen)
+ * - Toolbar (zoom, export, fullscreen, grid toggle)
  * - Legend (posição configurável)
  * - Loading/Error states
  * - Slot para gráfico filho
  */
 import { ref, computed } from 'vue'
-import { Spinner } from '@/shared/components'
+import { Spinner, BtnToggle } from '@/shared/components'
 
 interface BaseChartProps {
     /** Título do gráfico */
@@ -34,7 +34,7 @@ interface BaseChartProps {
 
     /** Mostrar toolbar de ações */
     showToolbar?: boolean
-    /** Mostrar grid */
+    /** Mostrar grid (valor inicial) */
     showGrid?: boolean
 
     /** Estado de loading */
@@ -46,6 +46,8 @@ interface BaseChartProps {
     exportable?: boolean
     /** Permitir fullscreen */
     fullscreenable?: boolean
+    /** Permitir toggle de grid */
+    gridToggleable?: boolean
 
     /** Cores customizadas (sobrescreve theme) */
     colors?: string[]
@@ -59,15 +61,18 @@ const props = withDefaults(defineProps<BaseChartProps>(), {
     showGrid: true,
     loading: false,
     exportable: true,
-    fullscreenable: true
+    fullscreenable: true,
+    gridToggleable: true
 })
 
 const emit = defineEmits<{
     export: [format: 'png' | 'svg' | 'csv']
     fullscreen: []
+    'update:showGrid': [value: boolean]
 }>()
 
 const isFullscreen = ref(false)
+const gridEnabled = ref(props.showGrid)
 
 const containerClasses = computed(() => [
     'chart-container',
@@ -86,12 +91,17 @@ const toggleFullscreen = () => {
     isFullscreen.value = !isFullscreen.value
     emit('fullscreen')
 }
+
+const toggleGrid = (value: boolean) => {
+    gridEnabled.value = value
+    emit('update:showGrid', value)
+}
 </script>
 
 <template>
     <div :class="containerClasses">
         <!-- Header -->
-        <header v-if="title || subtitle || $slots.header" class="chart-header">
+        <header v-if="title || subtitle || $slots.header || showToolbar" class="chart-header">
             <div class="chart-header__content">
                 <slot name="header">
                     <h3 v-if="title" class="chart-header__title">{{ title }}</h3>
@@ -102,6 +112,13 @@ const toggleFullscreen = () => {
             <!-- Toolbar -->
             <div v-if="showToolbar" class="chart-toolbar">
                 <slot name="toolbar">
+                    <!-- Grid Toggle -->
+                    <div v-if="gridToggleable" class="chart-toolbar__grid-toggle">
+                        <BtnToggle v-model="gridEnabled" size="sm" @update:model-value="toggleGrid">
+                            Grid
+                        </BtnToggle>
+                    </div>
+
                     <button v-if="exportable" class="chart-toolbar__btn" type="button" title="Exportar"
                         @click="handleExport('png')">
                         <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor">
@@ -237,6 +254,15 @@ const toggleFullscreen = () => {
 .chart-toolbar {
     display: flex;
     gap: var(--spacing-xs);
+    align-items: center;
+
+    &__grid-toggle {
+        display: flex;
+        align-items: center;
+        margin-right: var(--spacing-xs);
+        padding-right: var(--spacing-xs);
+        border-right: 1px solid var(--color-border-light);
+    }
 
     &__btn {
         display: flex;

@@ -44,6 +44,9 @@ interface Props {
 const props = withDefaults(defineProps<Props>(), {
     showLegend: false,
     legendPosition: 'top',
+    showToolbar: true,
+    exportable: true,
+    fullscreenable: true,
     enableTooltip: true,
     enableClick: true
 })

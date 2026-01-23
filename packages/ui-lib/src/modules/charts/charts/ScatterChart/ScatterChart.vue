@@ -45,6 +45,10 @@ interface Props {
 const props = withDefaults(defineProps<Props>(), {
     showLegend: true,
     legendPosition: 'top',
+    showToolbar: true,
+    showGrid: true,
+    exportable: true,
+    fullscreenable: true,
     enableTooltip: true,
     enableClick: true
 })
@@ -327,7 +331,7 @@ const drawPoint = (x: number, y: number, radius: number, color: string) => {
 //     draw() // Agora é chamado via onReady callback
 // })
 
-watch([() => props.data, dimensions], () => {
+watch([() => props.data, () => props.showGrid, dimensions], () => {
     draw()
 }, { deep: true })
 </script>
