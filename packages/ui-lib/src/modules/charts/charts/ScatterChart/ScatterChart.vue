@@ -61,6 +61,9 @@ const emit = defineEmits<{
 
 const canvasRef = ref<HTMLCanvasElement | null>(null)
 
+// Grid state (controlado pelo BaseChart via v-model)
+const internalShowGrid = ref(props.showGrid)
+
 const {
     ctx,
     dimensions,
@@ -200,7 +203,7 @@ const draw = () => {
     )
 
     // Desenhar grid
-    if (props.showGrid) {
+    if (internalShowGrid.value) {
         drawGrid(xScale, yScale)
     }
 
@@ -331,14 +334,14 @@ const drawPoint = (x: number, y: number, radius: number, color: string) => {
 //     draw() // Agora é chamado via onReady callback
 // })
 
-watch([() => props.data, () => props.showGrid, dimensions], () => {
+watch([() => props.data, internalShowGrid, dimensions], () => {
     draw()
 }, { deep: true })
 </script>
 
 <template>
     <BaseChart :title="title" :subtitle="subtitle" :variant="variant" :show-legend="false" :show-toolbar="showToolbar"
-        :show-grid="showGrid" :loading="loading" :error="error" :exportable="exportable"
+        v-model:show-grid="internalShowGrid" :loading="loading" :error="error" :exportable="exportable"
         :fullscreenable="fullscreenable">
         <template #header>
             <slot name="header" />
