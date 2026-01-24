@@ -198,7 +198,7 @@ export interface ScatterChartData {
     datasets: {
         label: string
         /** Pontos (x, y) */
-        data: { x: number; y: number }[]
+        data: { x: number; y: number; label?: string }[]
         color?: string
         /** Raio dos pontos */
         pointRadius?: number

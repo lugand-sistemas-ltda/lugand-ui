@@ -287,11 +287,6 @@ const drawLabel = (x: number, y: number, text: string) => {
     ctx.value.shadowBlur = 0
 }
 
-// Lifecycle
-// onMounted(() => {
-//     draw() // Agora é chamado via onReady callback
-// })
-
 watch([() => props.data, dimensions, sectorVisibility], () => {
     draw()
 }, { deep: true })
@@ -299,7 +294,8 @@ watch([() => props.data, dimensions, sectorVisibility], () => {
 
 <template>
     <BaseChart :title="title" :subtitle="subtitle" :variant="variant" :show-legend="false" :show-toolbar="showToolbar"
-        :show-grid="false" :loading="loading" :error="error" :exportable="exportable" :fullscreenable="fullscreenable">
+        :show-grid="false" :grid-toggleable="false" :loading="loading" :error="error" :exportable="exportable"
+        :fullscreenable="fullscreenable">
         <template #header>
             <slot name="header" />
         </template>

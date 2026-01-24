@@ -329,11 +329,6 @@ const drawPoint = (x: number, y: number, radius: number, color: string) => {
     ctx.value.stroke()
 }
 
-// Lifecycle
-// onMounted(() => {
-//     draw() // Agora é chamado via onReady callback
-// })
-
 watch([() => props.data, internalShowGrid, dimensions], () => {
     draw()
 }, { deep: true })

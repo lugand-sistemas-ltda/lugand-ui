@@ -184,11 +184,16 @@ const draw = () => {
     // Criar escalas
     let categoryScale, valueScale
 
+    // Para bar charts, adicionar margem nas extremidades (0.5 categoria de cada lado)
+    // Isso evita que as barras grudem nas bordas e sigam o padrão das bibliotecas profissionais
+    const categoryMin = -0.5
+    const categoryMax = props.data.labels.length - 0.5
+
     if (isHorizontal) {
-        categoryScale = createLinearScale(0, props.data.labels.length - 1, [area.y, area.y + area.height])
+        categoryScale = createLinearScale(categoryMin, categoryMax, [area.y, area.y + area.height])
         valueScale = createLinearScale(minValue, maxValue, [area.x, area.x + area.width])
     } else {
-        categoryScale = createLinearScale(0, props.data.labels.length - 1, [area.x, area.x + area.width])
+        categoryScale = createLinearScale(categoryMin, categoryMax, [area.x, area.x + area.width])
         valueScale = createLinearScale(minValue, maxValue, [area.y + area.height, area.y])
     }
 
@@ -248,12 +253,14 @@ const draw = () => {
                     barHeightPx = Math.abs(valueEndPos - valueStartPos)
                 }
             } else {
-                // Lado a lado
+                // Lado a lado: calcular offset em fração da categoria
                 const barOffset = (datasetIndex - (visibleData.length - 1) / 2) * barWidth
                 const actualBarWidth = barWidth * 0.9
 
-                drawBar(
-                    index + barOffset,
+                // Passar índice normal e barOffset separado
+                drawBarWithOffset(
+                    index,
+                    barOffset,
                     0,
                     value,
                     color,
@@ -264,18 +271,19 @@ const draw = () => {
                 )
 
                 // Calcular dimensões da barra
-                const categoryPos = categoryScale.toPixel(index + barOffset)
+                const categoryPos = categoryScale.toPixel(index)
+                const categoryOffsetPx = categoryScale.toPixel(index + barOffset) - categoryPos
                 const valueStartPos = valueScale.toPixel(0)
                 const valueEndPos = valueScale.toPixel(value)
                 const categorySize = Math.abs(categoryScale.toPixel(1) - categoryScale.toPixel(0)) * actualBarWidth
 
                 if (isHorizontal) {
                     barCenterX = (valueStartPos + valueEndPos) / 2
-                    barCenterY = categoryPos
+                    barCenterY = categoryPos + categoryOffsetPx
                     barWidthPx = Math.abs(valueEndPos - valueStartPos)
                     barHeightPx = categorySize
                 } else {
-                    barCenterX = categoryPos
+                    barCenterX = categoryPos + categoryOffsetPx
                     barCenterY = (valueStartPos + valueEndPos) / 2
                     barWidthPx = categorySize
                     barHeightPx = Math.abs(valueEndPos - valueStartPos)
@@ -421,10 +429,45 @@ const drawBar = (
     }
 }
 
-// Lifecycle
-// onMounted(() => {
-//     draw() // Agora é chamado via onReady callback
-// })
+// Versão com offset para barras lado a lado
+const drawBarWithOffset = (
+    index: number,
+    barOffset: number,
+    valueStart: number,
+    valueEnd: number,
+    color: string,
+    categoryScale: any,
+    valueScale: any,
+    barWidth: number,
+    isHorizontal: boolean
+) => {
+    if (!ctx.value) return
+
+    const categoryPos = categoryScale.toPixel(index)
+    const categoryOffsetPx = categoryScale.toPixel(index + barOffset) - categoryPos
+    const valueStartPos = valueScale.toPixel(valueStart)
+    const valueEndPos = valueScale.toPixel(valueEnd)
+
+    const categorySize = Math.abs(categoryScale.toPixel(1) - categoryScale.toPixel(0)) * barWidth
+
+    ctx.value.fillStyle = color
+
+    if (isHorizontal) {
+        const y = categoryPos + categoryOffsetPx - categorySize / 2
+        const x = Math.min(valueStartPos, valueEndPos)
+        const width = Math.abs(valueEndPos - valueStartPos)
+        const height = categorySize
+
+        ctx.value.fillRect(x, y, width, height)
+    } else {
+        const x = categoryPos + categoryOffsetPx - categorySize / 2
+        const y = Math.min(valueStartPos, valueEndPos)
+        const width = categorySize
+        const height = Math.abs(valueEndPos - valueStartPos)
+
+        ctx.value.fillRect(x, y, width, height)
+    }
+}
 
 watch([() => props.data, internalShowGrid, dimensions], () => {
     draw()

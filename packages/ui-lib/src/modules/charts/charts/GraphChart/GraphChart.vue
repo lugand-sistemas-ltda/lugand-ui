@@ -63,6 +63,7 @@ const canvasRef = ref<HTMLCanvasElement | null>(null)
 
 const {
     ctx,
+    dimensions,
     drawArea,
     clear,
     getThemeColors
@@ -450,7 +451,7 @@ const drawNode = (x: number, y: number, size: number, color: string, label: stri
     ctx.value.shadowBlur = 0
 }
 
-watch(() => props.data, () => {
+watch([() => props.data, dimensions], () => {
     nodePositions.value = []
     initializePositions()
     simulatePhysics(100)
@@ -460,7 +461,8 @@ watch(() => props.data, () => {
 
 <template>
     <BaseChart :title="title" :subtitle="subtitle" :variant="variant" :show-legend="false" :show-toolbar="showToolbar"
-        :show-grid="false" :loading="loading" :error="error" :exportable="exportable" :fullscreenable="fullscreenable">
+        :show-grid="false" :grid-toggleable="false" :loading="loading" :error="error" :exportable="exportable"
+        :fullscreenable="fullscreenable">
         <template #header>
             <slot name="header" />
         </template>
