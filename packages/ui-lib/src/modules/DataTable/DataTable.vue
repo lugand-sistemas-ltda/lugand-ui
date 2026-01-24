@@ -10,6 +10,8 @@ interface Props {
     selectable?: boolean
     pagination?: boolean
     itemsPerPageOptions?: number[]
+    /** Disable internal search (when managed externally) */
+    disableSearch?: boolean
 }
 
 const props = withDefaults(defineProps<Props>(), {
@@ -18,7 +20,8 @@ const props = withDefaults(defineProps<Props>(), {
     loading: false,
     selectable: false,
     pagination: false,
-    itemsPerPageOptions: () => [5, 10, 25, 50]
+    itemsPerPageOptions: () => [5, 10, 25, 50],
+    disableSearch: false
 })
 
 const emit = defineEmits<{
@@ -54,11 +57,12 @@ const handleSort = (key: string) => {
 }
 
 // --- Filtering ---
-// Simple client-side search across all fields
+// Simple client-side search across all fields (if not disabled)
 const filteredData = computed(() => {
     let result = [...props.data]
 
-    if (searchQuery.value) {
+    // Only apply internal search if not disabled
+    if (!props.disableSearch && searchQuery.value) {
         const query = searchQuery.value.toLowerCase()
         result = result.filter(row => {
             return Object.values(row).some(val =>
@@ -129,8 +133,8 @@ const isSelected = (row: any) => selectedRows.value.includes(row)
 <template>
     <div class="data-table-wrapper">
         <!-- Toolbar -->
-        <div class="data-table-toolbar">
-            <div class="data-table-toolbar__search">
+        <div class="data-table-toolbar" v-if="!disableSearch || $slots.actions">
+            <div class="data-table-toolbar__search" v-if="!disableSearch">
                 <Input v-model="searchQuery" placeholder="Search..." class="search-input" />
             </div>
             <div class="data-table-toolbar__actions">
@@ -176,9 +180,8 @@ const isSelected = (row: any) => selectedRows.value.includes(row)
                         </td>
                     </tr>
 
-                    <tr v-for="(row, i) in paginatedData" :key="i" :class="{ 'tr-selected': isSelected(row) }"
-                        @click="selectable && toggleRow(row)">
-                        <td v-if="selectable" class="td-checkbox">
+                    <tr v-for="(row, i) in paginatedData" :key="i" :class="{ 'tr-selected': isSelected(row) }">
+                        <td v-if="selectable" class="td-checkbox" @click="toggleRow(row)">
                             <Checkbox :model-value="isSelected(row)" @click.stop="toggleRow(row)" />
                         </td>
                         <td v-for="col in columns" :key="col.key" :class="[`text-${col.align || 'left'}`]">

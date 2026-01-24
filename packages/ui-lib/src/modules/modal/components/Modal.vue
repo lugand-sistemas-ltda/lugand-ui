@@ -18,6 +18,7 @@ import { registerModal, unregisterModal, getModalZIndex } from './modalStack'
 
 interface Props {
     modelValue?: boolean
+    isOpen?: boolean  // Alias for modelValue
     title?: string
     size?: ModalSize
     variant?: ModalVariant
@@ -33,6 +34,7 @@ interface Props {
 
 const props = withDefaults(defineProps<Props>(), {
     modelValue: false,
+    isOpen: false,
     size: 'md',
     variant: 'default',
     closable: true,
@@ -47,14 +49,15 @@ const props = withDefaults(defineProps<Props>(), {
 
 const emit = defineEmits<{
     'update:modelValue': [value: boolean]
+    'update:isOpen': [value: boolean]
     'open': []
     'close': []
     'confirm': []
     'cancel': []
 }>()
 
-// State
-const isOpen = ref(props.modelValue)
+// State - usa isOpen se fornecido, senão usa modelValue
+const isOpen = ref(props.isOpen || props.modelValue)
 const modalRef = ref<HTMLElement | null>(null)
 const modalId = ref<symbol | null>(null)
 const dynamicZIndex = ref<number>(1000)
@@ -71,6 +74,7 @@ const computedZIndex = computed(() => {
 const open = () => {
     isOpen.value = true
     emit('update:modelValue', true)
+    emit('update:isOpen', true)
     emit('open')
     lockScroll()
     nextTick(() => {
@@ -84,6 +88,7 @@ const close = () => {
 
     isOpen.value = false
     emit('update:modelValue', false)
+    emit('update:isOpen', false)
     emit('close')
     unlockScroll()
 }
@@ -92,6 +97,7 @@ const close = () => {
 const forceClose = () => {
     isOpen.value = false
     emit('update:modelValue', false)
+    emit('update:isOpen', false)
     emit('close')
     unlockScroll()
 }
@@ -155,12 +161,24 @@ const focusFirstElement = () => {
 
 // Watchers
 watch(() => props.modelValue, (newVal) => {
-    if (newVal) {
-        open()
-    } else {
-        // Quando o parent muda o v-model para false, sempre fecha (usa forceClose)
-        // Isso permite que persistent e loading fechem via v-model
-        forceClose()
+    if (newVal !== isOpen.value) {
+        if (newVal) {
+            open()
+        } else {
+            // Quando o parent muda o v-model para false, sempre fecha (usa forceClose)
+            // Isso permite que persistent e loading fechem via v-model
+            forceClose()
+        }
+    }
+})
+
+watch(() => props.isOpen, (newVal) => {
+    if (newVal !== isOpen.value) {
+        if (newVal) {
+            open()
+        } else {
+            forceClose()
+        }
     }
 })
 

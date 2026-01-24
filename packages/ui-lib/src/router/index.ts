@@ -84,6 +84,11 @@ const routes: RouteRecordRaw[] = [
     name: 'ui-complex-modals',
     component: () => import('@/views/ui/complex/ModalsView.vue'),
   },
+  {
+    path: '/ui/complex/crud',
+    name: 'ui-complex-crud',
+    component: () => import('@/views/ui/complex/CrudView.vue'),
+  },
   // UI Feedback Components
   {
     path: '/ui/feedback/alerts',

@@ -80,6 +80,7 @@ export {
     Checkbox,
     Select,
     Scrollable,
+    BulkActionBar,
 
     // Display
     Icon,
@@ -92,12 +93,17 @@ export {
 
     // Feedback
     Spinner,
+    Alert,
+    AlertDialog,
 
     // Layout
     ComponentShowcase,
     CodeBlock,
     GridContainer,
     ScrollContainer,
+
+    // Navigation
+    Pagination,
 
     // Forms
     Switch,
@@ -109,9 +115,59 @@ export {
 // COMPOSABLES
 // ============================================
 export {
+    // Theme & UI
     useTheme,
+
+    // Loading
     useLoading,
-    useDateInput
+
+    // Forms & Inputs
+    useDateInput,
+
+    // CRUD & Data Management
+    useCrudStore,
+
+    // Selection & Bulk Actions
+    useSelection,
+    useBulkActions,
+
+    // Validation
+    useValidation,
+    required,
+    minLength,
+    maxLength,
+    min,
+    max,
+    email,
+    url,
+    pattern,
+    matches,
+    oneOf,
+
+    // Search
+    useSearch,
+
+    // Sorting
+    useSorting,
+
+    // Pagination
+    usePagination,
+
+    // Table State
+    useTableState
+} from '../src/shared/composables/index.ts'
+
+export type {
+    // Selection Types
+    UseSelectionOptions,
+    UseSelectionReturn,
+
+    // Bulk Actions Types
+    BulkActionVariant,
+    BulkActionDefinition,
+    BulkActionsState,
+    UseBulkActionsOptions,
+    UseBulkActionsReturn
 } from '../src/shared/composables/index.ts'
 
 // ============================================

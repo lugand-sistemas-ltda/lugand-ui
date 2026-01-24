@@ -9,6 +9,7 @@
 export { default as Btn } from './primitives/Btn.vue'
 export { default as BtnToggle } from './primitives/BtnToggle.vue'
 export { default as Scrollable } from './primitives/Scrollable.vue'
+export { default as BulkActionBar } from './BulkActionBar.vue'
 
 // ============================================
 // FORM PRIMITIVES - Inputs base especializados
@@ -59,9 +60,16 @@ export { default as GridContainer } from './layout/GridContainer.vue'
 export { default as ScrollContainer } from './layout/ScrollContainer.vue'
 
 // ============================================
+// NAVIGATION - Componentes de navegação
+// ============================================
+export { default as Pagination } from './navigation/Pagination.vue'
+
+// ============================================
 // FEEDBACK - Componentes de alerta e notificação
 // ============================================
 // Toast movido para modules/toast
 // Modal movido para modules/modal
 
 export { default as Spinner } from './feedback/Spinner.vue'
+export { default as Alert } from './feedback/Alert.vue'
+export { default as AlertDialog } from './feedback/AlertDialog.vue'

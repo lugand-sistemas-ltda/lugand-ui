@@ -1,0 +1,1024 @@
+/**
+* ============================================
+* CRUD VIEW - Exemplo completo de CRUD com localStorage
+* ============================================
+*
+* Demonstra o uso de:
+* - useCrudStore (localStorage persistence)
+* - useTableState (search + sort + pagination)
+* - useValidation (form validation)
+* - Modal (create/edit forms)
+* - Toast (feedback)
+* - DataTable (data display)
+*
+* Features:
+* - Create, Read, Update, Delete
+* - Client-side search
+* - Column sorting
+* - Pagination
+* - Form validation
+* - localStorage persistence
+* - Bulk delete
+*/
+
+<script setup lang="ts">
+import { ref, computed } from 'vue'
+import { ComponentShowcase, CodeBlock, AlertDialog, Input, BulkActionBar, Icon } from '@/shared/components'
+import {
+  useCrudStore,
+  useTableState,
+  useValidation,
+  useSelection,
+  useBulkActions,
+  required,
+  email,
+  minLength
+} from '@/shared/composables'
+import type { BulkActionDefinition } from '@/shared/composables'
+import { useModal, Modal } from '@/modules/modal'
+import { useToast, ToastProvider } from '@/modules/toast'
+import { DataTable, DynamicForm } from '@/modules'
+import { Btn, Card } from '@/shared/components'
+import type { TableColumn } from '@/modules/DataTable/types'
+import type { FormField } from '@/modules/DynamicForm/DynamicForm.vue'
+import { USERS_DEFAULT, type User } from '@/mocks'
+
+// ============================================
+// COMPOSABLES
+// ============================================
+const userStore = useCrudStore<User>('demo-users', USERS_DEFAULT)
+const toast = useToast()
+const createModal = useModal()
+const editModal = useModal()
+const viewModal = useModal()
+
+// Delete dialog state
+const showDeleteDialog = ref(false)
+
+// ============================================
+// TABLE STATE
+// ============================================
+const tableState = useTableState(userStore.items, {
+  searchFields: ['name', 'email', 'role', 'status'],
+  itemsPerPage: 10,
+  initialSortBy: 'createdAt',
+  initialDirection: 'desc'
+})
+
+const columns: TableColumn[] = [
+  { key: 'name', label: 'Name', sortable: true },
+  { key: 'email', label: 'Email', sortable: true },
+  { key: 'role', label: 'Role', sortable: true },
+  { key: 'status', label: 'Status', sortable: true },
+  { key: 'createdAt', label: 'Created', sortable: true },
+  { key: 'actions', label: 'Actions', align: 'right' }
+]
+
+// ============================================
+// FORM STATE
+// ============================================
+const formData = ref<Partial<User>>({})
+const isEditing = ref(false)
+const selectedUser = ref<User | null>(null)
+
+const validation = useValidation<User>()
+
+const formFields: FormField[] = [
+  {
+    name: 'name',
+    label: 'Name',
+    type: 'text',
+    required: true,
+    placeholder: 'Enter full name',
+    cols: 2 // Full width (2 colunas no grid de 2)
+  },
+  {
+    name: 'email',
+    label: 'Email',
+    type: 'email',
+    required: true,
+    placeholder: 'user@example.com',
+    cols: 2 // Full width
+  },
+  {
+    name: 'role',
+    label: 'Role',
+    type: 'select',
+    required: true,
+    options: [
+      { value: 'admin', label: 'Admin' },
+      { value: 'editor', label: 'Editor' },
+      { value: 'viewer', label: 'Viewer' }
+    ],
+    cols: 1 // Half width
+  },
+  {
+    name: 'status',
+    label: 'Status',
+    type: 'select',
+    required: true,
+    options: [
+      { value: 'active', label: 'Active' },
+      { value: 'inactive', label: 'Inactive' },
+      { value: 'pending', label: 'Pending' }
+    ],
+    cols: 1 // Half width
+  }
+]
+
+const validationRules = {
+  name: [required(), minLength(3)],
+  email: [required(), email()],
+  role: [required()],
+  status: [required()]
+}
+
+// ============================================
+// SELECTION STATE (novo composable)
+// ============================================
+const selection = useSelection<User>({
+  getKey: (user) => user.id,
+  onChange: (selected) => {
+    console.log(`Selection changed: ${selected.length} items selected`)
+  }
+})
+
+// Bulk Actions
+const bulkActions = useBulkActions<User>({
+  selection: selection.selected,
+  onSuccess: (action, items) => {
+    console.log(`Bulk action '${action.id}' completed for ${items.length} items`)
+  },
+  onError: (action, error) => {
+    console.error(`Bulk action '${action.id}' failed:`, error)
+  }
+})
+
+// Registrar ação de delete em lote
+bulkActions.register({
+  id: 'bulk-delete',
+  label: 'Delete',
+  icon: 'delete', // UI Icon from our library
+  variant: 'danger',
+  minSelection: 1,
+  confirmation: {
+    title: 'Delete Users',
+    message: (items) => `Are you sure you want to delete ${items.length} user(s)?`,
+    confirmText: 'Delete',
+    cancelText: 'Cancel'
+  },
+  execute: async (items) => {
+    const ids = items.map(u => u.id)
+    const count = userStore.removeMany(ids)
+    toast.success(`${count} users deleted successfully`)
+  }
+})
+
+// ============================================
+// CRUD OPERATIONS
+// ============================================
+
+/**
+ * Abre o modal de criação
+ */
+function openCreateModal(): void {
+  isEditing.value = false
+  formData.value = {
+    name: '',
+    email: '',
+    role: 'viewer',
+    status: 'active'
+  }
+  validation.clearErrors()
+  createModal.open()
+}
+
+/**
+ * Abre o modal de edição
+ */
+function openEditModal(user: User): void {
+  isEditing.value = true
+  selectedUser.value = user
+  formData.value = { ...user }
+  validation.clearErrors()
+  editModal.open()
+}
+
+/**
+ * Abre o modal de visualização
+ */
+function openViewModal(user: User): void {
+  selectedUser.value = user
+  viewModal.open()
+}
+
+/**
+ * Abre o modal de confirmação de exclusão
+ */
+function openDeleteModal(user: User): void {
+  selectedUser.value = user
+  showDeleteDialog.value = true
+}
+
+/**
+ * Cria um novo usuário
+ */
+async function handleCreate(): Promise<void> {
+  const isValid = await validation.validate(formData.value as User, validationRules)
+
+  if (!isValid) {
+    toast.error('Please fix the form errors')
+    return
+  }
+
+  try {
+    userStore.create(formData.value as Omit<User, 'id' | 'createdAt' | 'updatedAt'>)
+    toast.success('User created successfully')
+    createModal.close()
+  } catch (err) {
+    toast.error('Failed to create user')
+    console.error(err)
+  }
+}
+
+/**
+ * Atualiza um usuário existente
+ */
+async function handleUpdate(): Promise<void> {
+  if (!selectedUser.value) return
+
+  const isValid = await validation.validate(formData.value as User, validationRules)
+
+  if (!isValid) {
+    toast.error('Please fix the form errors')
+    return
+  }
+
+  try {
+    userStore.update(selectedUser.value.id, formData.value)
+    toast.success('User updated successfully')
+    editModal.close()
+  } catch (err) {
+    toast.error('Failed to update user')
+    console.error(err)
+  }
+}
+
+/**
+ * Deleta um usuário
+ */
+function handleDelete(): void {
+  if (!selectedUser.value) return
+
+  try {
+    userStore.remove(selectedUser.value.id)
+    toast.success(`User "${selectedUser.value.name}" deleted successfully`)
+    showDeleteDialog.value = false
+    selectedUser.value = null
+  } catch (err) {
+    toast.error('Failed to delete user')
+    console.error(err)
+  }
+}
+
+/**
+ * Reset CRUD - Recarrega dados iniciais
+ */
+function handleResetCrud(): void {
+  // Limpar localStorage
+  localStorage.removeItem('demo-users')
+
+  // Recarregar dados default
+  userStore.items.value = [...USERS_DEFAULT]
+
+  // Limpar seleções (usar novo composable)
+  selection.clear()
+
+  // Resetar busca
+  tableState.searchTerm.value = ''
+
+  // Feedback
+  toast.success('CRUD reset to default data')
+}
+
+/**
+ * Formata data para exibição
+ */
+function formatDate(date: Date): string {
+  return new Date(date).toLocaleDateString('pt-BR')
+}
+
+/**
+ * Badge color por role
+ */
+function getRoleBadgeColor(role: string): string {
+  const colors: Record<string, string> = {
+    admin: 'var(--color-error)',
+    editor: 'var(--color-warning)',
+    viewer: 'var(--color-info)'
+  }
+  return colors[role] || 'var(--color-text-secondary)'
+}
+
+/**
+ * Badge color por status
+ */
+function getStatusBadgeColor(status: string): string {
+  const colors: Record<string, string> = {
+    active: 'var(--color-success)',
+    inactive: 'var(--color-text-secondary)',
+    pending: 'var(--color-warning)'
+  }
+  return colors[status] || 'var(--color-text-secondary)'
+}
+
+// ============================================
+// CODE EXAMPLES
+// ============================================
+const crudStoreExample = `
+<script setup>
+import { useCrudStore } from '@lugand/vue-ui-lib'
+import { USERS_DEFAULT } from '@/mocks'
+
+// Initialize store with localStorage persistence
+const userStore = useCrudStore('users', USERS_DEFAULT)
+
+// Create
+const newUser = userStore.create({
+  name: 'João Silva',
+  email: 'joao@email.com',
+  role: 'editor',
+  status: 'active'
+})
+
+// Read
+const all = userStore.findAll()
+const one = userStore.findById('id-123')
+const admins = userStore.findWhere(u => u.role === 'admin')
+
+// Update
+userStore.update('id-123', { name: 'João Santos' })
+
+// Delete
+userStore.remove('id-123')
+userStore.removeMany(['id-1', 'id-2', 'id-3'])
+
+// State
+console.log(userStore.count)    // Total items
+console.log(userStore.isEmpty)  // Is empty?
+console.log(userStore.loading)  // Loading state
+<\/script>
+`
+
+const tableStateExample = `
+<script setup>
+import { useTableState } from '@lugand/vue-ui-lib'
+import { DataTable } from '@lugand/vue-ui-lib'
+
+const {
+  displayedItems,     // Final items (search + sort + pagination)
+  searchTerm,
+  sortBy,
+  currentPage,
+  totalPages,
+  toggleSort,
+  goToPage
+} = useTableState(users, {
+  searchFields: ['name', 'email'],
+  itemsPerPage: 10,
+  initialSortBy: 'createdAt',
+  initialDirection: 'desc'
+})
+<\/script>
+
+<template>
+  <DataTable 
+    :data="displayedItems" 
+    :columns="columns"
+    selectable
+    pagination
+  />
+</template>
+`
+
+const validationExample = `
+<script setup>
+import { 
+  useValidation, 
+  required, 
+  email, 
+  minLength 
+} from '@lugand/vue-ui-lib'
+
+const { validate, errors, isValid } = useValidation()
+
+const rules = {
+  name: [required(), minLength(3)],
+  email: [required(), email()],
+  role: [required()]
+}
+
+async function handleSubmit() {
+  await validate(formData, rules)
+  
+  if (isValid.value) {
+    // Submit form
+  } else {
+    console.log(errors.value)
+    // { name: 'Deve ter no mínimo 3 caracteres' }
+  }
+}
+<\/script>
+`
+
+const fullExample = `
+<script setup>
+import { useCrudStore, useTableState, useValidation } from '@lugand/vue-ui-lib'
+import { useModal, useToast } from '@lugand/vue-ui-lib'
+import { DataTable, DynamicForm, Modal, ToastProvider } from '@lugand/vue-ui-lib'
+import { USERS_DEFAULT } from '@/mocks'
+
+// CRUD Store with localStorage
+const userStore = useCrudStore('users', USERS_DEFAULT)
+
+// Table State (search + sort + pagination)
+const tableState = useTableState(userStore.items, {
+  searchFields: ['name', 'email', 'role'],
+  itemsPerPage: 10
+})
+
+// Validation
+const validation = useValidation()
+const rules = {
+  name: [required(), minLength(3)],
+  email: [required(), email()]
+}
+
+// Modals
+const createModal = useModal()
+const toast = useToast()
+
+// Create user
+async function handleCreate() {
+  const isValid = await validation.validate(formData.value, rules)
+  if (!isValid) {
+    toast.error('Please fix form errors')
+    return
+  }
+  
+  userStore.create(formData.value)
+  toast.success('User created successfully')
+  createModal.close()
+}
+<\/script>
+
+<template>
+  <div>
+    <ToastProvider />
+    
+    <!-- Stats -->
+    <div class="stats">
+      <p>Total: {{ userStore.count }}</p>
+      <p>Filtered: {{ tableState.filteredTotal }}</p>
+    </div>
+    
+    <!-- Table -->
+    <DataTable
+      :data="tableState.displayedItems"
+      :columns="columns"
+      selectable
+      pagination
+    />
+    
+    <!-- Create Modal -->
+    <Modal :is-open="createModal.isOpen.value" @close="createModal.close()">
+      <DynamicForm v-model="formData" :schema="fields" />
+      <button @click="handleCreate">Create</button>
+    </Modal>
+  </div>
+</template>
+`
+</script>
+
+<template>
+  <div class="crud-view">
+    <ToastProvider />
+
+    <!-- Page Header -->
+    <div class="crud-view__header">
+      <h1>CRUD System</h1>
+      <p class="subtitle">
+        Complete CRUD implementation with localStorage persistence, validation, search, sorting, and pagination.
+      </p>
+    </div>
+
+    <!-- 1. Full CRUD Example (Main Showcase) -->
+    <ComponentShowcase title="Full CRUD Example"
+      description="Complete CRUD interface with DataTable, search, sorting, pagination, bulk actions, and inline actions. Data persists in localStorage.">
+      <template #preview>
+        <Card>
+          <!-- Table Controls & Stats -->
+          <div class="table-controls">
+            <div class="table-controls__stats">
+              <div class="stat-item">
+                <span class="stat-label">Total:</span>
+                <span class="stat-value">{{ userStore.count }}</span>
+              </div>
+              <div class="stat-item">
+                <span class="stat-label">Filtered:</span>
+                <span class="stat-value">{{ tableState.filteredTotal }}</span>
+              </div>
+              <div class="stat-item">
+                <span class="stat-label">Selected:</span>
+                <span class="stat-value">{{ selection.count }}</span>
+              </div>
+            </div>
+
+            <div class="table-controls__search">
+              <Input v-model="tableState.searchTerm.value" placeholder="Search users..." type="text"
+                class="search-input" />
+            </div>
+
+            <div class="table-controls__actions">
+              <Btn variant="outline" size="sm" @click="handleResetCrud">
+                🔄 Reset
+              </Btn>
+              <Btn variant="primary" size="sm" @click="openCreateModal">
+                + Create User
+              </Btn>
+            </div>
+          </div>
+
+          <!-- Bulk Action Bar -->
+          <BulkActionBar v-if="selection.hasSelection" :actions="bulkActions.availableActions.value"
+            :selection="selection.selected.value" :loading="bulkActions.state.value.isExecuting"
+            @execute="bulkActions.execute" />
+
+          <DataTable :data="tableState.displayedItems.value" :columns="columns" :loading="userStore.loading.value"
+            selectable pagination disable-search @update:selection="selection.setSelection($event)">
+            <!-- Custom cell: Role -->
+            <template #role="{ value }">
+              <span class="badge" :style="{ backgroundColor: getRoleBadgeColor(value) }">
+                {{ value }}
+              </span>
+            </template>
+
+            <!-- Custom cell: Status -->
+            <template #status="{ value }">
+              <span class="badge" :style="{ backgroundColor: getStatusBadgeColor(value) }">
+                {{ value }}
+              </span>
+            </template>
+
+            <!-- Custom cell: Created At -->
+            <template #createdAt="{ value }">
+              {{ formatDate(value) }}
+            </template>
+
+            <!-- Custom cell: Actions -->
+            <template #actions="slotProps: any">
+              <div class="actions-cell">
+                <Btn size="sm" variant="ghost" @click="openViewModal(slotProps.row)">
+                  View
+                </Btn>
+                <Btn size="sm" variant="ghost" @click="openEditModal(slotProps.row)">
+                  Edit
+                </Btn>
+                <Btn size="sm" variant="danger" @click="openDeleteModal(slotProps.row)">
+                  Delete
+                </Btn>
+              </div>
+            </template>
+          </DataTable>
+        </Card>
+      </template>
+
+      <template #code>
+        <CodeBlock :code="fullExample" language="typescript" />
+      </template>
+    </ComponentShowcase>
+
+    <!-- 2. useCrudStore Showcase -->
+    <ComponentShowcase title="useCrudStore - CRUD with localStorage"
+      description="Composable for managing CRUD operations with automatic localStorage persistence. Provides reactive state and complete CRUD methods.">
+      <template #preview>
+        <div class="showcase-content">
+          <!-- Stats Cards -->
+          <div class="stats-grid">
+            <Card class="stat-card">
+              <div class="stat-card__content">
+                <span class="stat-card__label">Total Users</span>
+                <span class="stat-card__value">{{ userStore.count }}</span>
+              </div>
+            </Card>
+
+            <Card class="stat-card">
+              <div class="stat-card__content">
+                <span class="stat-card__label">Filtered Results</span>
+                <span class="stat-card__value">{{ tableState.filteredTotal }}</span>
+              </div>
+            </Card>
+
+            <Card class="stat-card">
+              <div class="stat-card__content">
+                <span class="stat-card__label">Selected</span>
+                <span class="stat-card__value">{{ selection.count }}</span>
+              </div>
+            </Card>
+          </div>
+
+          <!-- Actions -->
+          <div class="showcase-actions">
+            <Btn variant="outline" size="sm" @click="handleResetCrud">
+              🔄 Reset to Defaults
+            </Btn>
+            <Btn variant="primary" size="sm" @click="openCreateModal">
+              + Create User
+            </Btn>
+          </div>
+        </div>
+      </template>
+
+      <template #code>
+        <CodeBlock :code="crudStoreExample" language="typescript" />
+      </template>
+    </ComponentShowcase>
+
+    <!-- 3. useTableState Showcase -->
+    <ComponentShowcase title="useTableState - High-level Table Composable"
+      description="Combines search, sorting, and pagination into a single composable. Perfect for complex tables.">
+      <template #preview>
+        <Card>
+          <div class="table-state-demo">
+            <div class="demo-controls">
+              <Input v-model="tableState.searchTerm.value" placeholder="Search users..." type="text" />
+              <div class="demo-stats">
+                <span>Page: {{ tableState.currentPage.value }} / {{ tableState.totalPages.value }}</span>
+                <span>|</span>
+                <span>Showing: {{ tableState.displayedItems.value.length }} items</span>
+                <span>|</span>
+                <span>Filtered: {{ tableState.filteredTotal.value }} total</span>
+              </div>
+            </div>
+            <p class="demo-note">
+              ℹ️ Try searching above to see real-time filtering. The table below uses the same data.
+            </p>
+          </div>
+        </Card>
+      </template>
+
+      <template #code>
+        <CodeBlock :code="tableStateExample" language="typescript" />
+      </template>
+    </ComponentShowcase>
+
+    <!-- 4. useValidation Showcase -->
+    <ComponentShowcase title="useValidation - Custom Validation System"
+      description="Composable for form validation without external dependencies. Includes 9 built-in validators.">
+      <template #preview>
+        <Card>
+          <div class="validation-demo">
+            <div class="demo-errors" v-if="Object.keys(validation.errors.value).length > 0">
+              <h4>Current Validation Errors:</h4>
+              <ul>
+                <li v-for="(error, field) in validation.errors.value" :key="field">
+                  <strong>{{ field }}:</strong> {{ error }}
+                </li>
+              </ul>
+            </div>
+            <div v-else class="demo-success">
+              ✅ No validation errors! Form is valid.
+            </div>
+            <p class="demo-note">
+              💡 Validation runs automatically when you submit the create/edit forms above.
+              Open DevTools Console to see validation in action.
+            </p>
+          </div>
+        </Card>
+      </template>
+
+      <template #code>
+        <CodeBlock :code="validationExample" language="typescript" />
+      </template>
+    </ComponentShowcase>
+
+    <!-- Create Modal -->
+    <Modal :model-value="createModal.isOpen.value" title="Create User"
+      @update:model-value="createModal.isOpen.value = $event" @close="createModal.close()">
+      <DynamicForm v-model="formData" :schema="formFields" />
+
+      <template #footer>
+        <Btn variant="ghost" @click="createModal.close()">
+          Cancel
+        </Btn>
+        <Btn variant="primary" @click="handleCreate">
+          Create
+        </Btn>
+      </template>
+    </Modal>
+
+    <!-- Edit Modal -->
+    <Modal :model-value="editModal.isOpen.value" title="Edit User" @update:model-value="editModal.isOpen.value = $event"
+      @close="editModal.close()">
+      <DynamicForm v-model="formData" :schema="formFields" />
+
+      <template #footer>
+        <Btn variant="ghost" @click="editModal.close()">
+          Cancel
+        </Btn>
+        <Btn variant="primary" @click="handleUpdate">
+          Update
+        </Btn>
+      </template>
+    </Modal>
+
+    <!-- View Modal (Read-only) -->
+    <Modal :model-value="viewModal.isOpen.value" title="User Details"
+      @update:model-value="viewModal.isOpen.value = $event" @close="viewModal.close()">
+      <div v-if="selectedUser" class="user-details">
+        <div class="detail-row">
+          <span class="detail-label">Name:</span>
+          <span class="detail-value">{{ selectedUser.name }}</span>
+        </div>
+        <div class="detail-row">
+          <span class="detail-label">Email:</span>
+          <span class="detail-value">{{ selectedUser.email }}</span>
+        </div>
+        <div class="detail-row">
+          <span class="detail-label">Role:</span>
+          <span class="badge" :style="{ backgroundColor: getRoleBadgeColor(selectedUser.role) }">
+            {{ selectedUser.role }}
+          </span>
+        </div>
+        <div class="detail-row">
+          <span class="detail-label">Status:</span>
+          <span class="badge" :style="{ backgroundColor: getStatusBadgeColor(selectedUser.status) }">
+            {{ selectedUser.status }}
+          </span>
+        </div>
+        <div class="detail-row">
+          <span class="detail-label">Created:</span>
+          <span class="detail-value">{{ formatDate(selectedUser.createdAt) }}</span>
+        </div>
+        <div class="detail-row">
+          <span class="detail-label">Updated:</span>
+          <span class="detail-value">{{ formatDate(selectedUser.updatedAt) }}</span>
+        </div>
+      </div>
+
+      <template #footer>
+        <Btn variant="ghost" @click="viewModal.close()">
+          Close
+        </Btn>
+        <Btn variant="primary" @click="viewModal.close(); openEditModal(selectedUser!)">
+          Edit User
+        </Btn>
+      </template>
+    </Modal>
+
+    <!-- Delete Confirmation Dialog -->
+    <AlertDialog :is-open="showDeleteDialog" variant="danger" title="Delete User?"
+      :message="`Are you sure you want to delete user '${selectedUser?.name}'? This action cannot be undone.`"
+      confirm-text="Delete" cancel-text="Cancel" @confirm="handleDelete" @cancel="showDeleteDialog = false"
+      @close="showDeleteDialog = false" />
+  </div>
+</template>
+
+<style lang="scss" scoped>
+.crud-view {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-xl);
+
+  &__header {
+    h1 {
+      margin: 0 0 var(--spacing-xs);
+      font-size: var(--font-size-3xl);
+      font-weight: 700;
+      color: var(--color-text-primary);
+    }
+
+    .subtitle {
+      margin: 0;
+      font-size: var(--font-size-md);
+      color: var(--color-text-secondary);
+      max-width: 800px;
+    }
+  }
+}
+
+// Showcase-specific styles
+.showcase-content {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-md);
+  width: 100%;
+}
+
+.showcase-actions {
+  display: flex;
+  gap: var(--spacing-sm);
+  justify-content: flex-end;
+  padding: var(--spacing-sm) 0;
+}
+
+.stats-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: var(--spacing-md);
+}
+
+.stat-card {
+  &__content {
+    display: flex;
+    flex-direction: column;
+    gap: var(--spacing-xs);
+    padding: var(--spacing-md);
+  }
+
+  &__label {
+    font-size: var(--font-size-sm);
+    color: var(--color-text-secondary);
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+  }
+
+  &__value {
+    font-size: var(--font-size-2xl);
+    font-weight: 700;
+    color: var(--color-text-primary);
+  }
+}
+
+.badge {
+  display: inline-block;
+  padding: var(--spacing-xs) var(--spacing-sm);
+  border-radius: var(--radius-sm);
+  font-size: var(--font-size-xs);
+  font-weight: 600;
+  color: white;
+  text-transform: capitalize;
+}
+
+.actions-cell {
+  display: flex;
+  gap: var(--spacing-xs);
+  justify-content: flex-end;
+}
+
+.user-details {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-md);
+  padding: var(--spacing-md) 0;
+
+  .detail-row {
+    display: flex;
+    align-items: center;
+    gap: var(--spacing-md);
+    padding: var(--spacing-sm);
+    border-bottom: 1px solid var(--color-border);
+
+    &:last-child {
+      border-bottom: none;
+    }
+  }
+
+  .detail-label {
+    min-width: 100px;
+    font-weight: 600;
+    color: var(--color-text-secondary);
+    font-size: var(--font-size-sm);
+  }
+
+  .detail-value {
+    flex: 1;
+    color: var(--color-text-primary);
+  }
+}
+
+.warning-text {
+  color: var(--color-error);
+  font-size: var(--font-size-sm);
+  margin-top: var(--spacing-sm);
+}
+
+// Demo showcases styles
+.table-state-demo,
+.validation-demo {
+  padding: var(--spacing-md);
+}
+
+.demo-controls {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-md);
+  margin-bottom: var(--spacing-md);
+}
+
+.demo-stats {
+  display: flex;
+  gap: var(--spacing-sm);
+  font-size: var(--font-size-sm);
+  color: var(--color-text-secondary);
+  align-items: center;
+}
+
+.demo-note {
+  margin: var(--spacing-md) 0 0;
+  padding: var(--spacing-sm);
+  background: var(--color-bg-secondary);
+  border-left: 3px solid var(--color-info);
+  border-radius: var(--radius-sm);
+  font-size: var(--font-size-sm);
+  color: var(--color-text-secondary);
+}
+
+// Table Controls (novo layout compacto)
+.table-controls {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: var(--spacing-md);
+  border-bottom: 1px solid var(--color-border);
+  gap: var(--spacing-md);
+  flex-wrap: wrap;
+
+  &__stats {
+    display: flex;
+    gap: var(--spacing-lg);
+    align-items: center;
+  }
+
+  &__search {
+    flex: 1;
+    min-width: 200px;
+    max-width: 400px;
+
+    .search-input {
+      width: 100%;
+    }
+  }
+
+  &__actions {
+    display: flex;
+    gap: var(--spacing-sm);
+    align-items: center;
+  }
+}
+
+.stat-item {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-xs);
+  font-size: var(--font-size-sm);
+
+  .stat-label {
+    color: var(--color-text-secondary);
+    font-weight: 500;
+  }
+
+  .stat-value {
+    color: var(--color-primary);
+    font-weight: 700;
+    font-size: var(--font-size-base);
+  }
+}
+
+.demo-errors {
+  padding: var(--spacing-md);
+  background: rgba(239, 68, 68, 0.1);
+  border: 1px solid var(--color-error);
+  border-radius: var(--radius-sm);
+  margin-bottom: var(--spacing-md);
+
+  h4 {
+    margin: 0 0 var(--spacing-sm);
+    color: var(--color-error);
+    font-size: var(--font-size-sm);
+  }
+
+  ul {
+    margin: 0;
+    padding-left: var(--spacing-lg);
+    list-style-type: disc;
+  }
+
+  li {
+    margin-bottom: var(--spacing-xs);
+    font-size: var(--font-size-sm);
+    color: var(--color-text-primary);
+  }
+}
+
+.demo-success {
+  padding: var(--spacing-md);
+  background: rgba(34, 197, 94, 0.1);
+  border: 1px solid var(--color-success);
+  border-radius: var(--radius-sm);
+  margin-bottom: var(--spacing-md);
+  font-size: var(--font-size-sm);
+  color: var(--color-success);
+  font-weight: 600;
+}
+</style>
