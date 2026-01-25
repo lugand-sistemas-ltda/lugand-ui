@@ -23,7 +23,7 @@
 
 <script setup lang="ts">
 import { ref, computed } from 'vue'
-import { ComponentShowcase, CodeBlock, AlertDialog, Input, Icon } from '@/shared/components'
+import { ComponentShowcase, CodeBlock, AlertDialog, InputWithAddon, Icon } from '@/shared/components'
 import {
   useCrudStore,
   useTableState,
@@ -61,6 +61,14 @@ const tableState = useTableState(userStore.items, {
   itemsPerPage: 10,
   initialSortBy: 'createdAt',
   initialDirection: 'desc'
+})
+
+// Instância separada para demonstração do useTableState showcase
+const demoTableState = useTableState(userStore.items, {
+  searchFields: ['name', 'email', 'role', 'status'],
+  itemsPerPage: 5, // Menos itens para demonstração
+  initialSortBy: 'name',
+  initialDirection: 'asc'
 })
 
 const columns: TableColumn[] = [
@@ -515,14 +523,10 @@ async function handleCreate() {
       description="Complete CRUD interface with DataTable, search, sorting, pagination, bulk actions, and inline actions. Data persists in localStorage.">
       <template #preview>
         <Card>
-          <!-- Table Controls: Search + Stats -->
-          <div class="table-controls">
-            <div class="table-controls__search">
-              <Input v-model="tableState.searchTerm.value" placeholder="Search users..." type="text"
-                class="search-input" />
-            </div>
-
-            <div class="table-controls__stats">
+          <!-- Header: Título + Stats -->
+          <div class="table-header">
+            <h2 class="table-title">Users Management</h2>
+            <div class="table-header__stats">
               <div class="stat-item">
                 <span class="stat-label">Total:</span>
                 <span class="stat-value">{{ userStore.count }}</span>
@@ -542,19 +546,32 @@ async function handleCreate() {
             selectable pagination disable-search @update:selection="selection.setSelection($event)">
             <!-- Toolbar Actions Slot -->
             <template #actions>
-              <Btn variant="outline" size="sm" @click="handleResetCrud">
-                <Icon name="arrows_horizontal" type="ui" size="sm" />
-                Reset
-              </Btn>
-              <Btn variant="danger" size="sm" @click="handleBulkDelete"
-                :disabled="!selection.hasSelection || bulkActions.state.value.isExecuting">
-                <Icon name="delete" type="ui" size="sm" />
-                Delete
-              </Btn>
-              <Btn variant="primary" size="sm" @click="openCreateModal">
-                <Icon name="plus" type="ui" size="sm" />
-                Create
-              </Btn>
+              <!-- Left Side: Search Input -->
+              <div class="table-toolbar__left">
+                <InputWithAddon v-model="tableState.searchTerm.value" placeholder="Search users..." type="search"
+                  class="search-input">
+                  <template #prefix>
+                    <Icon name="search" type="ui" size="sm" />
+                  </template>
+                </InputWithAddon>
+              </div>
+
+              <!-- Right Side: Action Buttons -->
+              <div class="table-toolbar__right">
+                <Btn variant="outline" size="sm" @click="handleResetCrud">
+                  <Icon name="arrows_horizontal" type="ui" size="sm" />
+                  Reset
+                </Btn>
+                <Btn variant="danger" size="sm" @click="handleBulkDelete"
+                  :disabled="!selection.hasSelection || bulkActions.state.value.isExecuting">
+                  <Icon name="delete" type="ui" size="sm" />
+                  Delete
+                </Btn>
+                <Btn variant="primary" size="sm" @click="openCreateModal">
+                  <Icon name="plus" type="ui" size="sm" />
+                  Create
+                </Btn>
+              </div>
             </template>
 
             <!-- Custom cell: Role -->
@@ -642,17 +659,21 @@ async function handleCreate() {
         <Card>
           <div class="table-state-demo">
             <div class="demo-controls">
-              <Input v-model="tableState.searchTerm.value" placeholder="Search users..." type="text" />
+              <InputWithAddon v-model="demoTableState.searchTerm.value" placeholder="Search users..." type="search">
+                <template #prefix>
+                  <Icon name="search" type="ui" size="sm" />
+                </template>
+              </InputWithAddon>
               <div class="demo-stats">
-                <span>Page: {{ tableState.currentPage.value }} / {{ tableState.totalPages.value }}</span>
+                <span>Page: {{ demoTableState.currentPage.value }} / {{ demoTableState.totalPages.value }}</span>
                 <span>|</span>
-                <span>Showing: {{ tableState.displayedItems.value.length }} items</span>
+                <span>Showing: {{ demoTableState.displayedItems.value.length }} items</span>
                 <span>|</span>
-                <span>Filtered: {{ tableState.filteredTotal.value }} total</span>
+                <span>Filtered: {{ demoTableState.filteredTotal.value }} total</span>
               </div>
             </div>
             <p class="demo-note">
-              ℹ️ Try searching above to see real-time filtering. The table below uses the same data.
+              ℹ️ Try searching above to see real-time filtering. This demo is independent from the main CRUD table.
             </p>
           </div>
         </Card>
@@ -957,7 +978,76 @@ async function handleCreate() {
   color: var(--color-text-secondary);
 }
 
-// Table Controls (novo layout compacto)
+// ============================================
+// TABLE HEADER & TOOLBAR
+// ============================================
+
+// Header: Título + Stats (primeira linha)
+.table-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: var(--spacing-lg) var(--spacing-lg) var(--spacing-md);
+  border-bottom: 1px solid var(--color-border);
+  gap: var(--spacing-lg);
+  flex-wrap: wrap;
+
+  &__stats {
+    display: flex;
+    gap: var(--spacing-xl);
+    align-items: center;
+  }
+}
+
+.table-title {
+  margin: 0;
+  font-size: var(--font-size-xl);
+  font-weight: 600;
+  color: var(--color-text-primary);
+  line-height: 1.2;
+}
+
+// Toolbar Groups (dentro do DataTable actions slot)
+.table-toolbar__left {
+  flex: 1;
+  display: flex;
+  min-width: 250px;
+  max-width: 400px;
+
+  .search-input {
+    width: 100%;
+  }
+}
+
+.table-toolbar__right {
+  display: flex;
+  gap: var(--spacing-sm);
+  align-items: center;
+  margin-left: auto;
+}
+
+// Stats items
+.stat-item {
+  display: flex;
+  align-items: baseline;
+  gap: var(--spacing-xs);
+  font-size: var(--font-size-sm);
+
+  .stat-label {
+    color: var(--color-text-secondary);
+    font-weight: 500;
+    font-size: var(--font-size-sm);
+  }
+
+  .stat-value {
+    color: var(--color-primary);
+    font-weight: 700;
+    font-size: var(--font-size-lg);
+    line-height: 1;
+  }
+}
+
+// Legacy table-controls (manter para compatibilidade)
 .table-controls {
   display: flex;
   justify-content: space-between;
@@ -987,24 +1077,6 @@ async function handleCreate() {
     display: flex;
     gap: var(--spacing-sm);
     align-items: center;
-  }
-}
-
-.stat-item {
-  display: flex;
-  align-items: center;
-  gap: var(--spacing-xs);
-  font-size: var(--font-size-sm);
-
-  .stat-label {
-    color: var(--color-text-secondary);
-    font-weight: 500;
-  }
-
-  .stat-value {
-    color: var(--color-primary);
-    font-weight: 700;
-    font-size: var(--font-size-base);
   }
 }
 

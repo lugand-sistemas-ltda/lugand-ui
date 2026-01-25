@@ -3,7 +3,7 @@
  * InputsView - Showcase de componentes Input
  */
 import { ref } from 'vue'
-import { Input, Textarea, ComponentShowcase, CodeBlock } from '@/shared/components'
+import { Input, Textarea, InputWithAddon, Icon, ComponentShowcase, CodeBlock } from '@/shared/components'
 
 // Estados reativos para demonstração
 const textInput = ref('')
@@ -16,6 +16,12 @@ const errorInput = ref('valor com erro')
 const textareaBasic = ref('')
 const textareaWithCounter = ref('')
 const textareaLarge = ref('')
+
+// InputWithAddon states
+const searchAddonInput = ref('')
+const emailAddonInput = ref('')
+const urlAddonInput = ref('')
+const priceAddonInput = ref('')
 </script>
 
 <template>
@@ -78,6 +84,81 @@ const textInput = ref('')
 <Input v-model='email' type='email' label='Email' />
 <Input v-model='password' type='password' label='Password' />
 <Input v-model='search' type='search' label='Search' />`" />
+            </template>
+        </ComponentShowcase>
+
+        <!-- InputWithAddon - Com Ícones -->
+        <ComponentShowcase title="Input with Icon Addon"
+            description="Input profissional com ícones ou texto antes/depois do campo. Usa slots para máxima flexibilidade.">
+            <template #preview>
+                <div class="input-column">
+                    <InputWithAddon v-model="searchAddonInput" label="Search Input"
+                        placeholder="Search users, posts, etc...">
+                        <template #prefix>
+                            <Icon name="search" type="ui" size="sm" />
+                        </template>
+                    </InputWithAddon>
+
+                    <InputWithAddon v-model="emailAddonInput" type="email" label="Email Input"
+                        placeholder="exemplo@email.com">
+                        <template #prefix>
+                            <Icon name="email" type="ui" size="sm" />
+                        </template>
+                    </InputWithAddon>
+
+                    <InputWithAddon v-model="urlAddonInput" type="url" label="Website URL"
+                        placeholder="Digite o domínio">
+                        <template #prefix>
+                            <span style="font-size: var(--font-size-sm); font-weight: 600;">https://</span>
+                        </template>
+                        <template #suffix>
+                            <span style="font-size: var(--font-size-sm); color: var(--color-text-tertiary);">.com</span>
+                        </template>
+                    </InputWithAddon>
+
+                    <InputWithAddon v-model="priceAddonInput" type="number" label="Preço" placeholder="0.00">
+                        <template #prefix>
+                            <span style="font-size: var(--font-size-sm); font-weight: 600;">R$</span>
+                        </template>
+                    </InputWithAddon>
+                </div>
+            </template>
+
+            <template #code>
+                <CodeBlock :code="`<script setup>
+import { ref } from 'vue'
+import { InputWithAddon, Icon } from '@lugand/vue-ui-lib'
+
+const searchInput = ref('')
+const emailInput = ref('')
+</script>
+
+<template>
+  <!-- Com ícone de busca -->
+  <InputWithAddon v-model='searchInput' placeholder='Search...'>
+    <template #prefix>
+      <Icon name='search' type='ui' size='sm' />
+    </template>
+    </InputWithAddon>
+
+    <!-- Com ícone de email -->
+    <InputWithAddon v-model='emailInput' type='email'>
+        <template #prefix>
+      <Icon name='email' type='ui' size='sm' />
+    </template>
+    </InputWithAddon>
+
+    <!-- Com texto prefix e suffix -->
+    <InputWithAddon v-model='url' placeholder='Digite o domínio'>
+        <template #prefix>https://</template>
+        <template #suffix>.com</template>
+    </InputWithAddon>
+
+    <!-- Com símbolo monetário -->
+    <InputWithAddon v-model='price' type='number'>
+        <template #prefix>R$</template>
+    </InputWithAddon>
+    </template>`" language="typescript" />
             </template>
         </ComponentShowcase>
 

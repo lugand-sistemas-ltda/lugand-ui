@@ -9,6 +9,7 @@
 export { default as Btn } from './primitives/Btn.vue'
 export { default as BtnToggle } from './primitives/BtnToggle.vue'
 export { default as Scrollable } from './primitives/Scrollable.vue'
+export { default as InputWithAddon } from './primitives/InputWithAddon.vue'
 export { default as BulkActionBar } from './BulkActionBar.vue'
 
 // ============================================

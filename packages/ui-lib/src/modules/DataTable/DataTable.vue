@@ -253,7 +253,8 @@ const isSelected = (row: any) => selectedRows.value.includes(row)
         display: flex;
         gap: var(--spacing-sm);
         align-items: center;
-        margin-left: auto;
+        flex: 1;
+        justify-content: space-between;
     }
 }
 
