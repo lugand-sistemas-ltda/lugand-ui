@@ -543,7 +543,7 @@ async function handleCreate() {
           </div>
 
           <DataTable :data="tableState.displayedItems.value" :columns="columns" :loading="userStore.loading.value"
-            selectable pagination disable-search @update:selection="selection.setSelection($event)">
+            selectable disable-search disable-pagination @update:selection="selection.setSelection($event)">
             <!-- Toolbar Actions Slot -->
             <template #actions>
               <!-- Left Side: Search Input -->
@@ -608,6 +608,37 @@ async function handleCreate() {
               </div>
             </template>
           </DataTable>
+
+          <!-- Custom Pagination Controls -->
+          <div class="custom-pagination">
+            <div class="pagination-info">
+              Showing {{ tableState.pageInfo.value.from }} to {{ tableState.pageInfo.value.to }} of {{
+                tableState.pageInfo.value.total }} entries
+            </div>
+
+            <div class="pagination-controls">
+              <div class="rows-per-page">
+                <span>Rows per page:</span>
+                <select v-model="tableState.itemsPerPage.value" class="rows-select" @change="tableState.goToPage(1)">
+                  <option :value="5">5</option>
+                  <option :value="10">10</option>
+                  <option :value="25">25</option>
+                  <option :value="50">50</option>
+                </select>
+              </div>
+
+              <div class="page-nav">
+                <Btn size="sm" variant="ghost" :disabled="tableState.isFirstPage.value"
+                  @click="tableState.previousPage()">
+                  Prev
+                </Btn>
+                <span class="page-current">{{ tableState.currentPage.value }} / {{ tableState.totalPages.value }}</span>
+                <Btn size="sm" variant="ghost" :disabled="tableState.isLastPage.value" @click="tableState.nextPage()">
+                  Next
+                </Btn>
+              </div>
+            </div>
+          </div>
         </Card>
       </template>
 
@@ -1024,6 +1055,68 @@ async function handleCreate() {
   gap: var(--spacing-sm);
   align-items: center;
   margin-left: auto;
+}
+
+// Custom Pagination Controls
+.custom-pagination {
+  padding: var(--spacing-md);
+  border-top: 1px solid var(--color-border);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: var(--spacing-md);
+  font-size: var(--font-size-sm);
+  color: var(--color-text-secondary);
+
+  .pagination-info {
+    flex: 1;
+    min-width: 200px;
+  }
+
+  .pagination-controls {
+    display: flex;
+    align-items: center;
+    gap: var(--spacing-lg);
+  }
+
+  .rows-per-page {
+    display: flex;
+    align-items: center;
+    gap: var(--spacing-sm);
+
+    .rows-select {
+      padding: var(--spacing-xs) var(--spacing-sm);
+      border-radius: var(--radius-sm);
+      border: 1px solid var(--color-border);
+      background: var(--color-bg-primary);
+      color: var(--color-text-primary);
+      font-size: var(--font-size-sm);
+      cursor: pointer;
+      transition: all var(--transition-fast);
+
+      &:hover {
+        border-color: var(--color-border-hover);
+      }
+
+      &:focus {
+        outline: 2px solid var(--color-primary);
+        outline-offset: 0;
+      }
+    }
+  }
+
+  .page-nav {
+    display: flex;
+    align-items: center;
+    gap: var(--spacing-sm);
+
+    .page-current {
+      padding: 0 var(--spacing-sm);
+      font-weight: 600;
+      color: var(--color-text-primary);
+    }
+  }
 }
 
 // Stats items

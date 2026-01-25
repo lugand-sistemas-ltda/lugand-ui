@@ -27,6 +27,11 @@ export const USERS_MEDIUM: User[] = createUsers(20)
 export const USERS_LARGE: User[] = createUsers(50)
 
 /**
+ * Dataset extra grande (100 usuários) para testes de paginação avançada
+ */
+export const USERS_EXTRA_LARGE: User[] = createUsers(100)
+
+/**
  * Dataset padrão (usado nos exemplos)
  */
-export const USERS_DEFAULT = USERS_MEDIUM
+export const USERS_DEFAULT = USERS_EXTRA_LARGE

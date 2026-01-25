@@ -12,6 +12,8 @@ interface Props {
     itemsPerPageOptions?: number[]
     /** Disable internal search (when managed externally) */
     disableSearch?: boolean
+    /** Disable internal pagination (when managed externally) */
+    disablePagination?: boolean
 }
 
 const props = withDefaults(defineProps<Props>(), {
@@ -21,7 +23,8 @@ const props = withDefaults(defineProps<Props>(), {
     selectable: false,
     pagination: false,
     itemsPerPageOptions: () => [5, 10, 25, 50],
-    disableSearch: false
+    disableSearch: false,
+    disablePagination: false
 })
 
 const emit = defineEmits<{
@@ -91,7 +94,8 @@ const filteredData = computed(() => {
 const totalPages = computed(() => Math.ceil(filteredData.value.length / itemsPerPage.value))
 
 const paginatedData = computed(() => {
-    if (!props.pagination) return filteredData.value
+    // Se a paginação está desabilitada (gerenciada externamente), retorna os dados filtrados
+    if (props.disablePagination || !props.pagination) return filteredData.value
 
     const start = (currentPage.value - 1) * itemsPerPage.value
     const end = start + itemsPerPage.value
