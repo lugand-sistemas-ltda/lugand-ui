@@ -23,7 +23,7 @@
 
 <script setup lang="ts">
 import { ref, computed } from 'vue'
-import { ComponentShowcase, CodeBlock, AlertDialog, Input, BulkActionBar, Icon } from '@/shared/components'
+import { ComponentShowcase, CodeBlock, AlertDialog, Input, Icon } from '@/shared/components'
 import {
   useCrudStore,
   useTableState,
@@ -41,9 +41,7 @@ import { DataTable, DynamicForm } from '@/modules'
 import { Btn, Card } from '@/shared/components'
 import type { TableColumn } from '@/modules/DataTable/types'
 import type { FormField } from '@/modules/DynamicForm/DynamicForm.vue'
-import { USERS_DEFAULT, type User } from '@/mocks'
-
-// ============================================
+import { USERS_DEFAULT, type User } from '@/mocks'// ============================================
 // COMPOSABLES
 // ============================================
 const userStore = useCrudStore<User>('demo-users', USERS_DEFAULT)
@@ -71,7 +69,7 @@ const columns: TableColumn[] = [
   { key: 'role', label: 'Role', sortable: true },
   { key: 'status', label: 'Status', sortable: true },
   { key: 'createdAt', label: 'Created', sortable: true },
-  { key: 'actions', label: 'Actions', align: 'right' }
+  { key: 'rowActions', label: 'Actions', align: 'right' }
 ]
 
 // ============================================
@@ -143,35 +141,9 @@ const selection = useSelection<User>({
   }
 })
 
-// Bulk Actions
+// Bulk Actions state (mantido para compatibilidade futura)
 const bulkActions = useBulkActions<User>({
-  selection: selection.selected,
-  onSuccess: (action, items) => {
-    console.log(`Bulk action '${action.id}' completed for ${items.length} items`)
-  },
-  onError: (action, error) => {
-    console.error(`Bulk action '${action.id}' failed:`, error)
-  }
-})
-
-// Registrar ação de delete em lote
-bulkActions.register({
-  id: 'bulk-delete',
-  label: 'Delete',
-  icon: 'delete', // UI Icon from our library
-  variant: 'danger',
-  minSelection: 1,
-  confirmation: {
-    title: 'Delete Users',
-    message: (items) => `Are you sure you want to delete ${items.length} user(s)?`,
-    confirmText: 'Delete',
-    cancelText: 'Cancel'
-  },
-  execute: async (items) => {
-    const ids = items.map(u => u.id)
-    const count = userStore.removeMany(ids)
-    toast.success(`${count} users deleted successfully`)
-  }
+  selection: selection.selected
 })
 
 // ============================================
@@ -227,7 +199,7 @@ async function handleCreate(): Promise<void> {
   const isValid = await validation.validate(formData.value as User, validationRules)
 
   if (!isValid) {
-    toast.error('Please fix the form errors')
+    // Validação falhou - erros já estão no validation.errors
     return
   }
 
@@ -235,6 +207,7 @@ async function handleCreate(): Promise<void> {
     userStore.create(formData.value as Omit<User, 'id' | 'createdAt' | 'updatedAt'>)
     toast.success('User created successfully')
     createModal.close()
+    validation.clearErrors()
   } catch (err) {
     toast.error('Failed to create user')
     console.error(err)
@@ -250,7 +223,7 @@ async function handleUpdate(): Promise<void> {
   const isValid = await validation.validate(formData.value as User, validationRules)
 
   if (!isValid) {
-    toast.error('Please fix the form errors')
+    // Validação falhou - erros já estão no validation.errors
     return
   }
 
@@ -258,6 +231,7 @@ async function handleUpdate(): Promise<void> {
     userStore.update(selectedUser.value.id, formData.value)
     toast.success('User updated successfully')
     editModal.close()
+    validation.clearErrors()
   } catch (err) {
     toast.error('Failed to update user')
     console.error(err)
@@ -277,6 +251,30 @@ function handleDelete(): void {
     selectedUser.value = null
   } catch (err) {
     toast.error('Failed to delete user')
+    console.error(err)
+  }
+}
+
+/**
+ * Deleta múltiplos usuários com confirmação
+ */
+const showBulkDeleteDialog = ref(false)
+
+function handleBulkDelete(): void {
+  if (!selection.hasSelection) return
+  showBulkDeleteDialog.value = true
+}
+
+async function confirmBulkDelete(): Promise<void> {
+  try {
+    const ids = selection.selected.value.map(u => u.id)
+    const count = userStore.removeMany(ids)
+
+    toast.success(`${count} users deleted successfully`)
+    showBulkDeleteDialog.value = false
+    selection.clear()
+  } catch (err) {
+    toast.error('Failed to delete users')
     console.error(err)
   }
 }
@@ -517,8 +515,13 @@ async function handleCreate() {
       description="Complete CRUD interface with DataTable, search, sorting, pagination, bulk actions, and inline actions. Data persists in localStorage.">
       <template #preview>
         <Card>
-          <!-- Table Controls & Stats -->
+          <!-- Table Controls: Search + Stats -->
           <div class="table-controls">
+            <div class="table-controls__search">
+              <Input v-model="tableState.searchTerm.value" placeholder="Search users..." type="text"
+                class="search-input" />
+            </div>
+
             <div class="table-controls__stats">
               <div class="stat-item">
                 <span class="stat-label">Total:</span>
@@ -533,29 +536,27 @@ async function handleCreate() {
                 <span class="stat-value">{{ selection.count }}</span>
               </div>
             </div>
-
-            <div class="table-controls__search">
-              <Input v-model="tableState.searchTerm.value" placeholder="Search users..." type="text"
-                class="search-input" />
-            </div>
-
-            <div class="table-controls__actions">
-              <Btn variant="outline" size="sm" @click="handleResetCrud">
-                🔄 Reset
-              </Btn>
-              <Btn variant="primary" size="sm" @click="openCreateModal">
-                + Create User
-              </Btn>
-            </div>
           </div>
-
-          <!-- Bulk Action Bar -->
-          <BulkActionBar v-if="selection.hasSelection" :actions="bulkActions.availableActions.value"
-            :selection="selection.selected.value" :loading="bulkActions.state.value.isExecuting"
-            @execute="bulkActions.execute" />
 
           <DataTable :data="tableState.displayedItems.value" :columns="columns" :loading="userStore.loading.value"
             selectable pagination disable-search @update:selection="selection.setSelection($event)">
+            <!-- Toolbar Actions Slot -->
+            <template #actions>
+              <Btn variant="outline" size="sm" @click="handleResetCrud">
+                <Icon name="arrows_horizontal" type="ui" size="sm" />
+                Reset
+              </Btn>
+              <Btn variant="danger" size="sm" @click="handleBulkDelete"
+                :disabled="!selection.hasSelection || bulkActions.state.value.isExecuting">
+                <Icon name="delete" type="ui" size="sm" />
+                Delete
+              </Btn>
+              <Btn variant="primary" size="sm" @click="openCreateModal">
+                <Icon name="plus" type="ui" size="sm" />
+                Create
+              </Btn>
+            </template>
+
             <!-- Custom cell: Role -->
             <template #role="{ value }">
               <span class="badge" :style="{ backgroundColor: getRoleBadgeColor(value) }">
@@ -575,8 +576,8 @@ async function handleCreate() {
               {{ formatDate(value) }}
             </template>
 
-            <!-- Custom cell: Actions -->
-            <template #actions="slotProps: any">
+            <!-- Custom cell: Row Actions -->
+            <template #rowActions="slotProps: any">
               <div class="actions-cell">
                 <Btn size="sm" variant="ghost" @click="openViewModal(slotProps.row)">
                   View
@@ -625,16 +626,6 @@ async function handleCreate() {
                 <span class="stat-card__value">{{ selection.count }}</span>
               </div>
             </Card>
-          </div>
-
-          <!-- Actions -->
-          <div class="showcase-actions">
-            <Btn variant="outline" size="sm" @click="handleResetCrud">
-              🔄 Reset to Defaults
-            </Btn>
-            <Btn variant="primary" size="sm" @click="openCreateModal">
-              + Create User
-            </Btn>
           </div>
         </div>
       </template>
@@ -704,11 +695,24 @@ async function handleCreate() {
 
     <!-- Create Modal -->
     <Modal :model-value="createModal.isOpen.value" title="Create User"
-      @update:model-value="createModal.isOpen.value = $event" @close="createModal.close()">
-      <DynamicForm v-model="formData" :schema="formFields" />
+      @update:model-value="createModal.isOpen.value = $event" @close="createModal.close(); validation.clearErrors()">
+      <DynamicForm v-model="formData" :schema="formFields" hide-submit />
+
+      <!-- Validation Errors Display -->
+      <div v-if="Object.keys(validation.errors.value).length > 0" class="validation-errors">
+        <div class="validation-error-header">
+          <Icon name="warning" type="ui" size="sm" />
+          <span>Please fix the following errors:</span>
+        </div>
+        <ul class="validation-error-list">
+          <li v-for="(error, field) in validation.errors.value" :key="field">
+            <strong>{{ field }}:</strong> {{ error }}
+          </li>
+        </ul>
+      </div>
 
       <template #footer>
-        <Btn variant="ghost" @click="createModal.close()">
+        <Btn variant="ghost" @click="createModal.close(); validation.clearErrors()">
           Cancel
         </Btn>
         <Btn variant="primary" @click="handleCreate">
@@ -719,11 +723,24 @@ async function handleCreate() {
 
     <!-- Edit Modal -->
     <Modal :model-value="editModal.isOpen.value" title="Edit User" @update:model-value="editModal.isOpen.value = $event"
-      @close="editModal.close()">
-      <DynamicForm v-model="formData" :schema="formFields" />
+      @close="editModal.close(); validation.clearErrors()">
+      <DynamicForm v-model="formData" :schema="formFields" hide-submit />
+
+      <!-- Validation Errors Display -->
+      <div v-if="Object.keys(validation.errors.value).length > 0" class="validation-errors">
+        <div class="validation-error-header">
+          <Icon name="warning" type="ui" size="sm" />
+          <span>Please fix the following errors:</span>
+        </div>
+        <ul class="validation-error-list">
+          <li v-for="(error, field) in validation.errors.value" :key="field">
+            <strong>{{ field }}:</strong> {{ error }}
+          </li>
+        </ul>
+      </div>
 
       <template #footer>
-        <Btn variant="ghost" @click="editModal.close()">
+        <Btn variant="ghost" @click="editModal.close(); validation.clearErrors()">
           Cancel
         </Btn>
         <Btn variant="primary" @click="handleUpdate">
@@ -781,6 +798,12 @@ async function handleCreate() {
       :message="`Are you sure you want to delete user '${selectedUser?.name}'? This action cannot be undone.`"
       confirm-text="Delete" cancel-text="Cancel" @confirm="handleDelete" @cancel="showDeleteDialog = false"
       @close="showDeleteDialog = false" />
+
+    <!-- Bulk Delete Confirmation Dialog -->
+    <AlertDialog :is-open="showBulkDeleteDialog" variant="danger" title="Delete Multiple Users?"
+      :message="`Are you sure you want to delete ${selection.count.value} user(s)? This action cannot be undone.`"
+      confirm-text="Delete All" cancel-text="Cancel" @confirm="confirmBulkDelete" @cancel="showBulkDeleteDialog = false"
+      @close="showBulkDeleteDialog = false" />
   </div>
 </template>
 
@@ -1020,5 +1043,41 @@ async function handleCreate() {
   font-size: var(--font-size-sm);
   color: var(--color-success);
   font-weight: 600;
+}
+
+// Validation Errors in Modals
+.validation-errors {
+  margin-top: var(--spacing-md);
+  padding: var(--spacing-md);
+  background: rgba(239, 68, 68, 0.1);
+  border: 1px solid var(--color-error);
+  border-radius: var(--radius-sm);
+
+  .validation-error-header {
+    display: flex;
+    align-items: center;
+    gap: var(--spacing-xs);
+    margin-bottom: var(--spacing-sm);
+    color: var(--color-error);
+    font-weight: 600;
+    font-size: var(--font-size-sm);
+  }
+
+  .validation-error-list {
+    margin: 0;
+    padding-left: var(--spacing-lg);
+    list-style-type: disc;
+
+    li {
+      margin-bottom: var(--spacing-xs);
+      font-size: var(--font-size-sm);
+      color: var(--color-text-primary);
+
+      strong {
+        color: var(--color-error);
+        text-transform: capitalize;
+      }
+    }
+  }
 }
 </style>

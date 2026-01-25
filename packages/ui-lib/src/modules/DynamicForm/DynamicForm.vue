@@ -19,11 +19,13 @@ interface Props {
     modelValue: Record<string, any>
     submitLabel?: string
     loading?: boolean
+    hideSubmit?: boolean
 }
 
 const props = withDefaults(defineProps<Props>(), {
     submitLabel: 'Submit',
     loading: false,
+    hideSubmit: false
 })
 
 const emit = defineEmits<{
@@ -69,7 +71,7 @@ const handleSubmit = () => {
             </div>
         </div>
 
-        <div class="dynamic-form__actions">
+        <div class="dynamic-form__actions" v-if="!hideSubmit">
             <slot name="actions">
                 <Btn type="submit" variant="primary" :disabled="loading">
                     {{ submitLabel }}

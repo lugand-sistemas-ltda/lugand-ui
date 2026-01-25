@@ -248,6 +248,13 @@ const isSelected = (row: any) => selectedRows.value.includes(row)
         flex: 1;
         max-width: 300px;
     }
+
+    &__actions {
+        display: flex;
+        gap: var(--spacing-sm);
+        align-items: center;
+        margin-left: auto;
+    }
 }
 
 .data-table-container {

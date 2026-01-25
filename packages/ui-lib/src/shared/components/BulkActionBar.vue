@@ -78,7 +78,7 @@ function mapVariant(variant?: string): 'primary' | 'secondary' | 'ghost' | 'dang
         <div class="bulk-action-bar__actions">
             <Btn v-for="action in availableActions" :key="action.id" :variant="mapVariant(action.variant)" size="sm"
                 :disabled="loading || disabled" @click="handleActionClick(action.id)">
-                <Icon v-if="action.icon" :name="action.icon" class="bulk-action-bar__icon" />
+                <Icon v-if="action.icon" :name="action.icon" type="ui" size="sm" class="bulk-action-bar__icon" />
                 {{ action.label }}
             </Btn>
         </div>
