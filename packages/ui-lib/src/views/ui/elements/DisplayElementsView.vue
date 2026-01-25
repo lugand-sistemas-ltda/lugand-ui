@@ -159,6 +159,39 @@ import { Badge, Tooltip, Avatar, Skeleton, ComponentShowcase, CodeBlock, Btn } f
 
                     <Skeleton variant="rect" height="120px" animation="wave" />
                 </div>
+                <div class="showcase-group" style="width: 300px">
+                    <div style="display: flex; gap: 1rem; margin-bottom: 1rem">
+                        <Skeleton variant="circle" width="50px" height="50px" />
+                        <div style="flex: 1">
+                            <Skeleton variant="text" width="60%" />
+                            <Skeleton variant="text" width="90%" />
+                        </div>
+                    </div>
+
+                    <Skeleton variant="rect" height="120px" animation="wave" />
+                </div>
+                <div class="showcase-group" style="width: 300px">
+                    <div style="display: flex; gap: 1rem; margin-bottom: 1rem">
+                        <Skeleton variant="circle" width="50px" height="50px" />
+                        <div style="flex: 1">
+                            <Skeleton variant="text" width="60%" />
+                            <Skeleton variant="text" width="90%" />
+                        </div>
+                    </div>
+
+                    <Skeleton variant="rect" height="120px" animation="wave" />
+                </div>
+                <div class="showcase-group" style="width: 300px">
+                    <div style="display: flex; gap: 1rem; margin-bottom: 1rem">
+                        <Skeleton variant="circle" width="50px" height="50px" />
+                        <div style="flex: 1">
+                            <Skeleton variant="text" width="60%" />
+                            <Skeleton variant="text" width="90%" />
+                        </div>
+                    </div>
+
+                    <Skeleton variant="rect" height="120px" animation="wave" />
+                </div>
             </template>
 
             <template #code>
