@@ -3,7 +3,8 @@
  * InputsView - Showcase de componentes Input
  */
 import { ref } from 'vue'
-import { Input, Textarea, InputWithAddon, Icon, ComponentShowcase, CodeBlock } from '@/shared/components'
+import { Input, Textarea, InputWithAddon, InputWithSelectAddon, Icon, ComponentShowcase, CodeBlock } from '@/shared/components'
+import type { SelectOption } from '@/shared/components/primitives/InputWithSelectAddon.vue'
 
 // Estados reativos para demonstração
 const textInput = ref('')
@@ -20,8 +21,27 @@ const textareaLarge = ref('')
 // InputWithAddon states
 const searchAddonInput = ref('')
 const emailAddonInput = ref('')
-const urlAddonInput = ref('')
 const priceAddonInput = ref('')
+
+// InputWithSelectAddon states
+const urlSelectInput = ref('example')
+const urlProtocol = ref('https://')
+const urlDomain = ref('.com')
+
+const protocolOptions: SelectOption[] = [
+    { label: 'http://', value: 'http://' },
+    { label: 'https://', value: 'https://' },
+    { label: 'ftp://', value: 'ftp://' }
+]
+
+const domainOptions: SelectOption[] = [
+    { label: '.com', value: '.com' },
+    { label: '.com.br', value: '.com.br' },
+    { label: '.gov.br', value: '.gov.br' },
+    { label: '.org', value: '.org' },
+    { label: '.net', value: '.net' },
+    { label: '.io', value: '.io' }
+]
 </script>
 
 <template>
@@ -106,16 +126,6 @@ const textInput = ref('')
                         </template>
                     </InputWithAddon>
 
-                    <InputWithAddon v-model="urlAddonInput" type="url" label="Website URL"
-                        placeholder="Digite o domínio">
-                        <template #prefix>
-                            <span style="font-size: var(--font-size-sm); font-weight: 600;">https://</span>
-                        </template>
-                        <template #suffix>
-                            <span style="font-size: var(--font-size-sm); color: var(--color-text-tertiary);">.com</span>
-                        </template>
-                    </InputWithAddon>
-
                     <InputWithAddon v-model="priceAddonInput" type="number" label="Preço" placeholder="0.00">
                         <template #prefix>
                             <span style="font-size: var(--font-size-sm); font-weight: 600;">R$</span>
@@ -131,6 +141,7 @@ import { InputWithAddon, Icon } from '@lugand/vue-ui-lib'
 
 const searchInput = ref('')
 const emailInput = ref('')
+const priceInput = ref('')
 </script>
 
 <template>
@@ -148,17 +159,66 @@ const emailInput = ref('')
     </template>
     </InputWithAddon>
 
-    <!-- Com texto prefix e suffix -->
-    <InputWithAddon v-model='url' placeholder='Digite o domínio'>
-        <template #prefix>https://</template>
-        <template #suffix>.com</template>
-    </InputWithAddon>
-
     <!-- Com símbolo monetário -->
-    <InputWithAddon v-model='price' type='number'>
+    <InputWithAddon v-model='priceInput' type='number'>
         <template #prefix>R$</template>
     </InputWithAddon>
     </template>`" language="typescript" />
+            </template>
+        </ComponentShowcase>
+
+        <!-- InputWithSelectAddon - Advanced -->
+        <ComponentShowcase title="Input with Select Addon (Advanced)"
+            description="Input profissional com Select nos addons para casos avançados como URLs com protocolo e domínio selecionáveis.">
+            <template #preview>
+                <div class="input-column">
+                    <InputWithSelectAddon v-model="urlSelectInput" v-model:prefix-select-value="urlProtocol"
+                        v-model:suffix-select-value="urlDomain" label="Website URL" placeholder="Digite o domínio"
+                        :prefix-select-options="protocolOptions" :suffix-select-options="domainOptions"
+                        hint="Selecione o protocolo e domínio, digite o nome do site" />
+
+                    <div class="demo-output">
+                        <strong>URL Completa:</strong>
+                        <code>{{ urlProtocol }}{{ urlSelectInput }}{{ urlDomain }}</code>
+                    </div>
+                </div>
+            </template>
+
+            <template #code>
+                <CodeBlock :code="`<script setup>
+import { ref } from 'vue'
+import { InputWithSelectAddon } from '@lugand/vue-ui-lib'
+
+const urlInput = ref('example')
+const protocol = ref('https://')
+const domain = ref('.com')
+
+const protocolOptions = [
+  { label: 'http://', value: 'http://' },
+  { label: 'https://', value: 'https://' },
+  { label: 'ftp://', value: 'ftp://' }
+]
+
+const domainOptions = [
+  { label: '.com', value: '.com' },
+  { label: '.com.br', value: '.com.br' },
+  { label: '.gov.br', value: '.gov.br' },
+  { label: '.org', value: '.org' },
+  { label: '.net', value: '.net' }
+]
+</script>
+
+<template>
+  <InputWithSelectAddon 
+    v-model='urlInput'
+    v-model:prefix-select-value='protocol'
+    v-model:suffix-select-value='domain'
+    label='Website URL'
+    :prefix-select-options='protocolOptions'
+    :suffix-select-options='domainOptions' />
+  
+  <!-- URL Completa: {{ protocol }}{{ urlInput }}{{ domain }} -->
+</template>`" language="typescript" />
             </template>
         </ComponentShowcase>
 
@@ -429,6 +489,29 @@ const emailInput = ref('')
                 }
             }
         }
+    }
+}
+
+// Demo output
+.demo-output {
+    margin-top: var(--spacing-md);
+    padding: var(--spacing-md);
+    background: var(--color-bg-secondary);
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-sm);
+    font-size: var(--font-size-sm);
+
+    strong {
+        color: var(--color-text-secondary);
+        margin-right: var(--spacing-xs);
+    }
+
+    code {
+        color: var(--color-primary);
+        background: var(--color-bg-tertiary);
+        padding: var(--spacing-xs) var(--spacing-sm);
+        border-radius: var(--radius-xs);
+        font-family: 'Courier New', monospace;
     }
 }
 </style>

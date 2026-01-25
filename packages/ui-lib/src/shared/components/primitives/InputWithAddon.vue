@@ -104,7 +104,7 @@ const handleInput = (event: Event) => {
 
 .input-addon-container {
     display: flex;
-    align-items: center;
+    align-items: stretch;
     width: 100%;
 
     background: var(--input-bg);
@@ -145,17 +145,54 @@ const handleInput = (event: Event) => {
         display: flex;
         align-items: center;
         justify-content: center;
-        padding: 0 var(--spacing-sm);
         background: var(--color-bg-secondary);
         color: var(--color-text-secondary);
-        border-right: 1px solid var(--input-border);
         user-select: none;
         flex-shrink: 0;
+        font-size: var(--font-size-sm);
+        font-weight: 500;
+
+        min-width: 40px;
+        padding: 0 var(--spacing-md);
+
+        // Border interna sutil
+        border-right: 1px solid var(--color-border);
 
         // Remove border do suffix e adiciona no lado esquerdo
         &.input-addon-container__suffix {
             border-right: none;
-            border-left: 1px solid var(--input-border);
+            border-left: 1px solid var(--color-border);
+        }
+    }
+
+    // Tamanhos específicos para addons
+    &--sm {
+
+        .input-addon-container__prefix,
+        .input-addon-container__suffix {
+            min-width: 36px;
+            padding: 0 var(--spacing-sm);
+            font-size: var(--font-size-xs);
+        }
+    }
+
+    &--md {
+
+        .input-addon-container__prefix,
+        .input-addon-container__suffix {
+            min-width: 40px;
+            padding: 0 var(--spacing-md);
+            font-size: var(--font-size-sm);
+        }
+    }
+
+    &--lg {
+
+        .input-addon-container__prefix,
+        .input-addon-container__suffix {
+            min-width: 48px;
+            padding: 0 var(--spacing-lg);
+            font-size: var(--font-size-base);
         }
     }
 
