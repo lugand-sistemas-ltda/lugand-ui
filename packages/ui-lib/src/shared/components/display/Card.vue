@@ -50,6 +50,8 @@ const handleClick = (e: MouseEvent) => {
     transition: all 0.2s ease;
     overflow: hidden;
     position: relative;
+    width: 100%; // Garante que o Card seja responsivo ao container pai
+    max-width: 100%; // Evita overflow horizontal
 
     // Variantes
     &--default {

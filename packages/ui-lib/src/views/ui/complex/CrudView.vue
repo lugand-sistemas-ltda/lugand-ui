@@ -522,7 +522,7 @@ async function handleCreate() {
     <ComponentShowcase title="Full CRUD Example"
       description="Complete CRUD interface with DataTable, search, sorting, pagination, bulk actions, and inline actions. Data persists in localStorage.">
       <template #preview>
-        <Card>
+        <Card padding="none">
           <!-- Header: Título + Stats -->
           <div class="table-header">
             <h2 class="table-title">Users Management</h2>
@@ -878,6 +878,14 @@ async function handleCreate() {
       font-size: var(--font-size-md);
       color: var(--color-text-secondary);
       max-width: 800px;
+    }
+  }
+
+  // Força o Card da tabela CRUD a ocupar toda a largura do showcase
+  :deep(.component-showcase__preview) {
+    .card {
+      width: 100%;
+      max-width: 100%;
     }
   }
 }
