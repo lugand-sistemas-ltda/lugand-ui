@@ -10,9 +10,11 @@
  * - Acessibilidade (ESC, focus trap, ARIA)
  * - Slots flexíveis (header, body, footer)
  * - Variantes e tamanhos
+ * - Usa useDisclosure composable para gerenciar estado
  */
 import { ref, watch, onMounted, onBeforeUnmount, nextTick, computed } from 'vue'
 import { Button, Icon } from '@/shared/components'
+import { useDisclosure } from '@/shared/composables'
 import type { ModalSize, ModalVariant } from './types'
 import { registerModal, unregisterModal, getModalZIndex } from './modalStack'
 
@@ -56,80 +58,16 @@ const emit = defineEmits<{
     'cancel': []
 }>()
 
-// State - usa isOpen se fornecido, senão usa modelValue
-const isOpen = ref(props.isOpen || props.modelValue)
+// ============================================
+// REFS & STATE
+// ============================================
 const modalRef = ref<HTMLElement | null>(null)
 const modalId = ref<symbol | null>(null)
 const dynamicZIndex = ref<number>(1000)
 
-// Computed z-index - usa o dinamico do stack
-const computedZIndex = computed(() => {
-    if (modalId.value) {
-        return getModalZIndex(modalId.value) || dynamicZIndex.value
-    }
-    return dynamicZIndex.value
-})
-
-// Controle de abertura/fechamento
-const open = () => {
-    isOpen.value = true
-    emit('update:modelValue', true)
-    emit('update:isOpen', true)
-    emit('open')
-    lockScroll()
-    nextTick(() => {
-        focusFirstElement()
-    })
-}
-
-// Close interno - respeitando persistent e loading
-const close = () => {
-    if (props.persistent || props.loading) return
-
-    isOpen.value = false
-    emit('update:modelValue', false)
-    emit('update:isOpen', false)
-    emit('close')
-    unlockScroll()
-}
-
-// Force close - usado pelos botões, ignora persistent
-const forceClose = () => {
-    isOpen.value = false
-    emit('update:modelValue', false)
-    emit('update:isOpen', false)
-    emit('close')
-    unlockScroll()
-}
-
-const handleOverlayClick = () => {
-    if (props.closeOnOverlay && !props.persistent) {
-        close()
-    }
-}
-
-const handleEscKey = (e: KeyboardEvent) => {
-    if (e.key === 'Escape' && props.closeOnEsc && isOpen.value) {
-        close()
-    }
-}
-
-const handleConfirm = () => {
-    emit('confirm')
-    // Modals não-persistent fecham automaticamente no confirm
-    // Modals persistent só fecham se o parent mudar o v-model
-    if (!props.persistent && !props.loading) {
-        forceClose()
-    }
-}
-
-const handleCancel = () => {
-    emit('cancel')
-    // Fecha automaticamente no cancel (comportamento padrão para todos)
-    if (!props.loading) {
-        forceClose()
-    }
-}
+// ============================================
+// UTILITY FUNCTIONS (declared first for use in disclosure callbacks)
+// ============================================
 
 // Lock de scroll (previne scroll do body)
 const lockScroll = () => {
@@ -159,7 +97,89 @@ const focusFirstElement = () => {
     }
 }
 
-// Watchers
+// ============================================
+// DISCLOSURE STATE - Using useDisclosure composable
+// ============================================
+const disclosure = useDisclosure({
+    defaultOpen: props.isOpen || props.modelValue,
+    onOpen: () => {
+        emit('update:modelValue', true)
+        emit('update:isOpen', true)
+        emit('open')
+        lockScroll()
+        nextTick(() => {
+            focusFirstElement()
+        })
+    },
+    onClose: () => {
+        emit('update:modelValue', false)
+        emit('update:isOpen', false)
+        emit('close')
+        unlockScroll()
+    }
+})
+
+// Expose disclosure methods for external use
+const { isOpen, open, close } = disclosure
+
+// Computed z-index - usa o dinamico do stack
+const computedZIndex = computed(() => {
+    if (modalId.value) {
+        return getModalZIndex(modalId.value) || dynamicZIndex.value
+    }
+    return dynamicZIndex.value
+})
+
+// ============================================
+// MODAL CONTROL METHODS
+// ============================================
+
+// Close with validation - respeitando persistent e loading
+const closeWithValidation = () => {
+    if (props.persistent || props.loading) return
+    close()
+}
+
+// Force close - usado pelos botões, ignora persistent
+const forceClose = () => {
+    // Force close bypasses persistent/loading checks
+    close()
+}
+
+const handleOverlayClick = () => {
+    if (props.closeOnOverlay && !props.persistent) {
+        closeWithValidation()
+    }
+}
+
+const handleEscKey = (e: KeyboardEvent) => {
+    if (e.key === 'Escape' && props.closeOnEsc && isOpen.value) {
+        closeWithValidation()
+    }
+}
+
+const handleConfirm = () => {
+    emit('confirm')
+    // Modals não-persistent fecham automaticamente no confirm
+    // Modals persistent só fecham se o parent mudar o v-model
+    if (!props.persistent && !props.loading) {
+        forceClose()
+    }
+}
+
+const handleCancel = () => {
+    emit('cancel')
+    // Fecha automaticamente no cancel (comportamento padrão para todos)
+    if (!props.loading) {
+        forceClose()
+    }
+}
+
+// ============================================
+// V-MODEL SYNC - Watchers
+// ============================================
+
+// Sync external v-model changes to internal disclosure state
 watch(() => props.modelValue, (newVal) => {
     if (newVal !== isOpen.value) {
         if (newVal) {
@@ -182,7 +202,9 @@ watch(() => props.isOpen, (newVal) => {
     }
 })
 
-// Lifecycle
+// ============================================
+// LIFECYCLE
+// ============================================
 onMounted(() => {
     window.addEventListener('keydown', handleEscKey)
 
