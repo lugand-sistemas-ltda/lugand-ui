@@ -73,7 +73,7 @@ export { default as ThemeSelector } from '../src/modules/AppShell/components/The
 // ============================================
 export {
     // Primitives
-    Btn,
+    Button,
     BtnToggle,
     Input,
     Textarea,

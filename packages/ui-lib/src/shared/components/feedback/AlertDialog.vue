@@ -27,7 +27,7 @@
  */
 
 import { Modal } from '@/modules/modal'
-import { Btn } from '@/shared/components'
+import { Button } from '@/shared/components'
 
 defineOptions({
   inheritAttrs: false
@@ -103,12 +103,12 @@ function handleClose(): void {
 
     <!-- Actions -->
     <template #footer>
-      <Btn variant="ghost" :disabled="loading" @click="handleCancel">
+      <Button variant="ghost" :disabled="loading" @click="handleCancel">
         {{ cancelText }}
-      </Btn>
-      <Btn :variant="confirmButtonVariant" :loading="loading" :disabled="disabled" @click="handleConfirm">
+      </Button>
+      <Button :variant="confirmButtonVariant" :loading="loading" :disabled="disabled" @click="handleConfirm">
         {{ confirmText }}
-      </Btn>
+      </Button>
     </template>
   </Modal>
 </template>

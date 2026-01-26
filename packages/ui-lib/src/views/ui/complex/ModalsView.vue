@@ -3,7 +3,7 @@
  * ModalsView - Showcase de componentes Modal
  */
 import { ref } from 'vue'
-import { Btn, Input, Card, ComponentShowcase, CodeBlock, Spinner } from '@/shared/components'
+import { Button, Input, Card, ComponentShowcase, CodeBlock, Spinner } from '@/shared/components'
 import { Modal, useModal, useConfirmModal } from '@/modules/modal'
 
 // Basic Modal
@@ -85,13 +85,13 @@ const handlePersistentCancel = () => {
 // Code examples
 const basicExample = `<script setup lang="ts">
 import { ref } from 'vue'
-import { Modal, Btn } from '@lugand/vue-ui-lib'
+import { Modal, Button } from '@lugand/vue-ui-lib'
 
 const showModal = ref(false)
 <\/script>
 
 <template>
-    <Btn @click="showModal = true">Abrir Modal</Btn>
+    <Button @click="showModal = true">Abrir Modal</Button>
     
     <Modal v-model="showModal" title="Título do Modal">
         <p>Conteúdo do modal aqui...</p>
@@ -99,13 +99,13 @@ const showModal = ref(false)
 </template>`
 
 const composableExample = `<script setup lang="ts">
-import { useModal, Modal, Btn } from '@lugand/vue-ui-lib'
+import { useModal, Modal, Button } from '@lugand/vue-ui-lib'
 
 const { isOpen, open, close } = useModal()
 <\/script>
 
 <template>
-    <Btn @click="open">Abrir Modal</Btn>
+    <Button @click="open">Abrir Modal</Button>
     
     <Modal v-model="isOpen" title="Com Composable">
         <p>Usando useModal() composable</p>
@@ -138,8 +138,8 @@ const handleDelete = async () => {
         <!-- Basic Usage -->
         <ComponentShowcase title="Basic Modal">
             <template #preview>
-                <Btn @click="showBasicModal = true">Abrir Modal Básico</Btn>
-                
+                <Button @click="showBasicModal = true">Abrir Modal Básico</Button>
+
                 <Modal v-model="showBasicModal" title="Modal Básico">
                     <p>Este é um modal básico com header, body e footer padrão.</p>
                     <p>Clique fora do modal, pressione ESC ou clique no X para fechar.</p>
@@ -154,10 +154,10 @@ const handleDelete = async () => {
         <ComponentShowcase title="Tamanhos">
             <template #preview>
                 <div style="display: flex; gap: var(--spacing-sm); flex-wrap: wrap;">
-                    <Btn size="sm" @click="showSmModal = true">Small</Btn>
-                    <Btn size="sm" @click="showMdModal = true">Medium</Btn>
-                    <Btn size="sm" @click="showLgModal = true">Large</Btn>
-                    <Btn size="sm" @click="showXlModal = true">Extra Large</Btn>
+                    <Button size="sm" @click="showSmModal = true">Small</Button>
+                    <Button size="sm" @click="showMdModal = true">Medium</Button>
+                    <Button size="sm" @click="showLgModal = true">Large</Button>
+                    <Button size="sm" @click="showXlModal = true">Extra Large</Button>
                 </div>
 
                 <Modal v-model="showSmModal" title="Small Modal" size="sm">
@@ -187,9 +187,9 @@ const handleDelete = async () => {
         <ComponentShowcase title="Variantes">
             <template #preview>
                 <div style="display: flex; gap: var(--spacing-sm); flex-wrap: wrap;">
-                    <Btn variant="danger" @click="showDangerModal = true">Danger</Btn>
-                    <Btn variant="primary" @click="showSuccessModal = true">Success</Btn>
-                    <Btn variant="secondary" @click="showWarningModal = true">Warning</Btn>
+                    <Button variant="danger" @click="showDangerModal = true">Danger</Button>
+                    <Button variant="primary" @click="showSuccessModal = true">Success</Button>
+                    <Button variant="secondary" @click="showWarningModal = true">Warning</Button>
                 </div>
 
                 <Modal v-model="showDangerModal" title="Ação Perigosa" variant="danger">
@@ -215,19 +215,14 @@ const handleDelete = async () => {
         <ComponentShowcase title="Features Especiais">
             <template #preview>
                 <div style="display: flex; gap: var(--spacing-sm); flex-wrap: wrap;">
-                    <Btn @click="showPersistentModal = true">Persistent</Btn>
-                    <Btn @click="showFullscreenModal = true">Fullscreen</Btn>
-                    <Btn @click="simulateLoading">Loading</Btn>
+                    <Button @click="showPersistentModal = true">Persistent</Button>
+                    <Button @click="showFullscreenModal = true">Fullscreen</Button>
+                    <Button @click="simulateLoading">Loading</Button>
                 </div>
 
                 <!-- Persistent - não fecha com ESC ou click fora -->
-                <Modal 
-                    v-model="showPersistentModal" 
-                    title="Modal Persistente" 
-                    persistent
-                    @confirm="handlePersistentConfirm"
-                    @cancel="handlePersistentCancel"
-                >
+                <Modal v-model="showPersistentModal" title="Modal Persistente" persistent
+                    @confirm="handlePersistentConfirm" @cancel="handlePersistentCancel">
                     <p>Este modal só fecha quando você clicar em "Confirmar" ou "Cancelar".</p>
                     <p>ESC e click fora estão desabilitados.</p>
                 </Modal>
@@ -239,17 +234,15 @@ const handleDelete = async () => {
                 </Modal>
 
                 <!-- Loading -->
-                <Modal 
-                    v-model="showLoadingModal" 
-                    title="Processando..." 
-                    :show-footer="false"
-                    persistent
-                    :closable="false"
-                >
-                    <div style="display: flex; flex-direction: column; align-items: center; gap: var(--spacing-lg); padding: var(--spacing-xl);">
+                <Modal v-model="showLoadingModal" title="Processando..." :show-footer="false" persistent
+                    :closable="false">
+                    <div
+                        style="display: flex; flex-direction: column; align-items: center; gap: var(--spacing-lg); padding: var(--spacing-xl);">
                         <Spinner size="lg" />
                         <p style="text-align: center; margin: 0;">Aguarde enquanto processamos sua solicitação...</p>
-                        <p style="text-align: center; margin: 0; color: var(--color-text-secondary); font-size: var(--font-size-sm);">Fecha automaticamente em 3 segundos</p>
+                        <p
+                            style="text-align: center; margin: 0; color: var(--color-text-secondary); font-size: var(--font-size-sm);">
+                            Fecha automaticamente em 3 segundos</p>
                     </div>
                 </Modal>
             </template>
@@ -266,13 +259,9 @@ const handleDelete = async () => {
         <!-- Form Example -->
         <ComponentShowcase title="Modal com Formulário">
             <template #preview>
-                <Btn @click="showFormModal = true">Abrir Formulário</Btn>
+                <Button @click="showFormModal = true">Abrir Formulário</Button>
 
-                <Modal 
-                    v-model="showFormModal" 
-                    title="Cadastrar Usuário"
-                    @confirm="handleFormSubmit"
-                >
+                <Modal v-model="showFormModal" title="Cadastrar Usuário" @confirm="handleFormSubmit">
                     <div style="display: flex; flex-direction: column; gap: var(--spacing-md);">
                         <Input v-model="formData.name" label="Nome" placeholder="Digite seu nome" />
                         <Input v-model="formData.email" type="email" label="E-mail" placeholder="seu@email.com" />
@@ -290,7 +279,7 @@ const handleDelete = async () => {
         <!-- Custom Slots -->
         <ComponentShowcase title="Custom Slots">
             <template #preview>
-                <Btn @click="showCustomModal = true">Modal Customizado</Btn>
+                <Button @click="showCustomModal = true">Modal Customizado</Button>
 
                 <Modal v-model="showCustomModal" :show-footer="false">
                     <template #header>
@@ -304,9 +293,9 @@ const handleDelete = async () => {
                         <p>Você pode customizar completamente o header e footer usando slots.</p>
                         <p>Este modal tem header customizado e footer desabilitado.</p>
                     </Card>
-                    
+
                     <div style="margin-top: var(--spacing-md); text-align: right;">
-                        <Btn @click="showCustomModal = false">Fechar</Btn>
+                        <Button @click="showCustomModal = false">Fechar</Button>
                     </div>
                 </Modal>
             </template>
@@ -316,21 +305,22 @@ const handleDelete = async () => {
         <h2>🎨 Header Customizado</h2>
     </template>
     <p>Conteúdo customizado...</p>
-</Modal>`" language="vue" />
+    </Modal>`" language="vue" />
             </template>
         </ComponentShowcase>
 
         <!-- Using Composable -->
         <ComponentShowcase title="Usando useModal() Composable">
             <template #preview>
-                <Btn @click="openComposableModal">Abrir com Composable</Btn>
+                <Button @click="openComposableModal">Abrir com Composable</Button>
 
                 <Modal v-model="composableModalOpen" title="Modal com Composable">
                     <p>Este modal é controlado pelo composable <code>useModal()</code>.</p>
-                    <p>Você tem acesso a <code>isOpen</code>, <code>open()</code>, <code>close()</code> e <code>toggle()</code>.</p>
-                    
+                    <p>Você tem acesso a <code>isOpen</code>, <code>open()</code>, <code>close()</code> e
+                        <code>toggle()</code>.</p>
+
                     <div style="margin-top: var(--spacing-md);">
-                        <Btn variant="ghost" @click="closeComposableModal">Fechar via Composable</Btn>
+                        <Button variant="ghost" @click="closeComposableModal">Fechar via Composable</Button>
                     </div>
                 </Modal>
             </template>
@@ -342,41 +332,55 @@ const handleDelete = async () => {
         <!-- Long Content with Scroll -->
         <ComponentShowcase title="Conteúdo Longo (Scroll Vertical)">
             <template #preview>
-                <Btn @click="showLongContentModal = true">Abrir Modal com Muito Conteúdo</Btn>
+                <Button @click="showLongContentModal = true">Abrir Modal com Muito Conteúdo</Button>
 
                 <Modal v-model="showLongContentModal" title="Artigo Completo" size="lg">
                     <h3 style="margin-top: 0;">Lorem Ipsum - Texto de Exemplo</h3>
-                    
-                    <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris.</p>
-                    
-                    <img src="https://picsum.photos/700/400" alt="Exemplo visual 1" style="width: 100%; height: auto; border-radius: var(--radius-md); margin: var(--spacing-md) 0;" />
-                    
+
+                    <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut
+                        labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco
+                        laboris.</p>
+
+                    <img src="https://picsum.photos/700/400" alt="Exemplo visual 1"
+                        style="width: 100%; height: auto; border-radius: var(--radius-md); margin: var(--spacing-md) 0;" />
+
                     <h4>Seção 1: Introdução</h4>
-                    <p>Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.</p>
-                    
-                    <p>Sed ut perspiciatis unde omnis iste natus error sit voluptatem accusantium doloremque laudantium, totam rem aperiam, eaque ipsa quae ab illo inventore veritatis et quasi architecto beatae vitae dicta sunt explicabo.</p>
-                    
+                    <p>Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla
+                        pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt
+                        mollit anim id est laborum.</p>
+
+                    <p>Sed ut perspiciatis unde omnis iste natus error sit voluptatem accusantium doloremque laudantium,
+                        totam rem aperiam, eaque ipsa quae ab illo inventore veritatis et quasi architecto beatae vitae
+                        dicta sunt explicabo.</p>
+
                     <h4>Seção 2: Desenvolvimento</h4>
-                    <p>Nemo enim ipsam voluptatem quia voluptas sit aspernatur aut odit aut fugit, sed quia consequuntur magni dolores eos qui ratione voluptatem sequi nesciunt.</p>
-                    
+                    <p>Nemo enim ipsam voluptatem quia voluptas sit aspernatur aut odit aut fugit, sed quia consequuntur
+                        magni dolores eos qui ratione voluptatem sequi nesciunt.</p>
+
                     <ul>
                         <li>Item de lista 1</li>
                         <li>Item de lista 2</li>
                         <li>Item de lista 3</li>
                         <li>Item de lista 4</li>
                     </ul>
-                    
-                    <p>Neque porro quisquam est, qui dolorem ipsum quia dolor sit amet, consectetur, adipisci velit, sed quia non numquam eius modi tempora incidunt ut labore et dolore magnam aliquam quaerat voluptatem.</p>
-                    
-                    <img src="https://picsum.photos/700/300" alt="Exemplo visual 2" style="width: 100%; height: auto; border-radius: var(--radius-md); margin: var(--spacing-md) 0;" />
-                    
+
+                    <p>Neque porro quisquam est, qui dolorem ipsum quia dolor sit amet, consectetur, adipisci velit, sed
+                        quia non numquam eius modi tempora incidunt ut labore et dolore magnam aliquam quaerat
+                        voluptatem.</p>
+
+                    <img src="https://picsum.photos/700/300" alt="Exemplo visual 2"
+                        style="width: 100%; height: auto; border-radius: var(--radius-md); margin: var(--spacing-md) 0;" />
+
                     <h4>Seção 3: Conclusão</h4>
-                    <p>Ut enim ad minima veniam, quis nostrum exercitationem ullam corporis suscipit laboriosam, nisi ut aliquid ex ea commodi consequatur?</p>
-                    
-                    <p>Quis autem vel eum iure reprehenderit qui in ea voluptate velit esse quam nihil molestiae consequatur, vel illum qui dolorem eum fugiat quo voluptas nulla pariatur?</p>
-                    
+                    <p>Ut enim ad minima veniam, quis nostrum exercitationem ullam corporis suscipit laboriosam, nisi ut
+                        aliquid ex ea commodi consequatur?</p>
+
+                    <p>Quis autem vel eum iure reprehenderit qui in ea voluptate velit esse quam nihil molestiae
+                        consequatur, vel illum qui dolorem eum fugiat quo voluptas nulla pariatur?</p>
+
                     <Card variant="flat" padding="md" style="margin-top: var(--spacing-lg);">
-                        <strong>💡 Nota:</strong> Este modal demonstra scroll vertical automático quando o conteúdo excede 90vh. Imagens se adaptam à largura (sem scroll horizontal).
+                        <strong>💡 Nota:</strong> Este modal demonstra scroll vertical automático quando o conteúdo
+                        excede 90vh. Imagens se adaptam à largura (sem scroll horizontal).
                     </Card>
                 </Modal>
             </template>
@@ -393,20 +397,16 @@ const handleDelete = async () => {
         <!-- Delete Confirmation with Icon -->
         <ComponentShowcase title="Confirmação de Exclusão (com Ícone)">
             <template #preview>
-                <Btn variant="danger" @click="showDeleteModal = true">🗑️ Deletar Item</Btn>
+                <Button variant="danger" @click="showDeleteModal = true">🗑️ Deletar Item</Button>
 
-                <Modal 
-                    v-model="showDeleteModal" 
-                    title="Confirmar Exclusão"
-                    variant="danger"
-                    size="sm"
-                    @confirm="handleDeleteConfirm"
-                >
+                <Modal v-model="showDeleteModal" title="Confirmar Exclusão" variant="danger" size="sm"
+                    @confirm="handleDeleteConfirm">
                     <div style="display: flex; align-items: flex-start; gap: var(--spacing-md);">
                         <div style="font-size: 48px; line-height: 1;">⚠️</div>
                         <div style="flex: 1;">
                             <p style="margin-top: 0;"><strong>Tem certeza que deseja excluir este item?</strong></p>
-                            <p style="margin-bottom: 0; color: var(--color-text-secondary);">Esta ação não pode ser desfeita. Todos os dados relacionados serão permanentemente removidos.</p>
+                            <p style="margin-bottom: 0; color: var(--color-text-secondary);">Esta ação não pode ser
+                                desfeita. Todos os dados relacionados serão permanentemente removidos.</p>
                         </div>
                     </div>
                 </Modal>
@@ -427,10 +427,11 @@ const handleDelete = async () => {
         <!-- Complex Component Composition -->
         <ComponentShowcase title="Composição Complexa (Múltiplos Componentes)">
             <template #preview>
-                <Btn @click="showComplexModal = true">Abrir Modal Complexo</Btn>
+                <Button @click="showComplexModal = true">Abrir Modal Complexo</Button>
 
                 <Modal v-model="showComplexModal" title="Dashboard de Configurações" size="xl">
-                    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: var(--spacing-lg);">
+                    <div
+                        style="display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: var(--spacing-lg);">
                         <!-- Card 1 -->
                         <Card variant="outline" padding="md">
                             <h4 style="margin-top: 0; display: flex; align-items: center; gap: var(--spacing-sm);">
@@ -445,17 +446,22 @@ const handleDelete = async () => {
                             <h4 style="margin-top: 0; display: flex; align-items: center; gap: var(--spacing-sm);">
                                 🔔 Notificações
                             </h4>
-                            <p style="color: var(--color-text-secondary); font-size: var(--font-size-sm);">Configure como deseja receber notificações</p>
-                            <div style="display: flex; flex-direction: column; gap: var(--spacing-sm); margin-top: var(--spacing-md);">
-                                <label style="display: flex; align-items: center; gap: var(--spacing-sm); cursor: pointer;">
+                            <p style="color: var(--color-text-secondary); font-size: var(--font-size-sm);">Configure
+                                como deseja receber notificações</p>
+                            <div
+                                style="display: flex; flex-direction: column; gap: var(--spacing-sm); margin-top: var(--spacing-md);">
+                                <label
+                                    style="display: flex; align-items: center; gap: var(--spacing-sm); cursor: pointer;">
                                     <input type="checkbox" checked />
                                     <span>E-mail</span>
                                 </label>
-                                <label style="display: flex; align-items: center; gap: var(--spacing-sm); cursor: pointer;">
+                                <label
+                                    style="display: flex; align-items: center; gap: var(--spacing-sm); cursor: pointer;">
                                     <input type="checkbox" />
                                     <span>SMS</span>
                                 </label>
-                                <label style="display: flex; align-items: center; gap: var(--spacing-sm); cursor: pointer;">
+                                <label
+                                    style="display: flex; align-items: center; gap: var(--spacing-sm); cursor: pointer;">
                                     <input type="checkbox" checked />
                                     <span>Push</span>
                                 </label>
@@ -467,7 +473,8 @@ const handleDelete = async () => {
                             <h4 style="margin-top: 0; display: flex; align-items: center; gap: var(--spacing-sm);">
                                 🎨 Preferências
                             </h4>
-                            <p style="color: var(--color-text-secondary); font-size: var(--font-size-sm);">Personalize sua experiência</p>
+                            <p style="color: var(--color-text-secondary); font-size: var(--font-size-sm);">Personalize
+                                sua experiência</p>
                             <div style="margin-top: var(--spacing-md);">
                                 <Spinner size="sm" style="margin-right: var(--spacing-xs);" />
                                 <span style="font-size: var(--font-size-sm);">Carregando preferências...</span>
@@ -495,7 +502,8 @@ const handleDelete = async () => {
                     </div>
 
                     <Card variant="ghost" padding="md" style="margin-top: var(--spacing-lg);">
-                        <strong>✨ Insight:</strong> Este exemplo demonstra que modals podem conter qualquer combinação de componentes (Cards, Inputs, Spinners, etc.) sem limitações.
+                        <strong>✨ Insight:</strong> Este exemplo demonstra que modals podem conter qualquer combinação
+                        de componentes (Cards, Inputs, Spinners, etc.) sem limitações.
                     </Card>
                 </Modal>
             </template>
@@ -517,15 +525,10 @@ const handleDelete = async () => {
         <!-- Confirm Modal Pattern -->
         <ComponentShowcase title="Confirm Modal Pattern">
             <template #preview>
-                <Btn variant="danger" @click="handleDelete">Deletar Item</Btn>
+                <Button variant="danger" @click="handleDelete">Deletar Item</Button>
 
-                <Modal 
-                    v-model="confirmOpen" 
-                    :title="confirmOptions.title || 'Confirmar'"
-                    variant="danger"
-                    @confirm="handleConfirm"
-                    @cancel="handleCancel"
-                >
+                <Modal v-model="confirmOpen" :title="confirmOptions.title || 'Confirmar'" variant="danger"
+                    @confirm="handleConfirm" @cancel="handleCancel">
                     <p>{{ confirmOptions.message }}</p>
                 </Modal>
             </template>
@@ -725,29 +728,30 @@ const handleDelete = async () => {
 
 .api-table {
     overflow-x: auto;
-    
+
     table {
         width: 100%;
         border-collapse: collapse;
         font-size: var(--font-size-sm);
-        
-        th, td {
+
+        th,
+        td {
             text-align: left;
             padding: var(--spacing-sm);
             border: 1px solid var(--color-border-base);
         }
-        
+
         th {
             background: var(--color-bg-tertiary);
             font-weight: 600;
             color: var(--color-text-primary);
         }
-        
+
         td {
             background: var(--color-bg-secondary);
             color: var(--color-text-secondary);
         }
-        
+
         code {
             white-space: nowrap;
         }

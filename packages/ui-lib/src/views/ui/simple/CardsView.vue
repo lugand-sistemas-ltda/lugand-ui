@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { Card, MediaCard, Btn, ComponentShowcase, CodeBlock } from '@/shared/components'
+import { Card, MediaCard, Button, ComponentShowcase, CodeBlock } from '@/shared/components'
 
 // Mock Data para Produtos
 const products = [
@@ -52,7 +52,7 @@ const codeMedia = `<MediaCard
 
   <!-- Slot Actions -->
   <template #actions>
-    <Btn variant="primary">Comprar</Btn>
+    <Button variant="primary">Comprar</Button>
   </template>
 </MediaCard>`
 
@@ -117,10 +117,10 @@ const handleBuy = (product: any) => {
                         </template>
 
                         <template #actions>
-                            <Btn variant="ghost" size="sm">Detalhes</Btn>
-                            <Btn variant="primary" size="sm" @click="handleBuy(prod)">
+                            <Button variant="ghost" size="sm">Detalhes</Button>
+                            <Button variant="primary" size="sm" @click="handleBuy(prod)">
                                 Comprar
-                            </Btn>
+                            </Button>
                         </template>
                     </MediaCard>
                 </div>

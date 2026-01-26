@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { Input, Select, Checkbox, Btn } from '@/shared/components'
+import { Input, Select, Checkbox, Button } from '@/shared/components'
 
 /**
  * Definição do Schema do Formulário
@@ -73,9 +73,9 @@ const handleSubmit = () => {
 
         <div class="dynamic-form__actions" v-if="!hideSubmit">
             <slot name="actions">
-                <Btn type="submit" variant="primary" :disabled="loading">
+                <Button type="submit" variant="primary" :disabled="loading">
                     {{ submitLabel }}
-                </Btn>
+                </Button>
             </slot>
         </div>
     </form>

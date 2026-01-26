@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { ref, computed, watch } from 'vue'
 import type { TableColumn, SortState } from './types'
-import { Checkbox, Btn, Input } from '@/shared/components'
+import { Checkbox, Button, Input } from '@/shared/components'
 
 interface Props {
     data: any[]
@@ -214,13 +214,13 @@ const isSelected = (row: any) => selectedRows.value.includes(row)
                 </div>
 
                 <div class="page-nav">
-                    <Btn size="sm" variant="ghost" :disabled="currentPage === 1" @click="currentPage--">
+                    <Button size="sm" variant="ghost" :disabled="currentPage === 1" @click="currentPage--">
                         Prev
-                    </Btn>
+                    </Button>
                     <span class="page-current">{{ currentPage }} / {{ totalPages }}</span>
-                    <Btn size="sm" variant="ghost" :disabled="currentPage === totalPages" @click="currentPage++">
+                    <Button size="sm" variant="ghost" :disabled="currentPage === totalPages" @click="currentPage++">
                         Next
-                    </Btn>
+                    </Button>
                 </div>
             </div>
         </div>

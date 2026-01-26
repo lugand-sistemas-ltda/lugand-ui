@@ -12,7 +12,7 @@
  * - Variantes e tamanhos
  */
 import { ref, watch, onMounted, onBeforeUnmount, nextTick, computed } from 'vue'
-import { Btn, Icon } from '@/shared/components'
+import { Button, Icon } from '@/shared/components'
 import type { ModalSize, ModalVariant } from './types'
 import { registerModal, unregisterModal, getModalZIndex } from './modalStack'
 
@@ -241,13 +241,13 @@ onBeforeUnmount(() => {
                         <!-- Footer -->
                         <footer v-if="showFooter || $slots.footer" class="modal__footer">
                             <slot name="footer">
-                                <Btn variant="ghost" :disabled="loading" @click="handleCancel">
+                                <Button variant="ghost" :disabled="loading" @click="handleCancel">
                                     Cancelar
-                                </Btn>
-                                <Btn :variant="variant === 'danger' ? 'danger' : 'primary'" :loading="loading"
+                                </Button>
+                                <Button :variant="variant === 'danger' ? 'danger' : 'primary'" :loading="loading"
                                     @click="handleConfirm">
                                     Confirmar
-                                </Btn>
+                                </Button>
                             </slot>
                         </footer>
                     </div>

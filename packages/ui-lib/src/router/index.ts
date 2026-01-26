@@ -122,6 +122,11 @@ const routes: RouteRecordRaw[] = [
     name: 'docs-components',
     component: () => import('@/views/docs/ComponentsView.vue'),
   },
+  {
+    path: '/docs/composables/use-disclosure',
+    name: 'docs-use-disclosure',
+    component: () => import('@/views/docs/UseDisclosureExample.vue'),
+  },
   // About
   {
     path: '/about',

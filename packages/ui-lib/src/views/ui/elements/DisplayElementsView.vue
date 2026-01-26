@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { Badge, Tooltip, Avatar, Skeleton, ComponentShowcase, CodeBlock, Btn } from '@/shared/components'
+import { Badge, Tooltip, Avatar, Skeleton, ComponentShowcase, CodeBlock, Button } from '@/shared/components'
 </script>
 
 <template>
@@ -72,22 +72,22 @@ import { Badge, Tooltip, Avatar, Skeleton, ComponentShowcase, CodeBlock, Btn } f
                     <div class="tooltip-grid">
                         <!-- Top -->
                         <Tooltip text="Tooltip no Topo" position="top">
-                            <Btn>Hover Top</Btn>
+                            <Button>Hover Top</Button>
                         </Tooltip>
 
                         <!-- Bottom -->
                         <Tooltip text="Tooltip Abaixo" position="bottom">
-                            <Btn>Hover Bottom</Btn>
+                            <Button>Hover Bottom</Button>
                         </Tooltip>
 
                         <!-- Left -->
                         <Tooltip text="Tooltip na Esquerda" position="left">
-                            <Btn>Hover Left</Btn>
+                            <Button>Hover Left</Button>
                         </Tooltip>
 
                         <!-- Right -->
                         <Tooltip text="Tooltip na Direita" position="right">
-                            <Btn>Hover Right</Btn>
+                            <Button>Hover Right</Button>
                         </Tooltip>
                     </div>
                 </div>
@@ -104,7 +104,7 @@ import { Badge, Tooltip, Avatar, Skeleton, ComponentShowcase, CodeBlock, Btn } f
 
             <template #code>
                 <CodeBlock code='<Tooltip text="Salvar alterações" position="top">
-  <Btn icon="save">Salvar</Btn>
+  <Button icon="save">Salvar</Button>
 </Tooltip>
 
 <!-- Inline -->

@@ -5,6 +5,10 @@
 // Theme & UI
 export { useTheme } from './useTheme'
 
+// Disclosure (open/close state management)
+export { useDisclosure, useDisclosureGroup, useControlledDisclosure } from './useDisclosure'
+export type { UseDisclosureOptions, UseDisclosureReturn } from './useDisclosure'
+
 // Forms & Inputs
 export { useDateInput } from './useDateInput'
 export type { UseDateInputOptions, UseDateInputReturn, DateInputType, DateOutputFormat } from './useDateInput'

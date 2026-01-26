@@ -26,7 +26,7 @@
  * ```
  */
 import { computed } from 'vue'
-import { Btn, Select } from '@/shared/components'
+import { Button, Select } from '@/shared/components'
 
 interface Props {
   currentPage: number
@@ -137,21 +137,21 @@ function handlePerPageChange(value: string | number): void {
       <!-- Navigation -->
       <div class="pagination__nav">
         <!-- First -->
-        <Btn v-if="showFirstLast" size="sm" variant="ghost" :disabled="isFirstPage || disabled" @click="firstPage">
+        <Button v-if="showFirstLast" size="sm" variant="ghost" :disabled="isFirstPage || disabled" @click="firstPage">
           <slot name="first-icon">
             «
           </slot>
-        </Btn>
+        </Button>
 
         <!-- Previous -->
-        <Btn size="sm" variant="ghost" :disabled="isFirstPage || disabled" @click="previousPage">
+        <Button size="sm" variant="ghost" :disabled="isFirstPage || disabled" @click="previousPage">
           <slot name="prev-icon">
             ‹
           </slot>
           <slot name="prev-text">
             Prev
           </slot>
-        </Btn>
+        </Button>
 
         <!-- Current Page Indicator -->
         <span class="pagination__current">
@@ -161,21 +161,21 @@ function handlePerPageChange(value: string | number): void {
         </span>
 
         <!-- Next -->
-        <Btn size="sm" variant="ghost" :disabled="isLastPage || disabled" @click="nextPage">
+        <Button size="sm" variant="ghost" :disabled="isLastPage || disabled" @click="nextPage">
           <slot name="next-text">
             Next
           </slot>
           <slot name="next-icon">
             ›
           </slot>
-        </Btn>
+        </Button>
 
         <!-- Last -->
-        <Btn v-if="showFirstLast" size="sm" variant="ghost" :disabled="isLastPage || disabled" @click="lastPage">
+        <Button v-if="showFirstLast" size="sm" variant="ghost" :disabled="isLastPage || disabled" @click="lastPage">
           <slot name="last-icon">
             »
           </slot>
-        </Btn>
+        </Button>
       </div>
     </div>
   </div>

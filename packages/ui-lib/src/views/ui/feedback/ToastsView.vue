@@ -3,7 +3,7 @@ import { ref } from 'vue'
 import {
     ComponentShowcase,
     GridContainer,
-    Btn,
+    Button,
     Input,
     Select,
     Checkbox,
@@ -131,8 +131,8 @@ function showCustomClass() {
                     </GridContainer>
 
                     <div class="actions">
-                        <Btn variant="primary" @click="showPlaygroundToast">Disparar Toast</Btn>
-                        <Btn variant="outline" @click="toast.clear()">Limpar Todos</Btn>
+                        <Button variant="primary" @click="showPlaygroundToast">Disparar Toast</Button>
+                        <Button variant="outline" @click="toast.clear()">Limpar Todos</Button>
                     </div>
                 </div>
             </template>
@@ -158,10 +158,10 @@ toast.add({
         <ComponentShowcase title="Variantes Semânticas" description="Shortcuts para mensagens de status comuns.">
             <template #preview>
                 <div class="button-group">
-                    <Btn color="success" @click="toast.success('Operação realizada com sucesso!')">Success</Btn>
-                    <Btn color="warning" @click="toast.warning('Atenção: verifique os dados.')">Warning</Btn>
-                    <Btn color="danger" @click="toast.error('Erro ao conectar ao servidor.')">Error</Btn>
-                    <Btn color="info" @click="toast.info('Nova atualização disponível.')">Info</Btn>
+                    <Button color="success" @click="toast.success('Operação realizada com sucesso!')">Success</Button>
+                    <Button color="warning" @click="toast.warning('Atenção: verifique os dados.')">Warning</Button>
+                    <Button color="danger" @click="toast.error('Erro ao conectar ao servidor.')">Error</Button>
+                    <Button color="info" @click="toast.info('Nova atualização disponível.')">Info</Button>
                 </div>
             </template>
             <template #code>
@@ -178,8 +178,8 @@ toast.info('Informação útil')
         <ComponentShowcase title="Cenários Avançados" description="Empilhamento, Persistência e Ações.">
             <template #preview>
                 <div class="button-group">
-                    <Btn variant="outline" @click="showStackDemo">Simular Fila (Stack)</Btn>
-                    <Btn variant="outline" @click="showPersistentToast">Toast Persistente com Ação</Btn>
+                    <Button variant="outline" @click="showStackDemo">Simular Fila (Stack)</Button>
+                    <Button variant="outline" @click="showPersistentToast">Toast Persistente com Ação</Button>
                 </div>
             </template>
             <template #code>
@@ -203,8 +203,8 @@ toast.add({
             description="Exemplo de toast com estilos CSS personalizados inline ou via classes.">
             <template #preview>
                 <div class="button-group">
-                    <Btn @click="showCustomGradient">Toast Gradiente (Style)</Btn>
-                    <Btn @click="showCustomClass">Toast Neon (Class)</Btn>
+                    <Button @click="showCustomGradient">Toast Gradiente (Style)</Button>
+                    <Button @click="showCustomClass">Toast Neon (Class)</Button>
                 </div>
             </template>
             <template #code>

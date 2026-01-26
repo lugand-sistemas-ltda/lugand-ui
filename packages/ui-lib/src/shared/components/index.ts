@@ -6,7 +6,7 @@
 // ============================================
 // PRIMITIVES - Componentes base simples
 // ============================================
-export { default as Btn } from './primitives/Btn.vue'
+export { default as Button } from './primitives/Button.vue'
 export { default as BtnToggle } from './primitives/BtnToggle.vue'
 export { default as Scrollable } from './primitives/Scrollable.vue'
 export { default as InputWithAddon } from './primitives/InputWithAddon.vue'

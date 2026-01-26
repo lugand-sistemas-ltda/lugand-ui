@@ -38,7 +38,7 @@ import type { BulkActionDefinition } from '@/shared/composables'
 import { useModal, Modal } from '@/modules/modal'
 import { useToast, ToastProvider } from '@/modules/toast'
 import { DataTable, DynamicForm } from '@/modules'
-import { Btn, Card } from '@/shared/components'
+import { Button, Card } from '@/shared/components'
 import type { TableColumn } from '@/modules/DataTable/types'
 import type { FormField } from '@/modules/DynamicForm/DynamicForm.vue'
 import { USERS_DEFAULT, type User } from '@/mocks'// ============================================
@@ -558,19 +558,19 @@ async function handleCreate() {
 
               <!-- Right Side: Action Buttons -->
               <div class="table-toolbar__right">
-                <Btn variant="outline" size="sm" @click="handleResetCrud">
+                <Button variant="outline" size="sm" @click="handleResetCrud">
                   <Icon name="arrows_horizontal" type="ui" size="sm" />
                   Reset
-                </Btn>
-                <Btn variant="danger" size="sm" @click="handleBulkDelete"
+                </Button>
+                <Button variant="danger" size="sm" @click="handleBulkDelete"
                   :disabled="!selection.hasSelection || bulkActions.state.value.isExecuting">
                   <Icon name="delete" type="ui" size="sm" />
                   Delete
-                </Btn>
-                <Btn variant="primary" size="sm" @click="openCreateModal">
+                </Button>
+                <Button variant="primary" size="sm" @click="openCreateModal">
                   <Icon name="plus" type="ui" size="sm" />
                   Create
-                </Btn>
+                </Button>
               </div>
             </template>
 
@@ -596,15 +596,15 @@ async function handleCreate() {
             <!-- Custom cell: Row Actions -->
             <template #rowActions="slotProps: any">
               <div class="actions-cell">
-                <Btn size="sm" variant="ghost" @click="openViewModal(slotProps.row)">
+                <Button size="sm" variant="ghost" @click="openViewModal(slotProps.row)">
                   View
-                </Btn>
-                <Btn size="sm" variant="ghost" @click="openEditModal(slotProps.row)">
+                </Button>
+                <Button size="sm" variant="ghost" @click="openEditModal(slotProps.row)">
                   Edit
-                </Btn>
-                <Btn size="sm" variant="danger" @click="openDeleteModal(slotProps.row)">
+                </Button>
+                <Button size="sm" variant="danger" @click="openDeleteModal(slotProps.row)">
                   Delete
-                </Btn>
+                </Button>
               </div>
             </template>
           </DataTable>
@@ -628,14 +628,15 @@ async function handleCreate() {
               </div>
 
               <div class="page-nav">
-                <Btn size="sm" variant="ghost" :disabled="tableState.isFirstPage.value"
+                <Button size="sm" variant="ghost" :disabled="tableState.isFirstPage.value"
                   @click="tableState.previousPage()">
                   Prev
-                </Btn>
+                </Button>
                 <span class="page-current">{{ tableState.currentPage.value }} / {{ tableState.totalPages.value }}</span>
-                <Btn size="sm" variant="ghost" :disabled="tableState.isLastPage.value" @click="tableState.nextPage()">
+                <Button size="sm" variant="ghost" :disabled="tableState.isLastPage.value"
+                  @click="tableState.nextPage()">
                   Next
-                </Btn>
+                </Button>
               </div>
             </div>
           </div>
@@ -764,12 +765,12 @@ async function handleCreate() {
       </div>
 
       <template #footer>
-        <Btn variant="ghost" @click="createModal.close(); validation.clearErrors()">
+        <Button variant="ghost" @click="createModal.close(); validation.clearErrors()">
           Cancel
-        </Btn>
-        <Btn variant="primary" @click="handleCreate">
+        </Button>
+        <Button variant="primary" @click="handleCreate">
           Create
-        </Btn>
+        </Button>
       </template>
     </Modal>
 
@@ -792,12 +793,12 @@ async function handleCreate() {
       </div>
 
       <template #footer>
-        <Btn variant="ghost" @click="editModal.close(); validation.clearErrors()">
+        <Button variant="ghost" @click="editModal.close(); validation.clearErrors()">
           Cancel
-        </Btn>
-        <Btn variant="primary" @click="handleUpdate">
+        </Button>
+        <Button variant="primary" @click="handleUpdate">
           Update
-        </Btn>
+        </Button>
       </template>
     </Modal>
 
@@ -836,12 +837,12 @@ async function handleCreate() {
       </div>
 
       <template #footer>
-        <Btn variant="ghost" @click="viewModal.close()">
+        <Button variant="ghost" @click="viewModal.close()">
           Close
-        </Btn>
-        <Btn variant="primary" @click="viewModal.close(); openEditModal(selectedUser!)">
+        </Button>
+        <Button variant="primary" @click="viewModal.close(); openEditModal(selectedUser!)">
           Edit User
-        </Btn>
+        </Button>
       </template>
     </Modal>
 

@@ -3,7 +3,7 @@
  * AlertsView - Showcase de componentes Alert e AlertDialog
  */
 import { ref } from 'vue'
-import { ComponentShowcase, CodeBlock, Alert, AlertDialog, Btn } from '@/shared/components'
+import { ComponentShowcase, CodeBlock, Alert, AlertDialog, Button } from '@/shared/components'
 import { useToast, ToastProvider } from '@/modules/toast'
 
 const toast = useToast()
@@ -109,7 +109,7 @@ const alertCustomIconExample = `
 const alertDialogExample = `
 <script setup>
 import { ref } from 'vue'
-import { AlertDialog, Btn } from '@lugand/vue-ui-lib'
+import { AlertDialog, Button } from '@lugand/vue-ui-lib'
 import { useToast } from '@lugand/vue-ui-lib'
 
 const showDeleteDialog = ref(false)
@@ -122,9 +122,9 @@ function handleDelete() {
 <\/script>
 
 <template>
-  <Btn variant="danger" @click="showDeleteDialog = true">
+  <Button variant="danger" @click="showDeleteDialog = true">
     Delete Item
-  </Btn>
+  </Button>
 
   <AlertDialog
     :is-open="showDeleteDialog"
@@ -186,9 +186,9 @@ function handleDelete() {
       description="Alerts can be dismissed by the user. Use the @dismiss event to handle closure.">
       <template #preview>
         <div class="showcase-controls">
-          <Btn variant="secondary" size="sm" @click="resetDismissibleAlerts">
+          <Button variant="secondary" size="sm" @click="resetDismissibleAlerts">
             Reset Dismissible Alerts
-          </Btn>
+          </Button>
         </div>
         <div class="showcase-grid">
           <Alert v-if="showSuccessAlert" variant="success" title="Dismissible Alert" dismissible
@@ -218,9 +218,9 @@ function handleDelete() {
     <ComponentShowcase title="Bordered Alerts" description="Add a border for extra emphasis on important messages.">
       <template #preview>
         <div class="showcase-controls">
-          <Btn variant="secondary" size="sm" @click="resetBorderedAlerts">
+          <Button variant="secondary" size="sm" @click="resetBorderedAlerts">
             Reset Bordered Alerts
-          </Btn>
+          </Button>
         </div>
         <div class="showcase-grid">
           <Alert v-if="showBorderedInfoAlert" variant="info" title="Bordered Info" bordered dismissible
@@ -275,18 +275,18 @@ function handleDelete() {
       description="Modal dialogs for confirming destructive or important actions. Built on top of Modal with pre-styled actions.">
       <template #preview>
         <div class="showcase-actions">
-          <Btn variant="ghost" @click="showInfoDialog = true">
+          <Button variant="ghost" @click="showInfoDialog = true">
             Info Dialog
-          </Btn>
-          <Btn variant="primary" @click="showSuccessDialog = true">
+          </Button>
+          <Button variant="primary" @click="showSuccessDialog = true">
             Success Dialog
-          </Btn>
-          <Btn variant="outline" @click="showWarningDialog = true">
+          </Button>
+          <Button variant="outline" @click="showWarningDialog = true">
             Warning Dialog
-          </Btn>
-          <Btn variant="danger" @click="showDangerDialog = true">
+          </Button>
+          <Button variant="danger" @click="showDangerDialog = true">
             Danger Dialog
-          </Btn>
+          </Button>
         </div>
 
         <!-- Dialogs -->

@@ -12,11 +12,12 @@
         <section class="doc-section">
             <h2>Visão Geral</h2>
             <p>
-                Lugand UI é uma biblioteca de componentes Vue 3 moderna, construída com TypeScript e focada em 
-                fornecer uma experiência de desenvolvimento excepcional (DX) e uma interface de usuário consistente (UX).
+                Lugand UI é uma biblioteca de componentes Vue 3 moderna, construída com TypeScript e focada em
+                fornecer uma experiência de desenvolvimento excepcional (DX) e uma interface de usuário consistente
+                (UX).
             </p>
             <p>
-                A biblioteca utiliza Composition API, design tokens para tematização e padrões arquiteturais 
+                A biblioteca utiliza Composition API, design tokens para tematização e padrões arquiteturais
                 bem definidos para garantir escalabilidade e manutenibilidade.
             </p>
         </section>
@@ -54,7 +55,7 @@ app.mount('#app')</code></pre>
             <h2>Uso Básico</h2>
             <p>Você pode usar os componentes diretamente ou importá-los sob demanda:</p>
             <pre><code>&lt;script setup lang="ts"&gt;
-import { Btn, Input } from '@lugand/ui-lib'
+import { Button, Input } from '@lugand/ui-lib'
 import { ref } from 'vue'
 
 const name = ref('')
@@ -63,9 +64,9 @@ const name = ref('')
 &lt;template&gt;
   &lt;div&gt;
     &lt;Input v-model="name" placeholder="Digite seu nome" /&gt;
-    &lt;Btn variant="primary" @click="sayHello"&gt;
+    &lt;Button variant="primary" @click="sayHello"&gt;
       Olá \{\{ name \}\}!
-    &lt;/Btn&gt;
+    &lt;/Button&gt;
   &lt;/div&gt;
 &lt;/template&gt;</code></pre>
         </section>
@@ -76,7 +77,8 @@ const name = ref('')
                 <li><router-link to="/docs/theming">Explore o sistema de temas</router-link></li>
                 <li><router-link to="/docs/components">Veja todos os componentes disponíveis</router-link></li>
                 <li><router-link to="/ui/simple/buttons">Comece com componentes simples como Buttons</router-link></li>
-                <li><router-link to="/ui/complex/forms">Aprenda sobre componentes complexos como Forms</router-link></li>
+                <li><router-link to="/ui/complex/forms">Aprenda sobre componentes complexos como Forms</router-link>
+                </li>
             </ul>
         </section>
 
@@ -124,10 +126,11 @@ const name = ref('')
             margin-bottom: var(--spacing-md);
         }
 
-        ul, ol {
+        ul,
+        ol {
             margin-left: var(--spacing-lg);
             margin-bottom: var(--spacing-md);
-            
+
             li {
                 margin-bottom: var(--spacing-sm);
                 line-height: 1.6;
@@ -171,7 +174,7 @@ const name = ref('')
     a {
         color: var(--color-primary);
         text-decoration: none;
-        
+
         &:hover {
             text-decoration: underline;
         }

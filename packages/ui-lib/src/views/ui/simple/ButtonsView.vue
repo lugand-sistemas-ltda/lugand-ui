@@ -3,7 +3,7 @@
  * ButtonsView - Showcase de componentes Button
  */
 import { ref } from 'vue'
-import { Btn, BtnToggle, ComponentShowcase, CodeBlock } from '@/shared/components'
+import { Button, BtnToggle, ComponentShowcase, CodeBlock } from '@/shared/components'
 
 // Estados reativos para demonstração
 const toggleState = ref(false)
@@ -23,17 +23,17 @@ const disabledToggle = ref(false)
         <!-- Btn - Variantes -->
         <ComponentShowcase title="Variantes de Botão" description="Diferentes estilos visuais para contextos distintos">
             <template #preview>
-                <Btn variant="primary">Primary</Btn>
-                <Btn variant="secondary">Secondary</Btn>
-                <Btn variant="ghost">Ghost</Btn>
-                <Btn variant="danger">Danger</Btn>
+                <Button variant="primary">Primary</Button>
+                <Button variant="secondary">Secondary</Button>
+                <Button variant="ghost">Ghost</Button>
+                <Button variant="danger">Danger</Button>
             </template>
 
             <template #code>
-                <CodeBlock :code="`<Btn variant='primary'>Primary</Btn>
-<Btn variant='secondary'>Secondary</Btn>
-<Btn variant='ghost'>Ghost</Btn>
-<Btn variant='danger'>Danger</Btn>`" />
+                <CodeBlock :code="`<Button variant='primary'>Primary</Button>
+<Button variant='secondary'>Secondary</Button>
+<Button variant='ghost'>Ghost</Button>
+<Button variant='danger'>Danger</Button>`" />
             </template>
         </ComponentShowcase>
 
@@ -41,32 +41,32 @@ const disabledToggle = ref(false)
         <ComponentShowcase title="Tamanhos"
             description="Três tamanhos disponíveis para diferentes necessidades de layout">
             <template #preview>
-                <Btn size="sm">Small</Btn>
-                <Btn size="md">Medium</Btn>
-                <Btn size="lg">Large</Btn>
+                <Button size="sm">Small</Button>
+                <Button size="md">Medium</Button>
+                <Button size="lg">Large</Button>
             </template>
 
             <template #code>
-                <CodeBlock :code="`<Btn size='sm'>Small</Btn>
-<Btn size='md'>Medium</Btn>
-<Btn size='lg'>Large</Btn>`" />
+                <CodeBlock :code="`<Button size='sm'>Small</Button>
+<Button size='md'>Medium</Button>
+<Button size='lg'>Large</Button>`" />
             </template>
         </ComponentShowcase>
 
         <!-- Btn - Estados -->
         <ComponentShowcase title="Estados" description="Botões desabilitados e diferentes tipos">
             <template #preview>
-                <Btn>Normal</Btn>
-                <Btn disabled>Disabled</Btn>
-                <Btn type="submit" variant="secondary">Submit</Btn>
-                <Btn type="reset" variant="ghost">Reset</Btn>
+                <Button>Normal</Button>
+                <Button disabled>Disabled</Button>
+                <Button type="submit" variant="secondary">Submit</Button>
+                <Button type="reset" variant="ghost">Reset</Button>
             </template>
 
             <template #code>
-                <CodeBlock :code="`<Btn>Normal</Btn>
-<Btn disabled>Disabled</Btn>
-<Btn type='submit' variant='secondary'>Submit</Btn>
-<Btn type='reset' variant='ghost'>Reset</Btn>`" />
+                <CodeBlock :code="`<Button>Normal</Button>
+<Button disabled>Disabled</Button>
+<Button type='submit' variant='secondary'>Submit</Button>
+<Button type='reset' variant='ghost'>Reset</Button>`" />
             </template>
         </ComponentShowcase>
 
@@ -74,19 +74,19 @@ const disabledToggle = ref(false)
         <ComponentShowcase title="Combinações de Tamanho e Variante" description="Exemplos de diferentes combinações">
             <template #preview>
                 <div class="combination-group">
-                    <Btn size="sm" variant="primary">Small Primary</Btn>
-                    <Btn size="sm" variant="secondary">Small Secondary</Btn>
-                    <Btn size="sm" variant="ghost">Small Ghost</Btn>
+                    <Button size="sm" variant="primary">Small Primary</Button>
+                    <Button size="sm" variant="secondary">Small Secondary</Button>
+                    <Button size="sm" variant="ghost">Small Ghost</Button>
                 </div>
                 <div class="combination-group">
-                    <Btn size="lg" variant="primary">Large Primary</Btn>
-                    <Btn size="lg" variant="danger">Large Danger</Btn>
+                    <Button size="lg" variant="primary">Large Primary</Button>
+                    <Button size="lg" variant="danger">Large Danger</Button>
                 </div>
             </template>
 
             <template #code>
-                <CodeBlock :code="`<Btn size='sm' variant='primary'>Small Primary</Btn>
-<Btn size='lg' variant='danger'>Large Danger</Btn>`" />
+                <CodeBlock :code="`<Button size='sm' variant='primary'>Small Primary</Button>
+<Button size='lg' variant='danger'>Large Danger</Button>`" />
             </template>
         </ComponentShowcase>
 
