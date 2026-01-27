@@ -1,11 +1,11 @@
-<script setup lang="ts">
+<script setup lang="ts" generic="T extends Record<string, any> = any">
 import { ref, computed, watch } from 'vue'
-import type { TableColumn, SortState } from './types'
+import type { TableColumn, SortState } from '@/shared/types'
 import { Checkbox, Button, Input } from '@/shared/components'
 
-interface Props {
-    data: any[]
-    columns: TableColumn[]
+export interface DataTableProps<T extends Record<string, any> = any> {
+    data: T[]
+    columns: TableColumn<T>[]
     loading?: boolean
     selectable?: boolean
     pagination?: boolean
@@ -15,6 +15,8 @@ interface Props {
     /** Disable internal pagination (when managed externally) */
     disablePagination?: boolean
 }
+
+type Props = DataTableProps<T>
 
 const props = withDefaults(defineProps<Props>(), {
     data: () => [],
@@ -41,11 +43,12 @@ const itemsPerPage = ref(props.itemsPerPageOptions[0] || 10)
 const selectedRows = ref<any[]>([])
 
 // --- Sorting ---
-const handleSort = (key: string) => {
-    const column = props.columns.find(c => c.key === key)
+const handleSort = (key: string | number | symbol) => {
+    const keyStr = String(key)
+    const column = props.columns.find(c => String(c.key) === keyStr)
     if (!column?.sortable) return
 
-    if (sortState.value.key === key) {
+    if (sortState.value.key === keyStr) {
         // Cycle: asc -> desc -> null
         if (sortState.value.order === 'asc') sortState.value.order = 'desc'
         else if (sortState.value.order === 'desc') sortState.value.order = null
@@ -53,7 +56,7 @@ const handleSort = (key: string) => {
 
         if (sortState.value.order === null) sortState.value.key = ''
     } else {
-        sortState.value = { key, order: 'asc' }
+        sortState.value = { key: keyStr, order: 'asc' }
     }
 
     emit('sort', sortState.value)
@@ -78,8 +81,9 @@ const filteredData = computed(() => {
     // For now, let's implement client-side sorting for robustness
     if (sortState.value.key && sortState.value.order) {
         result.sort((a, b) => {
-            const valA = a[sortState.value.key]
-            const valB = b[sortState.value.key]
+            const key = sortState.value.key as keyof T
+            const valA = a[key]
+            const valB = b[key]
 
             if (valA < valB) return sortState.value.order === 'asc' ? -1 : 1
             if (valA > valB) return sortState.value.order === 'asc' ? 1 : -1
@@ -132,6 +136,19 @@ const toggleRow = (row: any) => {
 
 const isSelected = (row: any) => selectedRows.value.includes(row)
 
+// --- Helpers ---
+const getCellDisplay = (col: TableColumn<T>, row: T) => {
+    const key = col.key as keyof T
+    const raw = (row as any)[key as any]
+    try {
+        if (col.formatter) return col.formatter(raw, row)
+        return raw == null ? '' : String(raw)
+    } catch (e) {
+        // Formatter may throw; fall back to raw value
+        return raw == null ? '' : String(raw)
+    }
+}
+
 </script>
 
 <template>
@@ -157,8 +174,10 @@ const isSelected = (row: any) => selectedRows.value.includes(row)
                         <th v-for="col in columns" :key="col.key" :class="[
                             'col-header',
                             `text-${col.align || 'left'}`,
-                            { 'sortable': col.sortable }
-                        ]" :style="{ width: col.width }" @click="handleSort(col.key)">
+                            col.class || '',
+                            { 'sortable': col.sortable, 'hide-mobile': col.hideOnMobile }
+                        ]" :style="{ width: col.width }" @click="col.sortable && handleSort(col.key)"
+                            :aria-sort="(sortState.key === col.key) ? (sortState.order === 'asc' ? 'ascending' : 'descending') : 'none'">
                             <div class="th-content">
                                 {{ col.label }}
                                 <span v-if="col.sortable" class="sort-icon">
@@ -188,9 +207,13 @@ const isSelected = (row: any) => selectedRows.value.includes(row)
                         <td v-if="selectable" class="td-checkbox" @click="toggleRow(row)">
                             <Checkbox :model-value="isSelected(row)" @click.stop="toggleRow(row)" />
                         </td>
-                        <td v-for="col in columns" :key="col.key" :class="[`text-${col.align || 'left'}`]">
-                            <slot :name="col.key" :row="row" :value="row[col.key]">
-                                {{ row[col.key] }}
+                        <td v-for="col in columns" :key="col.key" :class="[
+                            `text-${col.align || 'left'}`,
+                            col.class || '',
+                            { 'hide-mobile': col.hideOnMobile }
+                        ]">
+                            <slot :name="col.key" :row="row" :value="(row as any)[col.key as any]">
+                                {{ getCellDisplay(col, row) }}
                             </slot>
                         </td>
                     </tr>

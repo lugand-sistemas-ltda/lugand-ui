@@ -2,7 +2,7 @@
 import { ref } from 'vue'
 import { ComponentShowcase, CodeBlock } from '@/shared/components'
 import DataTable from '@/modules/DataTable/DataTable.vue'
-import type { TableColumn } from '@/modules/DataTable/types'
+import type { TableColumn } from '@/shared/types'
 
 const fakeData = [
     { id: 1, name: 'Alice Johnson', role: 'Admin', status: 'Active', email: 'alice@example.com' },

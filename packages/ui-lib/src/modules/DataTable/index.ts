@@ -4,4 +4,5 @@
  */
 
 export { default as DataTable } from './DataTable.vue'
-export * from './types'
+// Types are now centralized in @/shared/types
+export type { TableColumn, SortState } from '@/shared/types'

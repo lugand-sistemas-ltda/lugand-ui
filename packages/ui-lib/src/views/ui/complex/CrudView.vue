@@ -39,7 +39,7 @@ import { useModal, Modal } from '@/modules/modal'
 import { useToast, ToastProvider } from '@/modules/toast'
 import { DataTable, DynamicForm } from '@/modules'
 import { Button, Card } from '@/shared/components'
-import type { TableColumn } from '@/modules/DataTable/types'
+import type { TableColumn } from '@/shared/types'
 import type { FormField } from '@/modules/DynamicForm/DynamicForm.vue'
 import { USERS_DEFAULT, type User } from '@/mocks'// ============================================
 // COMPOSABLES
