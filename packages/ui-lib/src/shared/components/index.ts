@@ -71,6 +71,7 @@ export { default as Pagination } from './navigation/Pagination.vue'
 // ============================================
 // Toast movido para modules/toast
 // Modal movido para modules/modal
+// Drawer movido para modules/Drawer
 
 export { default as Spinner } from './feedback/Spinner.vue'
 export { default as Alert } from './feedback/Alert.vue'

@@ -60,6 +60,12 @@ export type Position =
     | 'right-end'
 
 /**
+ * Posições para Drawer (slide-in panel)
+ * Usado em: Drawer component
+ */
+export type DrawerPosition = 'left' | 'right' | 'top' | 'bottom'
+
+/**
  * Alinhamento de texto/conteúdo
  * Usado em: TableColumn, Typography, etc.
  */

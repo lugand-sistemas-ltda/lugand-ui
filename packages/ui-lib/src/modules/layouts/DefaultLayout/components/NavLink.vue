@@ -29,11 +29,7 @@ const isActive = computed(() => {
 </script>
 
 <template>
-  <router-link
-    v-if="!disabled"
-    :to="to"
-    :class="['nav-link', { 'nav-link--active': isActive }]"
-  >
+  <router-link v-if="!disabled" :to="to" :class="['nav-link', { 'nav-link--active': isActive }]">
     <slot />
   </router-link>
   <span v-else class="nav-link nav-link--disabled">

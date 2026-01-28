@@ -45,6 +45,7 @@ watch(
           <NavItem label="Layout & Display" :default-expanded="false">
             <NavLink to="/ui/simple/cards">Cards</NavLink>
             <NavLink to="/ui/simple/containers">Containers</NavLink>
+            <NavLink to="/ui/simple/drawers">Drawers</NavLink>
             <NavLink to="/ui/simple/typography">Typography</NavLink>
             <NavLink to="/ui/elements/display">Badges & Tooltips</NavLink>
           </NavItem>

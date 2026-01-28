@@ -18,6 +18,10 @@ import './styles.scss'
 export { Modal, useModal, useConfirmModal } from '../src/modules/modal'
 export type { ModalSize, ModalVariant, ModalProps, ModalEmits } from '../src/modules/modal/components/types'
 
+// Drawer Module
+export { Drawer } from '../src/modules/Drawer'
+export type { DrawerProps } from '../src/modules/Drawer'
+
 // Toast Module
 export { ToastItem, ToastProvider, useToast } from '../src/modules/toast'
 export type { ToastOptions, ToastType, ToastPosition, ToastAction } from '../src/modules/toast/components/types'
