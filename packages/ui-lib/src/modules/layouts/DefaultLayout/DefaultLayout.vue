@@ -42,31 +42,35 @@ watch(
             <NavLink to="/ui/inputs/specialized">Specialized Inputs</NavLink>
           </NavItem>
 
-          <NavItem label="Layout & Display" :default-expanded="false">
+          <NavItem label="Layout" :default-expanded="false">
+            <NavLink to="/docs/theming">Theming</NavLink>
+            <NavLink to="/ui/simple/typography">Typography</NavLink>
+          </NavItem>
+
+          <NavItem label="Display" :default-expanded="false">
             <NavLink to="/ui/simple/cards">Cards</NavLink>
             <NavLink to="/ui/simple/containers">Containers</NavLink>
-            <NavLink to="/ui/simple/drawers">Drawers</NavLink>
-            <NavLink to="/ui/simple/typography">Typography</NavLink>
             <NavLink to="/ui/elements/display">Badges & Tooltips</NavLink>
+          </NavItem>
+
+          <NavItem label="Alerts & Overlay" :default-expanded="false">
+            <NavLink to="/ui/simple/drawers">Drawers</NavLink>
+            <NavLink to="/ui/complex/modals">Modals</NavLink>
+            <NavLink to="/ui/feedback/alerts">Alerts</NavLink>
+            <NavLink to="/ui/feedback/toasts">Toasts</NavLink>
           </NavItem>
 
           <NavItem label="Actions" :default-expanded="false">
             <NavLink to="/ui/simple/buttons">Buttons</NavLink>
           </NavItem>
 
-          <NavItem label="Complex" :default-expanded="false">
+          <NavItem label="Data Management" :default-expanded="false">
             <NavLink to="/ui/complex/forms">Forms</NavLink>
             <NavLink to="/ui/complex/tables">Tables</NavLink>
-            <NavLink to="/ui/complex/modals">Modals</NavLink>
             <NavLink to="/ui/complex/crud">CRUD</NavLink>
           </NavItem>
 
-          <NavItem label="Feedback" :default-expanded="false">
-            <NavLink to="/ui/feedback/alerts">Alerts</NavLink>
-            <NavLink to="/ui/feedback/toasts">Toasts</NavLink>
-          </NavItem>
-
-          <NavItem label="Visualization" :default-expanded="false">
+          <NavItem label="Data Visualization" :default-expanded="false">
             <NavLink to="/ui/visualization/charts">Charts</NavLink>
           </NavItem>
 
@@ -79,7 +83,6 @@ watch(
 
         <NavItem label="Docs" icon="📚" :default-expanded="false">
           <NavLink to="/docs/get-started">Get Started</NavLink>
-          <NavLink to="/docs/theming">Theming</NavLink>
           <NavLink to="/docs/components">Components</NavLink>
         </NavItem>
 
