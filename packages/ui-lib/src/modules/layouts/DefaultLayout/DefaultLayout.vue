@@ -43,6 +43,7 @@ watch(
           </NavItem>
 
           <NavItem label="Layout" :default-expanded="false">
+            <NavLink to="/ui/layout/structure">Layout Structure</NavLink>
             <NavLink to="/docs/theming">Theming</NavLink>
             <NavLink to="/ui/simple/typography">Typography</NavLink>
           </NavItem>

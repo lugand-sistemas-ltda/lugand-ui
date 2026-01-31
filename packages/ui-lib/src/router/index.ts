@@ -37,6 +37,11 @@ const routes: RouteRecordRaw[] = [
     component: () => import('@/views/ui/simple/DrawersView.vue'),
   },
   {
+    path: '/ui/layout/structure',
+    name: 'ui-layout-structure',
+    component: () => import('@/views/ui/layout/LayoutStructureView.vue'),
+  },
+  {
     path: '/ui/inputs/text',
     name: 'ui-inputs-text',
     component: () => import('@/views/ui/inputs/TextInputsView.vue'),
