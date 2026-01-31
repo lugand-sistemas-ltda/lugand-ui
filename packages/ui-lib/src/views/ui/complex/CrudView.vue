@@ -22,8 +22,8 @@
 */
 
 <script setup lang="ts">
-import { ref, computed } from 'vue'
-import { ComponentShowcase, CodeBlock, AlertDialog, InputWithAddon, Icon } from '@/shared/components'
+import { ref } from 'vue'
+import { Button, Card, ComponentShowcase, CodeBlock, AlertDialog, InputWithAddon, Icon } from '@/shared/components'
 import {
   useCrudStore,
   useTableState,
@@ -34,11 +34,9 @@ import {
   email,
   minLength
 } from '@/shared/composables'
-import type { BulkActionDefinition } from '@/shared/composables'
 import { useModal, Modal } from '@/modules/modal'
 import { useToast, ToastProvider } from '@/modules/toast'
 import { DataTable, DynamicForm } from '@/modules'
-import { Button, Card } from '@/shared/components'
 import type { TableColumn } from '@/shared/types'
 import type { FormField } from '@/modules/DynamicForm/DynamicForm.vue'
 import { USERS_DEFAULT, type User } from '@/mocks'// ============================================
