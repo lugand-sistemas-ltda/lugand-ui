@@ -1,148 +1,33 @@
 <script setup lang="ts">
 /**
  * ThemingView - Documentação sobre sistema de temas
+ * Teoria, conceitos e guia de uso dos design tokens
  */
-import { useTheme } from '@/shared/composables'
-import { themeList } from '@/core/config/themes.config'
-import type { ThemeName } from '@/core/types/theme.types'
-
-const { currentTheme, setTheme } = useTheme()
-const themes = themeList
-
-// Cores representativas de cada tema para preview
-// Ordem: Background → Text → Primary (títulos/links) → Border → Accent
-const themeColors: Record<ThemeName, { background: string; text: string; primary: string; border: string; accent: string }> = {
-    light: {
-        background: 'hsl(0, 0%, 98%)', // neutral-50
-        text: 'hsl(0, 0%, 10%)', // neutral-900
-        primary: 'hsl(217, 91%, 60%)', // azul primario
-        border: 'hsl(0, 0%, 88%)', // neutral-300
-        accent: 'hsl(258, 90%, 63%)', // roxo secondary
-    },
-    dark: {
-        background: 'hsl(0, 0%, 5%)', // neutral-50 dark
-        text: 'hsl(0, 0%, 96%)', // neutral-900 dark
-        primary: 'hsl(213, 94%, 70%)', // azul mais claro
-        border: 'hsl(0, 0%, 15%)', // neutral-300 dark
-        accent: 'hsl(250, 95%, 72%)', // roxo mais claro
-    },
-    ocean: {
-        background: 'hsl(195, 100%, 99%)', // neutral-50 azulado
-        text: 'hsl(195, 60%, 15%)', // neutral-900 azulado
-        primary: 'hsl(199, 89%, 55%)', // cyan oceano
-        border: 'hsl(195, 62%, 88%)', // neutral-300
-        accent: 'hsl(180, 84%, 65%)', // teal
-    },
-    forest: {
-        background: 'hsl(138, 100%, 99%)', // neutral-50 esverdeado
-        text: 'hsl(138, 55%, 15%)', // neutral-900 esverdeado
-        primary: 'hsl(142, 76%, 55%)', // verde floresta
-        border: 'hsl(138, 55%, 87%)', // neutral-300
-        accent: 'hsl(158, 64%, 65%)', // verde esmeralda
-    },
-    dracula: {
-        background: 'hsl(231, 15%, 18%)', // dracula bg
-        text: 'hsl(60, 30%, 96%)', // dracula fg
-        primary: 'hsl(265, 89%, 78%)', // roxo dracula
-        border: 'hsl(232, 14%, 31%)', // current line
-        accent: 'hsl(326, 100%, 74%)', // pink dracula
-    },
-    cyberpunk: {
-        background: 'hsl(253, 16%, 10%)', // roxo escuro
-        text: 'hsl(60, 90%, 90%)', // amarelo pálido
-        primary: 'hsl(58, 100%, 50%)', // amarelo neon
-        border: 'hsl(253, 30%, 30%)', // roxo border
-        accent: 'hsl(180, 100%, 50%)', // ciano neon
-    },
-    pcpr: {
-        background: 'hsl(0, 0%, 100%)', // branco
-        text: 'hsl(210, 100%, 20%)', // azul escuro institucional
-        primary: 'hsl(210, 100%, 20%)', // azul PCPR
-        border: 'hsl(210, 10%, 85%)', // cinza azulado
-        accent: 'hsl(48, 100%, 50%)', // amarelo ouro
-    },
-    pretona: {
-        background: 'hsl(0, 0%, 5%)', // preto fosco
-        text: 'hsl(0, 0%, 100%)', // branco puro
-        primary: 'hsl(345, 100%, 45%)', // vermelho carmim
-        border: 'hsl(210, 6%, 20%)', // grafite
-        accent: 'hsl(220, 100%, 50%)', // azul sirene
-    },
-    bombeiros: {
-        background: 'hsl(211, 100%, 30%)', // azul institucional
-        text: 'hsl(0, 0%, 100%)', // branco
-        primary: 'hsl(48, 100%, 50%)', // amarelo alerta
-        border: 'hsl(211, 50%, 40%)', // azul border
-        accent: 'hsl(0, 100%, 45%)', // vermelho emergência
-    },
-}
 </script>
 
 <template>
     <div class="view-container">
-        <h1>Theming</h1>
-        <p class="view-description">Sistema de temas e design tokens da UI Lib</p>
+        <h1>📚 Theming - Documentation</h1>
+        <p class="view-description">
+            Sistema de temas e design tokens: conceitos, arquitetura e boas práticas
+        </p>
 
         <section class="doc-section">
             <h2>Visão Geral</h2>
             <p>
-                O sistema de temas da UI Lib é baseado em <strong>CSS Custom Properties (variáveis CSS)</strong> 
+                O sistema de temas da UI Lib é baseado em <strong>CSS Custom Properties (variáveis CSS)</strong>
                 e utiliza o espaço de cores <strong>HSL</strong> para permitir variações dinâmicas e acessíveis.
             </p>
             <p>
-                Cada tema define um conjunto de tokens de design que controlam cores, espaçamentos, 
+                Cada tema define um conjunto de tokens de design que controlam cores, espaçamentos,
                 tipografia, sombras e outros aspectos visuais da interface.
             </p>
         </section>
 
         <section class="doc-section">
-            <h2>Temas Disponíveis</h2>
-            <p>A biblioteca vem com {{ themes.length }} temas pré-configurados:</p>
-            <div class="themes-grid">
-                <div 
-                    v-for="theme in themes" 
-                    :key="theme.name"
-                    class="theme-card"
-                    :class="{ active: currentTheme === theme.name }"
-                    @click="setTheme(theme.name)"
-                >
-                    <div class="theme-preview">
-                        <div 
-                            class="color-sample" 
-                            :style="{ backgroundColor: themeColors[theme.name].background }"
-                            title="Background"
-                        ></div>
-                        <div 
-                            class="color-sample" 
-                            :style="{ backgroundColor: themeColors[theme.name].text }"
-                            title="Text"
-                        ></div>
-                        <div 
-                            class="color-sample" 
-                            :style="{ backgroundColor: themeColors[theme.name].primary }"
-                            title="Primary (Links/Títulos)"
-                        ></div>
-                        <div 
-                            class="color-sample" 
-                            :style="{ backgroundColor: themeColors[theme.name].border }"
-                            title="Border/Surface"
-                        ></div>
-                        <div 
-                            class="color-sample" 
-                            :style="{ backgroundColor: themeColors[theme.name].accent }"
-                            title="Accent"
-                        ></div>
-                    </div>
-                    <h4>{{ theme.displayName }}</h4>
-                </div>
-            </div>
-            <p class="note">Clique em um tema para aplicá-lo em tempo real.</p>
-        </section>
-
-        <section class="doc-section">
             <h2>Design Tokens</h2>
             <p>Os principais tokens utilizados no sistema:</p>
-            
+
             <h3>Cores</h3>
             <pre><code>// Cores principais
 --color-primary
@@ -251,8 +136,8 @@ export const themes = [
         <section class="doc-section">
             <h2>Modo Escuro (Dark Mode)</h2>
             <p>
-                Todos os temas suportam modo claro e escuro. O tema 'dark' é otimizado 
-                especificamente para ambientes com pouca luz, reduzindo o brilho da tela 
+                Todos os temas suportam modo claro e escuro. O tema 'dark' é otimizado
+                especificamente para ambientes com pouca luz, reduzindo o brilho da tela
                 e melhorando o contraste.
             </p>
         </section>
@@ -292,10 +177,11 @@ export const themes = [
             margin-bottom: var(--spacing-md);
         }
 
-        ul, ol {
+        ul,
+        ol {
             margin-left: var(--spacing-lg);
             margin-bottom: var(--spacing-md);
-            
+
             li {
                 margin-bottom: var(--spacing-sm);
                 line-height: 1.6;
@@ -378,7 +264,7 @@ export const themes = [
         .color-sample {
             flex: 1;
             transition: transform 0.2s ease;
-            
+
             &:hover {
                 transform: scale(1.05);
             }

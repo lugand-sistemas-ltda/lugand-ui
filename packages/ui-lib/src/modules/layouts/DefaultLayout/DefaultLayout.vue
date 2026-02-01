@@ -44,31 +44,32 @@ watch(
 
           <NavItem label="Layout" :default-expanded="false">
             <NavLink to="/ui/layout/structure">Layout Structure</NavLink>
-            <NavLink to="/docs/theming">Theming</NavLink>
-            <NavLink to="/ui/simple/typography">Typography</NavLink>
+            <NavLink to="/ui/layout/typography">Typography</NavLink>
+            <NavLink to="/ui/layout/themes">Themes</NavLink>
           </NavItem>
 
           <NavItem label="Display" :default-expanded="false">
-            <NavLink to="/ui/simple/cards">Cards</NavLink>
-            <NavLink to="/ui/simple/containers">Containers</NavLink>
+            <NavLink to="/ui/display/cards">Cards</NavLink>
+            <NavLink to="/ui/display/containers">Containers</NavLink>
             <NavLink to="/ui/elements/display">Badges & Tooltips</NavLink>
           </NavItem>
 
           <NavItem label="Alerts & Overlay" :default-expanded="false">
-            <NavLink to="/ui/simple/drawers">Drawers</NavLink>
-            <NavLink to="/ui/complex/modals">Modals</NavLink>
-            <NavLink to="/ui/feedback/alerts">Alerts</NavLink>
-            <NavLink to="/ui/feedback/toasts">Toasts</NavLink>
+            <NavLink to="/ui/alerts-overlay/disclosure">Disclosure</NavLink>
+            <NavLink to="/ui/alerts-overlay/drawers">Drawers</NavLink>
+            <NavLink to="/ui/alerts-overlay/modals">Modals</NavLink>
+            <NavLink to="/ui/alerts-overlay/alerts">Alerts</NavLink>
+            <NavLink to="/ui/alerts-overlay/toasts">Toasts</NavLink>
           </NavItem>
 
           <NavItem label="Actions" :default-expanded="false">
-            <NavLink to="/ui/simple/buttons">Buttons</NavLink>
+            <NavLink to="/ui/actions/buttons">Buttons</NavLink>
           </NavItem>
 
           <NavItem label="Data Management" :default-expanded="false">
-            <NavLink to="/ui/complex/forms">Forms</NavLink>
-            <NavLink to="/ui/complex/tables">Tables</NavLink>
-            <NavLink to="/ui/complex/crud">CRUD</NavLink>
+            <NavLink to="/ui/data-management/forms">Forms</NavLink>
+            <NavLink to="/ui/data-management/tables">Tables</NavLink>
+            <NavLink to="/ui/data-management/crud">CRUD</NavLink>
           </NavItem>
 
           <NavItem label="Data Visualization" :default-expanded="false">
@@ -84,6 +85,8 @@ watch(
 
         <NavItem label="Docs" icon="📚" :default-expanded="false">
           <NavLink to="/docs/get-started">Get Started</NavLink>
+          <NavLink to="/docs/layout">Layout System</NavLink>
+          <NavLink to="/docs/theming">Theming</NavLink>
           <NavLink to="/docs/components">Components</NavLink>
         </NavItem>
 

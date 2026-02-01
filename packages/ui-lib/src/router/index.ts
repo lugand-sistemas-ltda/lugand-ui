@@ -10,37 +10,66 @@ const routes: RouteRecordRaw[] = [
     name: 'home',
     component: () => import('@/views/HomeView.vue'),
   },
-  // UI Simple Components
+  // UI Actions
   {
-    path: '/ui/simple/buttons',
-    name: 'ui-simple-buttons',
-    component: () => import('@/views/ui/simple/ButtonsView.vue'),
+    path: '/ui/actions/buttons',
+    name: 'ui-actions-buttons',
+    component: () => import('@/views/ui/actions/ButtonsView.vue'),
   },
-  {
-    path: '/ui/simple/typography',
-    name: 'ui-simple-typography',
-    component: () => import('@/views/ui/simple/TypographyView.vue'),
-  },
-  {
-    path: '/ui/simple/cards',
-    name: 'ui-simple-cards',
-    component: () => import('@/views/ui/simple/CardsView.vue'),
-  },
-  {
-    path: '/ui/simple/containers',
-    name: 'ui-simple-containers',
-    component: () => import('@/views/ui/simple/ContainersView.vue'),
-  },
-  {
-    path: '/ui/simple/drawers',
-    name: 'ui-simple-drawers',
-    component: () => import('@/views/ui/simple/DrawersView.vue'),
-  },
+  // UI Layout
   {
     path: '/ui/layout/structure',
     name: 'ui-layout-structure',
     component: () => import('@/views/ui/layout/LayoutStructureView.vue'),
   },
+  {
+    path: '/ui/layout/typography',
+    name: 'ui-layout-typography',
+    component: () => import('@/views/ui/layout/TypographyView.vue'),
+  },
+  {
+    path: '/ui/layout/themes',
+    name: 'ui-layout-themes',
+    component: () => import('@/views/ui/layout/ThemesView.vue'),
+  },
+  // UI Display
+  {
+    path: '/ui/display/cards',
+    name: 'ui-display-cards',
+    component: () => import('@/views/ui/display/CardsView.vue'),
+  },
+  {
+    path: '/ui/display/containers',
+    name: 'ui-display-containers',
+    component: () => import('@/views/ui/display/ContainersView.vue'),
+  },
+  // UI Alerts & Overlay
+  {
+    path: '/ui/alerts-overlay/disclosure',
+    name: 'ui-alerts-overlay-disclosure',
+    component: () => import('@/views/ui/alerts-overlay/DisclosureView.vue'),
+  },
+  {
+    path: '/ui/alerts-overlay/drawers',
+    name: 'ui-alerts-overlay-drawers',
+    component: () => import('@/views/ui/alerts-overlay/DrawersView.vue'),
+  },
+  {
+    path: '/ui/alerts-overlay/modals',
+    name: 'ui-alerts-overlay-modals',
+    component: () => import('@/views/ui/alerts-overlay/ModalsView.vue'),
+  },
+  {
+    path: '/ui/alerts-overlay/alerts',
+    name: 'ui-alerts-overlay-alerts',
+    component: () => import('@/views/ui/alerts-overlay/AlertsView.vue'),
+  },
+  {
+    path: '/ui/alerts-overlay/toasts',
+    name: 'ui-alerts-overlay-toasts',
+    component: () => import('@/views/ui/alerts-overlay/ToastsView.vue'),
+  },
+  // UI Inputs
   {
     path: '/ui/inputs/text',
     name: 'ui-inputs-text',
@@ -78,37 +107,21 @@ const routes: RouteRecordRaw[] = [
     name: 'ui-icons-ui',
     component: () => import('@/views/ui/icons/UiIconsView.vue'),
   },
-  // UI Complex Components
+  // UI Data Management
   {
-    path: '/ui/complex/forms',
-    name: 'ui-complex-forms',
-    component: () => import('@/views/ui/complex/FormsView.vue'),
+    path: '/ui/data-management/forms',
+    name: 'ui-data-management-forms',
+    component: () => import('@/views/ui/data-management/FormsView.vue'),
   },
   {
-    path: '/ui/complex/tables',
-    name: 'ui-complex-tables',
-    component: () => import('@/views/ui/complex/TablesView.vue'),
+    path: '/ui/data-management/tables',
+    name: 'ui-data-management-tables',
+    component: () => import('@/views/ui/data-management/TablesView.vue'),
   },
   {
-    path: '/ui/complex/modals',
-    name: 'ui-complex-modals',
-    component: () => import('@/views/ui/complex/ModalsView.vue'),
-  },
-  {
-    path: '/ui/complex/crud',
-    name: 'ui-complex-crud',
-    component: () => import('@/views/ui/complex/CrudView.vue'),
-  },
-  // UI Feedback Components
-  {
-    path: '/ui/feedback/alerts',
-    name: 'ui-feedback-alerts',
-    component: () => import('@/views/ui/feedback/AlertsView.vue'),
-  },
-  {
-    path: '/ui/feedback/toasts',
-    name: 'ui-feedback-toasts',
-    component: () => import('@/views/ui/feedback/ToastsView.vue'),
+    path: '/ui/data-management/crud',
+    name: 'ui-data-management-crud',
+    component: () => import('@/views/ui/data-management/CrudView.vue'),
   },
   // UI Visualization Components
   {
@@ -123,6 +136,11 @@ const routes: RouteRecordRaw[] = [
     component: () => import('@/views/docs/GetStartedView.vue'),
   },
   {
+    path: '/docs/layout',
+    name: 'docs-layout',
+    component: () => import('@/views/docs/LayoutDocsView.vue'),
+  },
+  {
     path: '/docs/theming',
     name: 'docs-theming',
     component: () => import('@/views/docs/ThemingView.vue'),
@@ -131,11 +149,6 @@ const routes: RouteRecordRaw[] = [
     path: '/docs/components',
     name: 'docs-components',
     component: () => import('@/views/docs/ComponentsView.vue'),
-  },
-  {
-    path: '/docs/composables/use-disclosure',
-    name: 'docs-use-disclosure',
-    component: () => import('@/views/docs/UseDisclosureExample.vue'),
   },
   // About
   {
