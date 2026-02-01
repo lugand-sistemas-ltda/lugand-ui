@@ -54,9 +54,12 @@ watch(
             <NavLink to="/ui/elements/display">Badges & Tooltips</NavLink>
           </NavItem>
 
+          <NavItem label="Navigation" :default-expanded="false">
+            <NavLink to="/ui/navigation/drawers">Drawers</NavLink>
+            <NavLink to="/ui/navigation/disclosure">Disclosure</NavLink>
+          </NavItem>
+
           <NavItem label="Alerts & Overlay" :default-expanded="false">
-            <NavLink to="/ui/alerts-overlay/disclosure">Disclosure</NavLink>
-            <NavLink to="/ui/alerts-overlay/drawers">Drawers</NavLink>
             <NavLink to="/ui/alerts-overlay/modals">Modals</NavLink>
             <NavLink to="/ui/alerts-overlay/alerts">Alerts</NavLink>
             <NavLink to="/ui/alerts-overlay/toasts">Toasts</NavLink>

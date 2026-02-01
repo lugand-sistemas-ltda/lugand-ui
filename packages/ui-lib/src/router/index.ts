@@ -43,17 +43,18 @@ const routes: RouteRecordRaw[] = [
     name: 'ui-display-containers',
     component: () => import('@/views/ui/display/ContainersView.vue'),
   },
+  // UI Navigation
+  {
+    path: '/ui/navigation/drawers',
+    name: 'ui-navigation-drawers',
+    component: () => import('@/views/ui/navigation/DrawersView.vue'),
+  },
+  {
+    path: '/ui/navigation/disclosure',
+    name: 'ui-navigation-disclosure',
+    component: () => import('@/views/ui/navigation/DisclosureView.vue'),
+  },
   // UI Alerts & Overlay
-  {
-    path: '/ui/alerts-overlay/disclosure',
-    name: 'ui-alerts-overlay-disclosure',
-    component: () => import('@/views/ui/alerts-overlay/DisclosureView.vue'),
-  },
-  {
-    path: '/ui/alerts-overlay/drawers',
-    name: 'ui-alerts-overlay-drawers',
-    component: () => import('@/views/ui/alerts-overlay/DrawersView.vue'),
-  },
   {
     path: '/ui/alerts-overlay/modals',
     name: 'ui-alerts-overlay-modals',
