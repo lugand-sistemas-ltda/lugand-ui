@@ -57,6 +57,7 @@ watch(
           <NavItem label="Navigation" :default-expanded="false">
             <NavLink to="/ui/navigation/drawers">Drawers</NavLink>
             <NavLink to="/ui/navigation/disclosure">Disclosure</NavLink>
+            <NavLink to="/ui/navigation/tabs">Tabs</NavLink>
           </NavItem>
 
           <NavItem label="Alerts & Overlay" :default-expanded="false">

@@ -22,6 +22,12 @@ export type { ModalSize, ModalVariant, ModalProps, ModalEmits } from '../src/mod
 export { Drawer } from '../src/modules/Drawer'
 export type { DrawerProps } from '../src/modules/Drawer'
 
+// Tabs Module
+export { Tabs, TabPanel } from '../src/modules/Tabs'
+export type { TabsProps } from '../src/modules/Tabs/Tabs.vue'
+export type { TabPanelProps } from '../src/modules/Tabs/TabPanel.vue'
+export type { TabsContext, TabOrientation, TabVariant } from '../src/modules/Tabs/types'
+
 // Toast Module
 export { ToastItem, ToastProvider, useToast } from '../src/modules/toast'
 export type { ToastOptions, ToastType, ToastPosition, ToastAction } from '../src/modules/toast/components/types'

@@ -54,6 +54,11 @@ const routes: RouteRecordRaw[] = [
     name: 'ui-navigation-disclosure',
     component: () => import('@/views/ui/navigation/DisclosureView.vue'),
   },
+  {
+    path: '/ui/navigation/tabs',
+    name: 'ui-navigation-tabs',
+    component: () => import('@/views/ui/navigation/TabsView.vue'),
+  },
   // UI Alerts & Overlay
   {
     path: '/ui/alerts-overlay/modals',

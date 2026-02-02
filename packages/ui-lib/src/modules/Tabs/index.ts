@@ -1,0 +1,5 @@
+export { default as Tabs } from './Tabs.vue'
+export { default as TabPanel } from './TabPanel.vue'
+export type { TabsProps } from './Tabs.vue'
+export type { TabPanelProps } from './TabPanel.vue'
+export type { TabOrientation, TabVariant, TabsContext, RegisteredTabPanel } from './types'

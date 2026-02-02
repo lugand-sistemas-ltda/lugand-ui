@@ -9,6 +9,10 @@ export { useTheme } from './useTheme'
 export { useDisclosure, useDisclosureGroup, useControlledDisclosure } from './useDisclosure'
 export type { UseDisclosureOptions, UseDisclosureReturn } from './useDisclosure'
 
+// Tabs (navigation state management)
+export { useTabs } from './useTabs'
+export type { UseTabsOptions, UseTabsReturn, TabOrientation, TabVariant } from './useTabs'
+
 // Forms & Inputs
 export { useDateInput } from './useDateInput'
 export type { UseDateInputOptions, UseDateInputReturn, DateInputType, DateOutputFormat } from './useDateInput'
