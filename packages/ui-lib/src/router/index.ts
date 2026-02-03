@@ -59,6 +59,11 @@ const routes: RouteRecordRaw[] = [
     name: 'ui-navigation-tabs',
     component: () => import('@/views/ui/navigation/TabsView.vue'),
   },
+  {
+    path: '/ui/navigation/accordion',
+    name: 'ui-navigation-accordion',
+    component: () => import('@/views/ui/navigation/AccordionView.vue'),
+  },
   // UI Alerts & Overlay
   {
     path: '/ui/alerts-overlay/modals',

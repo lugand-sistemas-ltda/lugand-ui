@@ -8,6 +8,7 @@ export * from './modal'
 export * from './toast'
 export * from './charts'
 export * from './Tabs'
+export * from './Accordion'
 
 // Módulos de Data
 export * from './DataTable'
