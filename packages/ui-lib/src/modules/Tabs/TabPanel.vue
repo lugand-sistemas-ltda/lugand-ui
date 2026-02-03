@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { computed, inject, onMounted, onUnmounted, ref, h, useSlots } from 'vue'
+import type { Slots } from 'vue'
 import type { TabsContext } from './types'
 import { TABS_INJECTION_KEY } from './types'
 
@@ -56,7 +57,7 @@ const handleClick = () => {
 }
 
 const buttonRef = ref<HTMLButtonElement>()
-const slots = useSlots()
+const slots: Slots = useSlots()
 let registrationOrder = 0
 
 onMounted(() => {
