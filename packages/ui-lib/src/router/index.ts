@@ -64,6 +64,11 @@ const routes: RouteRecordRaw[] = [
     name: 'ui-navigation-accordion',
     component: () => import('@/views/ui/navigation/AccordionView.vue'),
   },
+  {
+    path: '/ui/navigation/dropdown',
+    name: 'ui-navigation-dropdown',
+    component: () => import('@/views/ui/navigation/DropdownView.vue'),
+  },
   // UI Alerts & Overlay
   {
     path: '/ui/alerts-overlay/modals',
