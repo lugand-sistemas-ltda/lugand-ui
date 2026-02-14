@@ -5,6 +5,10 @@ on:
     tags:
       - 'v*.*.*'
 
+permissions:
+  contents: read
+  id-token: write  # Necessário para npm provenance (OIDC)
+
 jobs:
   build-and-publish:
     runs-on: ubuntu-latest
@@ -26,8 +30,8 @@ jobs:
         run: npm run build:lib
         working-directory: ./packages/ui-lib
 
-      - name: Publish to npm
-        run: npm publish --access public
+      - name: Publish to npm with provenance
+        run: npm publish --provenance --access public
         working-directory: ./packages/ui-lib
         env:
           NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
