@@ -37,15 +37,15 @@ npm run preview
 ### Installation (NPM)
 
 ```bash
-npm install @lugand/vue-ui-lib
+npm install @lugand-sistemas-ltda/vue-ui-lib
 ```
 
 ### Usage
 
 ```vue
 <script setup lang="ts">
-import { Btn, Input, DateInput, Card } from "@lugand/vue-ui-lib";
-import "@lugand/vue-ui-lib/style.css";
+import { Btn, Input, DateInput, Card } from "@lugand-sistemas-ltda/vue-ui-lib";
+import "@lugand-sistemas-ltda/vue-ui-lib/style.css";
 import { ref } from "vue";
 
 const name = ref("");
@@ -89,7 +89,7 @@ Complete documentation available in the `/docs` folder:
 
 ```vue
 <script setup>
-import { useTheme } from "@lugand/vue-ui-lib";
+import { useTheme } from "@lugand-sistemas-ltda/vue-ui-lib";
 const { setTheme } = useTheme();
 setTheme("dark"); // 10 themes available
 </script>
@@ -136,7 +136,7 @@ MIT © Lugand Sistemas
 
 ## 🔗 Links
 
-- [NPM Package](https://www.npmjs.com/package/@lugand/vue-ui-lib)
+- [NPM Package](https://www.npmjs.com/package/@lugand-sistemas-ltda/vue-ui-lib)
 - [GitHub Repository](https://github.com/lugand-sistemas-ltda/lugand-ui)
 - [Documentation](./docs/README.md)
 - [Changelog](./docs/CHANGELOG.md)

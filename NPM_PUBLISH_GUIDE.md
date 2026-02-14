@@ -60,7 +60,7 @@ git push origin v0.1.3
 2. Workflow inicia automaticamente
 3. Faz checkout, instala deps, build
 4. Publica no npm com o token
-5. Pacote fica disponível em: https://www.npmjs.com/package/@lugand/vue-ui-lib
+5. Pacote fica disponível em: https://www.npmjs.com/package/@lugand-sistemas-ltda/vue-ui-lib
 
 ---
 
@@ -72,7 +72,7 @@ git push origin v0.1.3
 
 2. **Confirmar no npm:**
    ```bash
-   npm view @lugand/vue-ui-lib
+   npm view @lugand-sistemas-ltda/vue-ui-lib
    ```
 
 ---
@@ -81,7 +81,7 @@ git push origin v0.1.3
 
 ```bash
 # Em outro projeto Vue 3
-npm install @lugand/vue-ui-lib
+npm install @lugand-sistemas-ltda/vue-ui-lib
 ```
 
 **No projeto, configurar:**
@@ -90,7 +90,7 @@ npm install @lugand/vue-ui-lib
 // main.ts
 import { createApp } from "vue";
 import App from "./App.vue";
-import "@lugand/vue-ui-lib/dist/style.css"; // ← IMPORTANTE!
+import "@lugand-sistemas-ltda/vue-ui-lib/dist/style.css"; // ← IMPORTANTE!
 
 createApp(App).mount("#app");
 ```
@@ -99,7 +99,7 @@ createApp(App).mount("#app");
 
 ```vue
 <script setup lang="ts">
-import { Tabs, TabPanel } from "@lugand/vue-ui-lib";
+import { Tabs, TabPanel } from "@lugand-sistemas-ltda/vue-ui-lib";
 </script>
 
 <template>
@@ -170,12 +170,12 @@ git push origin v0.1.3
 **Erro: "npm ERR! 402 Payment Required"**
 
 - Pacote com nome não-scoped requer conta paga
-- Use `@lugand/vue-ui-lib` (scoped = grátis)
+- Use `@lugand-sistemas-ltda/vue-ui-lib` (scoped = grátis)
 
 **Erro: "npm ERR! 403 Forbidden"**
 
 - Nome já existe no npm
-- Verificar: `npm view @lugand/vue-ui-lib`
+- Verificar: `npm view @lugand-sistemas-ltda/vue-ui-lib`
 
 **Workflow não inicia:**
 
