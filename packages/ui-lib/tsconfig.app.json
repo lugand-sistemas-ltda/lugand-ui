@@ -24,5 +24,9 @@
     "src/**/*.tsx",
     "src/**/*.vue",
     "lib/**/*.ts"
+  ],
+  "exclude": [
+    "src/views/**/*.vue",
+    "src/router/**/*.ts"
   ]
 }

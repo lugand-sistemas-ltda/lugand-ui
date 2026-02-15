@@ -20,10 +20,10 @@ const withCallbacks = useDisclosure({
 })
 
 // Exemplo 3: Accordion
-const accordionGroup = useDisclosureGroup()
-const item1 = useDisclosure({ group: accordionGroup })
-const item2 = useDisclosure({ group: accordionGroup })
-const item3 = useDisclosure({ group: accordionGroup })
+const accordionGroup = useDisclosureGroup(3)
+const item1 = accordionGroup.items[0]!
+const item2 = accordionGroup.items[1]!
+const item3 = accordionGroup.items[2]!
 
 // Exemplo 4: Default Open
 const defaultOpen = useDisclosure({ defaultOpen: true })

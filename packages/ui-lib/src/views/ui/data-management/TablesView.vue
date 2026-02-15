@@ -21,7 +21,7 @@ const fakeData = [
 
 const columns: TableColumn[] = [
     { key: 'name', label: 'Name', sortable: true },
-    { key: 'role', label: 'Role', sortable: true, filterable: true },
+    { key: 'role', label: 'Role', sortable: true },
     { key: 'email', label: 'Email' },
     { key: 'status', label: 'Status', sortable: true },
 ]

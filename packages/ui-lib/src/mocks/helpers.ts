@@ -58,7 +58,7 @@ export function randomString(length: number): string {
  * Gera um UUID simples (v4 mock)
  */
 export function generateId(): string {
-  return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replaceAll(/[xy]/g, (c) => {
+  return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, (c: string) => {
     const r = Math.trunc(Math.random() * 16)
     const v = c === 'x' ? r : (r & 0x3 | 0x8)
     return v.toString(16)
@@ -70,7 +70,7 @@ export function generateId(): string {
  */
 export function generateEmail(name: string): string {
   const domains = ['gmail.com', 'hotmail.com', 'yahoo.com', 'outlook.com', 'empresa.com.br']
-  const normalized = name.toLowerCase().replaceAll(/\s+/g, '.')
+  const normalized = name.toLowerCase().replace(/\s+/g, '.')
   return `${normalized}@${randomItem(domains)}`
 }
 

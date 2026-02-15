@@ -60,11 +60,19 @@ export { default as ComponentShowcase } from './layout/ComponentShowcase.vue'
 export { default as CodeBlock } from './layout/CodeBlock.vue'
 export { default as GridContainer } from './layout/GridContainer.vue'
 export { default as ScrollContainer } from './layout/ScrollContainer.vue'
+export { default as PageHeader } from './layout/PageHeader.vue'
+export { default as FilterSidebar } from './layout/FilterSidebar.vue'
+export { default as FilterSection } from './layout/FilterSection.vue'
 
 // ============================================
 // NAVIGATION - Componentes de navegação
 // ============================================
 export { default as Pagination } from './navigation/Pagination.vue'
+
+// ============================================
+// DATA - Componentes para exibição de dados
+// ============================================
+export { default as DataToolbar } from './data/DataToolbar.vue'
 
 // ============================================
 // FEEDBACK - Componentes de alerta e notificação

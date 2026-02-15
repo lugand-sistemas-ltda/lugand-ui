@@ -82,6 +82,7 @@ const docsTab = ref<string>('intro')
 // EXEMPLO 4: DASHBOARD COM DADOS (BÁSICO)
 // ============================================
 const dashboardTab = ref<string>('overview')
+console.log('Dashboard tab initialized:', dashboardTab.value)
 </script>
 
 <template>

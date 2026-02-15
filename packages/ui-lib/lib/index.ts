@@ -69,6 +69,12 @@ export type { FormField } from '../src/modules/DynamicForm/DynamicForm.vue'
 export { default as DataTable } from '../src/modules/DataTable/DataTable.vue'
 export type { DataTableProps, TableColumn } from '../src/modules/DataTable/types'
 
+// Layout Types
+export type { Breadcrumb } from '../src/shared/components/layout/PageHeader.vue'
+
+// Data Types
+export type { SortOption } from '../src/shared/components/data/DataToolbar.vue'
+
 // Layout Modules
 export { DefaultLayout, Navbar, NavItem, NavLink } from '../src/modules/layouts'
 
@@ -111,9 +117,15 @@ export {
     CodeBlock,
     GridContainer,
     ScrollContainer,
+    PageHeader,
+    FilterSidebar,
+    FilterSection,
 
     // Navigation
     Pagination,
+
+    // Data
+    DataToolbar,
 
     // Forms
     Switch,

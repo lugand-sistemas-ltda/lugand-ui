@@ -46,6 +46,8 @@ watch(
             <NavLink to="/ui/layout/structure">Layout Structure</NavLink>
             <NavLink to="/ui/layout/typography">Typography</NavLink>
             <NavLink to="/ui/layout/themes">Themes</NavLink>
+            <NavLink to="/ui/layout/page-header">PageHeader</NavLink>
+            <NavLink to="/ui/layout/filter-sidebar">FilterSidebar</NavLink>
           </NavItem>
 
           <NavItem label="Display" :default-expanded="false">
@@ -76,6 +78,10 @@ watch(
             <NavLink to="/ui/data-management/forms">Forms</NavLink>
             <NavLink to="/ui/data-management/tables">Tables</NavLink>
             <NavLink to="/ui/data-management/crud">CRUD</NavLink>
+          </NavItem>
+
+          <NavItem label="Data Components" :default-expanded="false">
+            <NavLink to="/ui/data/toolbar">DataToolbar</NavLink>
           </NavItem>
 
           <NavItem label="Data Visualization" :default-expanded="false">

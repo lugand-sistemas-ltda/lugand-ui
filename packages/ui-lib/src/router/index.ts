@@ -32,6 +32,16 @@ const routes: RouteRecordRaw[] = [
     name: 'ui-layout-themes',
     component: () => import('@/views/ui/layout/ThemesView.vue'),
   },
+  {
+    path: '/ui/layout/page-header',
+    name: 'ui-layout-page-header',
+    component: () => import('@/views/ui/layout/PageHeaderView.vue'),
+  },
+  {
+    path: '/ui/layout/filter-sidebar',
+    name: 'ui-layout-filter-sidebar',
+    component: () => import('@/views/ui/layout/FilterSidebarView.vue'),
+  },
   // UI Display
   {
     path: '/ui/display/cards',
@@ -138,6 +148,12 @@ const routes: RouteRecordRaw[] = [
     path: '/ui/data-management/crud',
     name: 'ui-data-management-crud',
     component: () => import('@/views/ui/data-management/CrudView.vue'),
+  },
+  // UI Data Components
+  {
+    path: '/ui/data/toolbar',
+    name: 'ui-data-toolbar',
+    component: () => import('@/views/ui/data/DataToolbarView.vue'),
   },
   // UI Visualization Components
   {

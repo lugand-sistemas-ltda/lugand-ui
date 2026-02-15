@@ -11,7 +11,7 @@ import type {
     AreaChartData,
     ScatterChartData,
     GraphChartData,
-} from '@/shared/components/visualization/types'
+} from '@/modules/charts/types'
 
 // ============================================
 // LINE CHART DATA
