@@ -76,7 +76,7 @@ const filters = ref({
   maxPrice: null,
   tags: []
 })
-</script>
+<\/script>
 
 <FilterSidebar 
   title="Filtros" 

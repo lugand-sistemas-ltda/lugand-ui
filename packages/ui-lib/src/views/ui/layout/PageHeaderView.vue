@@ -33,7 +33,7 @@ const breadcrumbs = [
   { label: 'E-commerce', icon: '🛒' },
   { label: 'Produtos' }
 ]
-</script>
+<\/script>
 
 <PageHeader
   icon="📦"

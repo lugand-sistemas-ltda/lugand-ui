@@ -76,8 +76,9 @@ const name = ref('')
             <ul>
                 <li><router-link to="/docs/theming">Explore o sistema de temas</router-link></li>
                 <li><router-link to="/docs/components">Veja todos os componentes disponíveis</router-link></li>
-                <li><router-link to="/ui/simple/buttons">Comece com componentes simples como Buttons</router-link></li>
-                <li><router-link to="/ui/complex/forms">Aprenda sobre componentes complexos como Forms</router-link>
+                <li><router-link to="/ui/actions/buttons">Comece com componentes de ação como Buttons</router-link></li>
+                <li><router-link to="/ui/data-management/forms">Aprenda sobre componentes complexos como
+                        Forms</router-link>
                 </li>
             </ul>
         </section>

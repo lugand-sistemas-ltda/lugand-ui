@@ -12,8 +12,8 @@
         <section class="doc-section">
             <h2>Visão Geral</h2>
             <p>
-                A Lugand UI oferece uma coleção abrangente de componentes Vue 3 organizados por categoria 
-                e complexidade. Todos os componentes são construídos com TypeScript, seguem padrões de 
+                A Lugand UI oferece uma coleção abrangente de componentes Vue 3 organizados por categoria
+                e complexidade. Todos os componentes são construídos com TypeScript, seguem padrões de
                 acessibilidade e são totalmente customizáveis.
             </p>
         </section>
@@ -25,9 +25,12 @@
                 <h3>📝 Inputs</h3>
                 <p>Componentes para entrada de dados e formulários.</p>
                 <ul>
-                    <li><router-link to="/ui/inputs/text">Text Inputs</router-link> - Input, Textarea, PasswordInput</li>
-                    <li><router-link to="/ui/inputs/selection">Selection Inputs</router-link> - Select, Checkbox, Radio, Switch</li>
-                    <li><router-link to="/ui/inputs/specialized">Specialized Inputs</router-link> - DateInput, FileUpload, ColorPicker</li>
+                    <li><router-link to="/ui/inputs/text">Text Inputs</router-link> - Input, Textarea, PasswordInput
+                    </li>
+                    <li><router-link to="/ui/inputs/selection">Selection Inputs</router-link> - Select, Checkbox, Radio,
+                        Switch</li>
+                    <li><router-link to="/ui/inputs/specialized">Specialized Inputs</router-link> - DateInput,
+                        FileUpload, ColorPicker</li>
                 </ul>
             </div>
 
@@ -35,10 +38,13 @@
                 <h3>🎨 Layout & Display</h3>
                 <p>Componentes para estruturação e exibição de conteúdo.</p>
                 <ul>
-                    <li><router-link to="/ui/simple/cards">Cards</router-link> - Card básico com header, footer e slots</li>
-                    <li><router-link to="/ui/simple/containers">Containers</router-link> - Section, Container, Grid</li>
-                    <li><router-link to="/ui/simple/typography">Typography</router-link> - Heading, Text, Link</li>
-                    <li><router-link to="/ui/elements/display">Badges & Tooltips</router-link> - Badge, Tooltip, Avatar</li>
+                    <li><router-link to="/ui/display/cards">Cards</router-link> - Card básico com header, footer e slots
+                    </li>
+                    <li><router-link to="/ui/display/containers">Containers</router-link> - Section, Container, Grid
+                    </li>
+                    <li><router-link to="/ui/layout/typography">Typography</router-link> - Heading, Text, Link</li>
+                    <li><router-link to="/ui/elements/display">Badges & Tooltips</router-link> - Badge, Tooltip, Avatar
+                    </li>
                 </ul>
             </div>
 
@@ -46,7 +52,8 @@
                 <h3>🔘 Actions</h3>
                 <p>Componentes para interações do usuário.</p>
                 <ul>
-                    <li><router-link to="/ui/simple/buttons">Buttons</router-link> - Btn com múltiplas variantes e tamanhos</li>
+                    <li><router-link to="/ui/actions/buttons">Buttons</router-link> - Btn com múltiplas variantes e
+                        tamanhos</li>
                 </ul>
             </div>
 
@@ -54,9 +61,12 @@
                 <h3>🔧 Complex</h3>
                 <p>Componentes compostos e avançados.</p>
                 <ul>
-                    <li><router-link to="/ui/complex/forms">Forms</router-link> - DynamicForm com validação e schemas</li>
-                    <li><router-link to="/ui/complex/tables">Tables</router-link> - DataTable com sorting, filtros e paginação</li>
-                    <li><router-link to="/ui/complex/modals">Modals</router-link> - Modal com múltiplas variantes e tamanhos</li>
+                    <li><router-link to="/ui/data-management/forms">Forms</router-link> - DynamicForm com validação e
+                        schemas</li>
+                    <li><router-link to="/ui/data-management/tables">Tables</router-link> - DataTable com sorting,
+                        filtros e paginação</li>
+                    <li><router-link to="/ui/alerts-overlay/modals">Modals</router-link> - Modal com múltiplas variantes
+                        e tamanhos</li>
                 </ul>
             </div>
 
@@ -64,8 +74,10 @@
                 <h3>💬 Feedback</h3>
                 <p>Componentes para comunicação com o usuário.</p>
                 <ul>
-                    <li><router-link to="/ui/feedback/alerts">Alerts</router-link> - Alert para mensagens contextuais</li>
-                    <li><router-link to="/ui/feedback/toasts">Toasts</router-link> - Toast notifications com posicionamento</li>
+                    <li><router-link to="/ui/alerts-overlay/alerts">Alerts</router-link> - Alert para mensagens
+                        contextuais</li>
+                    <li><router-link to="/ui/alerts-overlay/toasts">Toasts</router-link> - Toast notifications com
+                        posicionamento</li>
                     <li>Spinner - Indicador de carregamento</li>
                     <li>ProgressBar - Barra de progresso</li>
                 </ul>
@@ -75,11 +87,12 @@
                 <h3>📊 Visualization</h3>
                 <p>Componentes para visualização de dados.</p>
                 <ul>
-                    <li><router-link to="/ui/visualization/charts">Charts</router-link> - Line, Bar, Pie, Area, Scatter, Graph</li>
+                    <li><router-link to="/ui/visualization/charts">Charts</router-link> - Line, Bar, Pie, Area, Scatter,
+                        Graph</li>
                 </ul>
                 <p class="note">
-                    <strong>Arquitetura BaseChart:</strong> Todos os gráficos utilizam o padrão pai/filho com 
-                    BaseChart fornecendo container, header, toolbar e legenda, enquanto os gráficos específicos 
+                    <strong>Arquitetura BaseChart:</strong> Todos os gráficos utilizam o padrão pai/filho com
+                    BaseChart fornecendo container, header, toolbar e legenda, enquanto os gráficos específicos
                     implementam a lógica de renderização usando Canvas 2D API.
                 </p>
             </div>
@@ -97,7 +110,7 @@
 
         <section class="doc-section">
             <h2>Padrões Arquiteturais</h2>
-            
+
             <h3>Composables</h3>
             <p>Lógica reutilizável através de composables:</p>
             <ul>
@@ -121,7 +134,7 @@
 
             <h3>Type Safety</h3>
             <p>
-                Todos os componentes possuem tipos TypeScript completos exportados, 
+                Todos os componentes possuem tipos TypeScript completos exportados,
                 incluindo Props, Emits, e interfaces específicas.
             </p>
         </section>
@@ -129,8 +142,8 @@
         <section class="doc-section">
             <h2>Guias de Uso</h2>
             <p>
-                Cada componente possui uma view de demonstração completa com exemplos de código, 
-                props disponíveis, eventos e casos de uso comuns. Navegue pelo menu lateral 
+                Cada componente possui uma view de demonstração completa com exemplos de código,
+                props disponíveis, eventos e casos de uso comuns. Navegue pelo menu lateral
                 para explorar os componentes.
             </p>
         </section>
@@ -138,10 +151,11 @@
         <section class="doc-section">
             <h2>Próximos Passos</h2>
             <ul>
-                <li>Explore os <router-link to="/ui/simple/buttons">componentes simples</router-link> para começar</li>
-                <li>Aprenda sobre <router-link to="/ui/complex/forms">componentes complexos</router-link></li>
+                <li>Explore os <router-link to="/ui/actions/buttons">componentes de ação</router-link> para começar</li>
+                <li>Aprenda sobre <router-link to="/ui/data-management/forms">componentes complexos</router-link></li>
                 <li>Veja o <router-link to="/docs/theming">sistema de temas</router-link> para customização</li>
-                <li>Confira os <router-link to="/ui/visualization/charts">gráficos</router-link> para visualização de dados</li>
+                <li>Confira os <router-link to="/ui/visualization/charts">gráficos</router-link> para visualização de
+                    dados</li>
             </ul>
         </section>
     </div>
@@ -180,10 +194,11 @@
             margin-bottom: var(--spacing-md);
         }
 
-        ul, ol {
+        ul,
+        ol {
             margin-left: var(--spacing-lg);
             margin-bottom: var(--spacing-md);
-            
+
             li {
                 margin-bottom: var(--spacing-sm);
                 line-height: 1.6;
@@ -218,14 +233,14 @@
             color: var(--color-primary);
         }
 
-        > p {
+        >p {
             color: var(--color-text-secondary);
             margin-bottom: var(--spacing-md);
         }
 
         ul {
             margin-left: var(--spacing-md);
-            
+
             li {
                 margin-bottom: var(--spacing-sm);
             }
@@ -248,7 +263,7 @@
     a {
         color: var(--color-primary);
         text-decoration: none;
-        
+
         &:hover {
             text-decoration: underline;
         }
