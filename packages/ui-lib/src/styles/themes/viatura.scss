@@ -71,4 +71,44 @@
 
     // Customização de foco para usar o Amarelo (Estilo Viatura)
     --color-focus-ring: var(--pmpr-amarelo);
+
+    // ============================================
+    // SEMANTIC STATE COLORS (Viatura PMPR)
+    // ============================================
+
+    // INFO (azul PMPR)
+    --info-h: 210;
+    --info-s: 100%;
+    --color-info-bg: hsl(var(--info-h), 85%, 95%);
+    --color-info-text: hsl(var(--info-h), 100%, 20%); // Azul oficial
+    --color-info-border: hsl(var(--info-h), 80%, 60%);
+
+    // SUCCESS (verde institucional)
+    --success-h: 140;
+    --success-s: 65%;
+    --color-success-bg: hsl(var(--success-h), var(--success-s), 95%);
+    --color-success-text: hsl(var(--success-h), 60%, 28%);
+    --color-success-border: hsl(var(--success-h), 55%, 60%);
+
+    // WARNING (amarelo ouro PMPR)
+    --warning-h: 48;
+    --warning-s: 100%;
+    --color-warning-bg: hsl(var(--warning-h), 90%, 95%);
+    --color-warning-text: hsl(var(--warning-h), 100%, 25%);
+    --color-warning-border: hsl(var(--warning-h), 100%, 45%); // Amarelo ouro
+
+    // ERROR (vermelho institucional)
+    --error-h: 0;
+    --error-s: 75%;
+    --color-error-bg: hsl(var(--error-h), var(--error-s), 95%);
+    --color-error-text: hsl(var(--error-h), 70%, 40%);
+    --color-error-border: hsl(var(--error-h), 65%, 65%);
+
+    // ============================================
+    // ALIASES: danger → error (retrocompatibilidade)
+    // ============================================
+    --color-danger: var(--color-error-text);
+    --color-danger-bg: var(--color-error-bg);
+    --color-danger-light: var(--color-error-bg);
+    --color-danger-border: var(--color-error-border);
 }

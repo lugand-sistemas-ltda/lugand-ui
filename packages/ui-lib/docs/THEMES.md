@@ -100,6 +100,48 @@ Each theme defines semantic color variables:
 --color-info            // Info states
 ```
 
+### 🆕 Semantic State Colors (v0.1.4+)
+
+Each theme now includes full semantic color support for Alert components and other feedback elements:
+
+```scss
+// INFO STATE (blue tones)
+--color-info-bg         // Alert info background
+--color-info-text       // Alert info text color
+--color-info-border     // Alert info border color
+
+// SUCCESS STATE (green tones)
+--color-success-bg      // Alert success background
+--color-success-text    // Alert success text color
+--color-success-border  // Alert success border color
+
+// WARNING STATE (yellow/orange tones)
+--color-warning-bg      // Alert warning background
+--color-warning-text    // Alert warning text color
+--color-warning-border  // Alert warning border color
+
+// ERROR STATE (red tones)
+--color-error-bg        // Alert error background
+--color-error-text      // Alert error text color
+--color-error-border    // Alert error border color
+```
+
+**📌 Important:** These colors automatically adapt to theme brightness:
+
+- **Light themes**: Backgrounds at 95% lightness, text at 30% (dark text on light bg)
+- **Dark themes**: Backgrounds at 15% lightness, text at 75-80% (light text on dark bg)
+
+**Example in different themes:**
+
+| Theme     | Info Background          | Info Text                | Adaptation           |
+| --------- | ------------------------ | ------------------------ | -------------------- |
+| Light     | `hsl(200, 100%, 95%)` ☀️ | `hsl(200, 80%, 30%)` 🌑  | Light bg + Dark text |
+| Dark      | `hsl(200, 80%, 15%)` 🌑  | `hsl(200, 100%, 80%)` ☀️ | Dark bg + Light text |
+| Dracula   | `hsl(191, 50%, 15%)` 🌑  | `hsl(191, 97%, 85%)` 💎  | Cyan Dracula colors  |
+| Cyberpunk | `hsl(180, 70%, 12%)` 🌑  | `hsl(180, 100%, 70%)` 💠 | Neon cyan colors     |
+
+See [ALERT_COLOR_FIX.md](./ALERT_COLOR_FIX.md) for detailed migration guide.
+
 ### Input-Specific
 
 ```scss

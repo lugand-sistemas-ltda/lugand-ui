@@ -73,4 +73,47 @@
 
     // Focus ring
     --color-focus-ring: var(--cbpr-amarelo);
+
+    // ============================================
+    // SEMANTIC STATE COLORS (Bombeiros - fundo escuro)
+    // ============================================
+
+    // INFO (azul CBPR)
+    --info-h: 211;
+    --info-s: 100%;
+    --color-info-bg: hsl(var(--info-h), 70%, 15%); // Azul escuro CBPR
+    --color-info-text: hsl(var(--info-h), 90%, 75%); // Texto claro azul
+    --color-info-border: hsl(var(--info-h), 80%, 35%);
+
+    // SUCCESS (verde segurança)
+    --success-h: 140;
+    --success-s: 60%;
+    --color-success-bg: hsl(var(--success-h), var(--success-s), 15%);
+    --color-success-text: hsl(var(--success-h), 70%, 70%);
+    --color-success-border: hsl(var(--success-h), 60%, 35%);
+
+    // WARNING (amarelo alerta CBPR)
+    --warning-h: 48;
+    --warning-s: 100%;
+    --color-warning-bg: hsl(var(--warning-h), 80%, 18%); // Fundo amarelo escuro
+    --color-warning-text: hsl(var(--warning-h), 100%, 75%); // Amarelo brilhante
+    --color-warning-border: hsl(var(--warning-h), 100%, 45%);
+
+    // ERROR (vermelho emergência CBPR)
+    --error-h: 0;
+    --error-s: 100%;
+    --color-error-bg: hsl(var(--error-h), 80%, 18%); // Vermelho escuro
+    --color-error-text: hsl(var(--error-h), 100%, 75%); // Vermelho brilhante
+    --color-error-border: hsl(var(--error-h), 90%, 45%);
+
+    // ============================================
+    // ALIASES: danger → error (retrocompatibilidade)
+    // ============================================
+    --color-danger: var(--color-error-text);
+    --color-danger-bg: var(--color-error-bg);
+    --color-danger-light: var(--color-error-bg);
+    --color-danger-border: var(--color-error-border);
+
+    // LEGACY: manter --color-danger original para compatibilidade com código antigo
+    // --color-danger: var(--cbpr-vermelho); // Mantido como comentário caso necessário rollback
 }

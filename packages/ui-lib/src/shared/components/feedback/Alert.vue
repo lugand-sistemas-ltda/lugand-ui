@@ -98,25 +98,25 @@ function handleDismiss(): void {
   font-size: var(--font-size-sm);
   line-height: 1.5;
 
-  // Variants
+  // Variants - usando variáveis CSS dos temas
   &--info {
-    background: hsl(200, 100%, 95%);
-    color: hsl(200, 80%, 30%);
+    background: var(--color-info-bg);
+    color: var(--color-info-text);
   }
 
   &--success {
-    background: hsl(140, 70%, 95%);
-    color: hsl(140, 70%, 30%);
+    background: var(--color-success-bg);
+    color: var(--color-success-text);
   }
 
   &--warning {
-    background: hsl(40, 100%, 95%);
-    color: hsl(40, 90%, 35%);
+    background: var(--color-warning-bg);
+    color: var(--color-warning-text);
   }
 
   &--error {
-    background: hsl(0, 90%, 95%);
-    color: hsl(0, 80%, 40%);
+    background: var(--color-error-bg);
+    color: var(--color-error-text);
   }
 
   &--bordered {
@@ -124,19 +124,19 @@ function handleDismiss(): void {
     border-style: solid;
 
     &.alert--info {
-      border-color: hsl(200, 80%, 70%);
+      border-color: var(--color-info-border);
     }
 
     &.alert--success {
-      border-color: hsl(140, 70%, 60%);
+      border-color: var(--color-success-border);
     }
 
     &.alert--warning {
-      border-color: hsl(40, 90%, 60%);
+      border-color: var(--color-warning-border);
     }
 
     &.alert--error {
-      border-color: hsl(0, 80%, 70%);
+      border-color: var(--color-error-border);
     }
   }
 

@@ -91,6 +91,46 @@
     --color-secondary-active: var(--secondary-700);
 
     // ============================================
+    // SEMANTIC STATE COLORS (Forest theme)
+    // ============================================
+
+    // INFO (azul céu entre árvores)
+    --info-h: 200;
+    --info-s: 85%;
+    --color-info-bg: hsl(var(--info-h), var(--info-s), 95%);
+    --color-info-text: hsl(var(--info-h), 75%, 32%);
+    --color-info-border: hsl(var(--info-h), 70%, 65%);
+
+    // SUCCESS (verde floresta - já é primary)
+    --success-h: 142;
+    --success-s: 76%;
+    --color-success-bg: hsl(var(--success-h), var(--success-s), 95%);
+    --color-success-text: hsl(var(--success-h), 70%, 28%);
+    --color-success-border: hsl(var(--success-h), 65%, 58%);
+
+    // WARNING (dourado outonal)
+    --warning-h: 45;
+    --warning-s: 95%;
+    --color-warning-bg: hsl(var(--warning-h), var(--warning-s), 95%);
+    --color-warning-text: hsl(var(--warning-h), 85%, 32%);
+    --color-warning-border: hsl(var(--warning-h), 80%, 60%);
+
+    // ERROR (vermelho folhas secas)
+    --error-h: 10;
+    --error-s: 80%;
+    --color-error-bg: hsl(var(--error-h), var(--error-s), 95%);
+    --color-error-text: hsl(var(--error-h), 75%, 38%);
+    --color-error-border: hsl(var(--error-h), 70%, 65%);
+
+    // ============================================
+    // ALIASES: danger → error (retrocompatibilidade)
+    // ============================================
+    --color-danger: var(--color-error-text);
+    --color-danger-bg: var(--color-error-bg);
+    --color-danger-light: var(--color-error-bg);
+    --color-danger-border: var(--color-error-border);
+
+    // ============================================
     // SHADOWS (com toque esverdeado)
     // ============================================
     --shadow-color-sm: hsla(142, 76%, 55%, 0.1);

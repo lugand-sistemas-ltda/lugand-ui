@@ -50,6 +50,46 @@
     --color-primary-bg: hsla(var(--hsl-primary), 0.1);
 
     // ============================================
+    // SEMANTIC STATE COLORS (Dracula theme)
+    // ============================================
+
+    // INFO (ciano Dracula)
+    --info-h: 191;
+    --info-s: 97%;
+    --color-info-bg: hsl(var(--info-h), 50%, 15%);
+    --color-info-text: hsl(var(--info-h), var(--info-s), 85%); // #8be9fd
+    --color-info-border: hsl(var(--info-h), 70%, 35%);
+
+    // SUCCESS (verde Dracula)
+    --success-h: 135;
+    --success-s: 94%;
+    --color-success-bg: hsl(var(--success-h), 50%, 15%);
+    --color-success-text: hsl(var(--success-h), var(--success-s), 76%); // #50fa7b
+    --color-success-border: hsl(var(--success-h), 70%, 35%);
+
+    // WARNING (amarelo Dracula)
+    --warning-h: 65;
+    --warning-s: 92%;
+    --color-warning-bg: hsl(var(--warning-h), 50%, 18%);
+    --color-warning-text: hsl(var(--warning-h), var(--warning-s), 80%); // #f1fa8c
+    --color-warning-border: hsl(var(--warning-h), 70%, 40%);
+
+    // ERROR (vermelho Dracula)
+    --error-h: 0;
+    --error-s: 100%;
+    --color-error-bg: hsl(var(--error-h), 50%, 18%);
+    --color-error-text: hsl(var(--error-h), var(--error-s), 77%); // #ff5555
+    --color-error-border: hsl(var(--error-h), 70%, 40%);
+
+    // ============================================
+    // ALIASES: danger → error (retrocompatibilidade)
+    // ============================================
+    --color-danger: var(--color-error-text);
+    --color-danger-bg: var(--color-error-bg);
+    --color-danger-light: var(--color-error-bg);
+    --color-danger-border: var(--color-error-border);
+
+    // ============================================
     // BORDERS
     // ============================================
     --color-border-base: hsl(232, 14%, 31%); // #44475a

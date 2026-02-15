@@ -91,6 +91,46 @@
     --color-secondary-active: var(--secondary-700);
 
     // ============================================
+    // SEMANTIC STATE COLORS (Ocean theme)
+    // ============================================
+
+    // INFO (azul oceano - já é primary)
+    --info-h: 199;
+    --info-s: 89%;
+    --color-info-bg: hsl(var(--info-h), var(--info-s), 95%);
+    --color-info-text: hsl(var(--info-h), 85%, 30%);
+    --color-info-border: hsl(var(--info-h), 80%, 65%);
+
+    // SUCCESS (verde água)
+    --success-h: 165;
+    --success-s: 75%;
+    --color-success-bg: hsl(var(--success-h), var(--success-s), 95%);
+    --color-success-text: hsl(var(--success-h), 70%, 28%);
+    --color-success-border: hsl(var(--success-h), 65%, 60%);
+
+    // WARNING (coral/laranja)
+    --warning-h: 25;
+    --warning-s: 95%;
+    --color-warning-bg: hsl(var(--warning-h), var(--warning-s), 95%);
+    --color-warning-text: hsl(var(--warning-h), 90%, 35%);
+    --color-warning-border: hsl(var(--warning-h), 85%, 60%);
+
+    // ERROR (vermelho coral)
+    --error-h: 5;
+    --error-s: 85%;
+    --color-error-bg: hsl(var(--error-h), var(--error-s), 95%);
+    --color-error-text: hsl(var(--error-h), 80%, 38%);
+    --color-error-border: hsl(var(--error-h), 75%, 65%);
+
+    // ============================================
+    // ALIASES: danger → error (retrocompatibilidade)
+    // ============================================
+    --color-danger: var(--color-error-text);
+    --color-danger-bg: var(--color-error-bg);
+    --color-danger-light: var(--color-error-bg);
+    --color-danger-border: var(--color-error-border);
+
+    // ============================================
     // SHADOWS (com toque azulado)
     // ============================================
     --shadow-color-sm: hsla(199, 89%, 55%, 0.1);

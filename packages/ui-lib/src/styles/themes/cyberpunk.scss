@@ -52,6 +52,46 @@
     --color-primary-bg: hsla(var(--hsl-primary), 0.15);
 
     // ============================================
+    // SEMANTIC STATE COLORS (Cyberpunk neon)
+    // ============================================
+
+    // INFO (ciano neon)
+    --info-h: 180;
+    --info-s: 100%;
+    --color-info-bg: hsl(var(--info-h), 70%, 12%);
+    --color-info-text: hsl(var(--info-h), var(--info-s), 70%); // Ciano brilhante
+    --color-info-border: hsl(var(--info-h), 100%, 50%);
+
+    // SUCCESS (verde neon)
+    --success-h: 120;
+    --success-s: 100%;
+    --color-success-bg: hsl(var(--success-h), 70%, 12%);
+    --color-success-text: hsl(var(--success-h), var(--success-s), 60%); // Verde neon
+    --color-success-border: hsl(var(--success-h), 100%, 50%);
+
+    // WARNING (amarelo neon - já é primary)
+    --warning-h: 58;
+    --warning-s: 100%;
+    --color-warning-bg: hsl(var(--warning-h), 70%, 12%);
+    --color-warning-text: hsl(var(--warning-h), var(--warning-s), 70%); // Amarelo brilhante
+    --color-warning-border: hsl(var(--warning-h), 100%, 50%);
+
+    // ERROR (rosa/magenta neon)
+    --error-h: 320;
+    --error-s: 100%;
+    --color-error-bg: hsl(var(--error-h), 70%, 15%);
+    --color-error-text: hsl(var(--error-h), var(--error-s), 70%); // Rosa neon
+    --color-error-border: hsl(var(--error-h), 100%, 55%);
+
+    // ============================================
+    // ALIASES: danger → error (retrocompatibilidade)
+    // ============================================
+    --color-danger: var(--color-error-text);
+    --color-danger-bg: var(--color-error-bg);
+    --color-danger-light: var(--color-error-bg);
+    --color-danger-border: var(--color-error-border);
+
+    // ============================================
     // BORDERS
     // ============================================
     --color-border-base: hsl(253, 30%, 30%);
