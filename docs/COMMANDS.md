@@ -217,32 +217,69 @@ alias lugand-test='cd /home/heremit/Desktop/vue/lugand-ui/packages/test-ui-lib'
 
 ---
 
-## 🚢 Publicação (Futuro)
+## 🚢 Publicação no NPM
 
-### Preparar para Publicação
+### Workflow Automatizado (Recomendado)
+
+O projeto usa GitHub Actions para publicação automática via tags:
 
 ```bash
-# 1. Atualizar versão
+# 1. Atualizar versão no package.json
 cd packages/ui-lib
-npm version patch|minor|major
+# Editar manualmente "version": "0.1.6" ou usar npm version
 
-# 2. Build
+# 2. Commitar mudanças
+git add packages/ui-lib/package.json
+git commit -m "chore: bump version to 0.1.6"
+git push origin main
+
+# 3. Criar e enviar tag (INICIA PUBLICAÇÃO)
+git tag -a v0.1.6 -m "Release v0.1.6 - descrição das mudanças"
+git push origin v0.1.6
+
+# 4. Acompanhar workflow
+# https://github.com/lugand-sistemas-ltda/lugand-ui/actions
+
+# 5. Verificar publicação (~5-10 min)
+npm view @lugand-sistemas-ltda/vue-ui-lib version
+```
+
+**⚠️ Requisitos:**
+- Secret `NPM_TOKEN` configurado no GitHub
+- Workflow `.github/workflows/publish.yml` configurado
+- Tag no formato `v*.*.*` (ex: v0.1.6)
+
+### Atualizar Tag Existente
+
+Se precisar mover uma tag para outro commit:
+
+```bash
+# Deletar tag localmente e remotamente
+git tag -d v0.1.6
+git push origin :refs/tags/v0.1.6
+
+# Criar nova tag no HEAD atual
+git tag -a v0.1.6 -m "Release v0.1.6 - (corrigido)"
+git push origin v0.1.6
+```
+
+### Publicação Manual (Não Recomendado)
+
+```bash
+cd packages/ui-lib
+
+# Build da biblioteca
 npm run build:lib
 
-# 3. Testar localmente
-npm pack
-
-# 4. Publicar
+# Publicar
 npm publish --access public
-
-# 5. Criar tag git
-git tag v0.1.0
-git push --tags
 ```
+
+**📚 Documentação Completa:** Ver `NPM_PUBLISH_GUIDE.md` na raiz do projeto
 
 ---
 
-## 🐛 Troubleshooting
+##  Troubleshooting
 
 ### "Module not found" no test-ui-lib
 
@@ -291,12 +328,15 @@ npm run clean && npm install
 ### Versões
 
 ```bash
-# Versões instaladas
-node --version  # Deve ser >= 20.19.0 ou >= 22.12.0
-npm --version   # Deve ser >= 10.0.0
+# Versões instaladas (Node.js deve ser >= 20.19.0 ou >= 22.12.0)
+node --version
+npm --version
 
 # Versão da biblioteca
-cat packages/ui-lib/package.json | grep version
+cat packages/ui-lib/package.json | grep '"version"'
+
+# Última versão publicada no npm
+npm view @lugand-sistemas-ltda/vue-ui-lib version
 ```
 
 ### Tamanhos
@@ -331,5 +371,5 @@ du -sh node_modules/ packages/*/node_modules/
 
 ---
 
-**Última atualização**: 06/01/2026  
-**Versão do Guia**: 1.0.0
+**Última atualização**: 15/02/2026  
+**Versão do Guia**: 2.0.0

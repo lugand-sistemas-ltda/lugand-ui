@@ -75,6 +75,8 @@ npm run build:all
 - **[Components](./packages/ui-lib/docs/COMPONENTS.md)** - Complete API reference
 - **[Themes](./packages/ui-lib/docs/THEMES.md)** - Theming system
 - **[Changelog](./packages/ui-lib/docs/CHANGELOG.md)** - Version history
+- **[NPM Publishing Guide](./NPM_PUBLISH_GUIDE.md)** - Automated publishing workflow
+- **[Commands Reference](./docs/COMMANDS.md)** - All available commands
 
 ---
 
@@ -126,6 +128,12 @@ npm run build:all        # Build everything
 npm run type-check       # TypeScript type checking
 npm run lint             # Code linting
 npm run format           # Code formatting
+npm run clean            # Clean all node_modules and dist
+
+# Publishing (automated via GitHub Actions)
+# See NPM_PUBLISH_GUIDE.md for full workflow
+git tag -a v0.1.6 -m "Release v0.1.6"
+git push origin v0.1.6   # Triggers automated npm publish
 ```
 
 ### Package-specific Commands
