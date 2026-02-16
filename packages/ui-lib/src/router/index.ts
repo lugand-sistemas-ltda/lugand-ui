@@ -203,6 +203,11 @@ const routes: RouteRecordRaw[] = [
     name: 'ui-utilities-clipboard',
     component: () => import('@/views/ui/utilities/ClipboardView.vue'),
   },
+  {
+    path: '/ui/utilities/files',
+    name: 'ui-utilities-files',
+    component: () => import('@/views/ui/utilities/FileManagementView.vue'),
+  },
   // Docs
   {
     path: '/docs/get-started',

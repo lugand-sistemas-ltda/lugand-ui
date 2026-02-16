@@ -98,6 +98,7 @@ export {
     Scrollable,
     ActionButton,
     CopyButton,
+    FileIcon,
     BulkActionBar,
 
     // Display
@@ -111,6 +112,7 @@ export {
     ProgressBar,
     ProgressCircle,
     Rating,
+    FileList,
 
     // Feedback
     Spinner,
@@ -137,6 +139,7 @@ export {
     Radio,
     RadioGroup,
     CopyInput,
+    FileUpload,
 } from '../src/shared/components/index'
 
 // ============================================

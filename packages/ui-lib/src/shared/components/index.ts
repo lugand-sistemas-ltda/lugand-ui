@@ -13,6 +13,7 @@ export { default as InputWithAddon } from './primitives/InputWithAddon.vue'
 export { default as InputWithSelectAddon } from './primitives/InputWithSelectAddon.vue'
 export { default as ActionButton } from './primitives/ActionButton.vue'
 export { default as CopyButton } from './primitives/CopyButton.vue'
+export { default as FileIcon } from './primitives/FileIcon.vue'
 export { default as BulkActionBar } from './BulkActionBar.vue'
 
 // ============================================
@@ -31,6 +32,7 @@ export { default as DateInput } from './form/inputs/DateInput.vue'
 export { default as DateSegmentedInput } from './form/inputs/DateSegmentedInput.vue'
 export { default as DateSelectInput } from './form/inputs/DateSelectInput.vue'
 export { default as CopyInput } from './form/inputs/CopyInput.vue'
+export { default as FileUpload } from './form/FileUpload.vue'
 export { default as Select } from './form/selects/Select.vue'
 export { default as Checkbox } from './form/selection/Checkbox.vue'
 export { default as Switch } from './form/selection/Switch/Switch.vue'
@@ -59,6 +61,7 @@ export { default as TimelineItem } from './display/TimelineItem.vue'
 export { default as ProgressBar } from './display/ProgressBar.vue'
 export { default as ProgressCircle } from './display/ProgressCircle.vue'
 export { default as Rating } from './display/Rating.vue'
+export { default as FileList } from './display/FileList.vue'
 
 // ============================================
 // LAYOUT - Componentes de estrutura
