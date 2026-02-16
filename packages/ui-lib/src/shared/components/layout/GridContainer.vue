@@ -34,7 +34,7 @@ withDefaults(defineProps<Props>(), {
     minItemWidth: '280px'
 })
 
-import Skeleton from '../display/Skeleton.vue'
+import Skeleton from '../feedback/Skeleton.vue'
 </script>
 
 <template>

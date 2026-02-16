@@ -52,6 +52,10 @@ watch(
 
           <NavItem label="Display" :default-expanded="false">
             <NavLink to="/ui/display/cards">Cards</NavLink>
+            <NavLink to="/ui/display/stat-cards">StatCards</NavLink>
+            <NavLink to="/ui/display/timeline">Timeline</NavLink>
+            <NavLink to="/ui/display/progress">Progress</NavLink>
+            <NavLink to="/ui/display/rating">Rating</NavLink>
             <NavLink to="/ui/display/containers">Containers</NavLink>
             <NavLink to="/ui/elements/display">Badges & Tooltips</NavLink>
           </NavItem>
@@ -70,8 +74,14 @@ watch(
             <NavLink to="/ui/alerts-overlay/toasts">Toasts</NavLink>
           </NavItem>
 
+          <NavItem label="Feedback" :default-expanded="false">
+            <NavLink to="/ui/feedback/loading">Loading States</NavLink>
+            <NavLink to="/ui/feedback/empty">Empty States</NavLink>
+          </NavItem>
+
           <NavItem label="Actions" :default-expanded="false">
             <NavLink to="/ui/actions/buttons">Buttons</NavLink>
+            <NavLink to="/ui/actions/action-buttons">ActionButtons</NavLink>
           </NavItem>
 
           <NavItem label="Data Management" :default-expanded="false">
@@ -92,6 +102,10 @@ watch(
             <NavLink to="/ui/icons/emojis">Emojis</NavLink>
             <NavLink to="/ui/icons/brands">Brands</NavLink>
             <NavLink to="/ui/icons/ui">UI Icons</NavLink>
+          </NavItem>
+
+          <NavItem label="Utilities" :default-expanded="false">
+            <NavLink to="/ui/utilities/clipboard">Clipboard</NavLink>
           </NavItem>
         </NavItem>
 

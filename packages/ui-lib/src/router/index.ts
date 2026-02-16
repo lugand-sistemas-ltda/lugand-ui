@@ -16,6 +16,11 @@ const routes: RouteRecordRaw[] = [
     name: 'ui-actions-buttons',
     component: () => import('@/views/ui/actions/ButtonsView.vue'),
   },
+  {
+    path: '/ui/actions/action-buttons',
+    name: 'ui-actions-action-buttons',
+    component: () => import('@/views/ui/primitives/ActionButtonView.vue'),
+  },
   // UI Layout
   {
     path: '/ui/layout/structure',
@@ -47,6 +52,26 @@ const routes: RouteRecordRaw[] = [
     path: '/ui/display/cards',
     name: 'ui-display-cards',
     component: () => import('@/views/ui/display/CardsView.vue'),
+  },
+  {
+    path: '/ui/display/stat-cards',
+    name: 'ui-display-stat-cards',
+    component: () => import('@/views/ui/display/StatCardView.vue'),
+  },
+  {
+    path: '/ui/display/timeline',
+    name: 'ui-display-timeline',
+    component: () => import('@/views/ui/display/TimelineView.vue'),
+  },
+  {
+    path: '/ui/display/progress',
+    name: 'ui-display-progress',
+    component: () => import('@/views/ui/display/ProgressView.vue'),
+  },
+  {
+    path: '/ui/display/rating',
+    name: 'ui-display-rating',
+    component: () => import('@/views/ui/display/RatingView.vue'),
   },
   {
     path: '/ui/display/containers',
@@ -94,6 +119,17 @@ const routes: RouteRecordRaw[] = [
     path: '/ui/alerts-overlay/toasts',
     name: 'ui-alerts-overlay-toasts',
     component: () => import('@/views/ui/alerts-overlay/ToastsView.vue'),
+  },
+  // UI Feedback
+  {
+    path: '/ui/feedback/loading',
+    name: 'ui-feedback-loading',
+    component: () => import('@/views/ui/feedback/LoadingView.vue'),
+  },
+  {
+    path: '/ui/feedback/empty',
+    name: 'ui-feedback-empty',
+    component: () => import('@/views/ui/feedback/EmptyStateView.vue'),
   },
   // UI Inputs
   {
@@ -160,6 +196,12 @@ const routes: RouteRecordRaw[] = [
     path: '/ui/visualization/charts',
     name: 'ui-visualization-charts',
     component: () => import('@/views/ui/visualization/ChartsView.vue'),
+  },
+  // UI Utilities
+  {
+    path: '/ui/utilities/clipboard',
+    name: 'ui-utilities-clipboard',
+    component: () => import('@/views/ui/utilities/ClipboardView.vue'),
   },
   // Docs
   {

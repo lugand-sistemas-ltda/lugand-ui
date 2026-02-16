@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { Badge, Tooltip, Avatar, Skeleton, ComponentShowcase, CodeBlock, Button } from '@/shared/components'
+import { Badge, Tooltip, Avatar, ComponentShowcase, CodeBlock, Button } from '@/shared/components'
 </script>
 
 <template>
@@ -141,63 +141,6 @@ import { Badge, Tooltip, Avatar, Skeleton, ComponentShowcase, CodeBlock, Button 
             <template #code>
                 <CodeBlock code='<Avatar src="url.jpg" size="lg" status="online" />
 <Avatar name="John Doe" variant="circle" />' />
-            </template>
-        </ComponentShowcase>
-
-        <!-- 4. SKELETONS -->
-        <ComponentShowcase title="Skeleton Loading"
-            description="Placeholders animados para melhorar a percepção de performance.">
-            <template #preview>
-                <div class="showcase-group" style="width: 300px">
-                    <div style="display: flex; gap: 1rem; margin-bottom: 1rem">
-                        <Skeleton variant="circle" width="50px" height="50px" />
-                        <div style="flex: 1">
-                            <Skeleton variant="text" width="60%" />
-                            <Skeleton variant="text" width="90%" />
-                        </div>
-                    </div>
-
-                    <Skeleton variant="rect" height="120px" animation="wave" />
-                </div>
-                <div class="showcase-group" style="width: 300px">
-                    <div style="display: flex; gap: 1rem; margin-bottom: 1rem">
-                        <Skeleton variant="circle" width="50px" height="50px" />
-                        <div style="flex: 1">
-                            <Skeleton variant="text" width="60%" />
-                            <Skeleton variant="text" width="90%" />
-                        </div>
-                    </div>
-
-                    <Skeleton variant="rect" height="120px" animation="wave" />
-                </div>
-                <div class="showcase-group" style="width: 300px">
-                    <div style="display: flex; gap: 1rem; margin-bottom: 1rem">
-                        <Skeleton variant="circle" width="50px" height="50px" />
-                        <div style="flex: 1">
-                            <Skeleton variant="text" width="60%" />
-                            <Skeleton variant="text" width="90%" />
-                        </div>
-                    </div>
-
-                    <Skeleton variant="rect" height="120px" animation="wave" />
-                </div>
-                <div class="showcase-group" style="width: 300px">
-                    <div style="display: flex; gap: 1rem; margin-bottom: 1rem">
-                        <Skeleton variant="circle" width="50px" height="50px" />
-                        <div style="flex: 1">
-                            <Skeleton variant="text" width="60%" />
-                            <Skeleton variant="text" width="90%" />
-                        </div>
-                    </div>
-
-                    <Skeleton variant="rect" height="120px" animation="wave" />
-                </div>
-            </template>
-
-            <template #code>
-                <CodeBlock code='<Skeleton variant="circle" width="40px" height="40px" />
-<Skeleton variant="text" width="80%" />
-<Skeleton variant="rect" height="200px" animation="wave" />' />
             </template>
         </ComponentShowcase>
     </div>
