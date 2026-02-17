@@ -1,6 +1,6 @@
 {
   "name": "@lugand-sistemas-ltda/vue-ui-lib",
-  "version": "0.1.6",
+  "version": "0.1.7",
   "description": "Sistema robusto de componentes genéricos e reutilizáveis Vue 3 + TypeScript",
   "private": false,
   "type": "module",
