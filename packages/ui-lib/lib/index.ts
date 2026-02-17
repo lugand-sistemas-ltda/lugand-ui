@@ -113,6 +113,7 @@ export {
     ProgressCircle,
     Rating,
     FileList,
+    FileViewer,
 
     // Feedback
     Spinner,
@@ -225,6 +226,11 @@ export {
     SYMBOLS,
     FLAGS
 } from '../src/core/constants/emojis.ts'
+
+// ============================================
+// TYPES
+// ============================================
+export type { FileViewerFile } from '../src/shared/components/index'
 
 // ============================================
 // VERSION

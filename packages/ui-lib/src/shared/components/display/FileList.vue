@@ -11,7 +11,6 @@
  * 
  * UI-only: Emite eventos, app cliente trata download/delete/preview real
  */
-import { ref } from 'vue'
 import FileIcon from '../primitives/FileIcon.vue'
 
 export interface FileItem {
@@ -37,7 +36,7 @@ export interface Props {
     emptyMessage?: string
 }
 
-const props = withDefaults(defineProps<Props>(), {
+withDefaults(defineProps<Props>(), {
     showActions: true,
     compact: false,
     loading: false,

@@ -147,7 +147,7 @@ function processFiles(files: File[]) {
                 }
                 if (type.includes('*')) {
                     const [category] = type.split('/')
-                    return file.type.startsWith(category)
+                    return file.type && category && file.type.startsWith(category)
                 }
                 return file.type === type
             })

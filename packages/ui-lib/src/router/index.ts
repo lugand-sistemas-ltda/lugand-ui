@@ -208,6 +208,11 @@ const routes: RouteRecordRaw[] = [
     name: 'ui-utilities-files',
     component: () => import('@/views/ui/utilities/FileManagementView.vue'),
   },
+  {
+    path: '/ui/utilities/file-viewer',
+    name: 'ui-utilities-file-viewer',
+    component: () => import('@/views/ui/utilities/FileViewerView.vue'),
+  },
   // Docs
   {
     path: '/docs/get-started',

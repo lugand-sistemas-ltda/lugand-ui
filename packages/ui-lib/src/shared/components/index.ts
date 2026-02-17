@@ -62,6 +62,8 @@ export { default as ProgressBar } from './display/ProgressBar.vue'
 export { default as ProgressCircle } from './display/ProgressCircle.vue'
 export { default as Rating } from './display/Rating.vue'
 export { default as FileList } from './display/FileList.vue'
+export { default as FileViewer } from './display/FileViewer.vue'
+export type { FileViewerFile } from './display/FileViewer.vue'
 
 // ============================================
 // LAYOUT - Componentes de estrutura

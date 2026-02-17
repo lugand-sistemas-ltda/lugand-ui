@@ -107,6 +107,7 @@ watch(
           <NavItem label="Utilities" :default-expanded="false">
             <NavLink to="/ui/utilities/clipboard">Clipboard</NavLink>
             <NavLink to="/ui/utilities/files">File Management</NavLink>
+            <NavLink to="/ui/utilities/file-viewer">File Viewer</NavLink>
           </NavItem>
         </NavItem>
 
