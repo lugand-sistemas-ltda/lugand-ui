@@ -100,6 +100,11 @@ const routes: RouteRecordRaw[] = [
     component: () => import('@/views/ui/navigation/AccordionView.vue'),
   },
   {
+    path: '/ui/navigation/carousel',
+    name: 'ui-navigation-carousel',
+    component: () => import('@/views/ui/components/CarouselView.vue'),
+  },
+  {
     path: '/ui/navigation/dropdown',
     name: 'ui-navigation-dropdown',
     component: () => import('@/views/ui/navigation/DropdownView.vue'),

@@ -28,6 +28,11 @@ export type { TabsProps } from '../src/modules/Tabs/Tabs.vue'
 export type { TabPanelProps } from '../src/modules/Tabs/TabPanel.vue'
 export type { TabsContext, TabOrientation, TabVariant } from '../src/modules/Tabs/types'
 
+// Carousel Module
+export { Carousel, CarouselSlide, useCarousel } from '../src/modules/carousel'
+export type { CarouselProps, CarouselEmits, CarouselSlotProps, CarouselDirection, CarouselEffect } from '../src/modules/carousel/components/types'
+
+
 // Toast Module
 export { ToastItem, ToastProvider, useToast } from '../src/modules/toast'
 export type { ToastOptions, ToastType, ToastPosition, ToastAction } from '../src/modules/toast/components/types'

@@ -65,6 +65,7 @@ watch(
             <NavLink to="/ui/navigation/disclosure">Disclosure</NavLink>
             <NavLink to="/ui/navigation/tabs">Tabs</NavLink>
             <NavLink to="/ui/navigation/accordion">Accordion</NavLink>
+            <NavLink to="/ui/navigation/carousel">Carousel</NavLink>
             <NavLink to="/ui/navigation/dropdown">Dropdown</NavLink>
           </NavItem>
 

@@ -83,6 +83,11 @@ export { default as FilterSection } from './layout/FilterSection.vue'
 export { default as Pagination } from './navigation/Pagination.vue'
 
 // ============================================
+// MODULES - Componentes modulares complexos
+// ============================================
+export { Carousel, CarouselSlide } from '../../modules/carousel'
+
+// ============================================
 // DATA - Componentes para exibição de dados
 // ============================================
 export { default as DataToolbar } from './data/DataToolbar.vue'
