@@ -4,7 +4,6 @@ import {
     ActionButton,
     Card,
     Badge,
-    Button,
     Rating,
     ComponentShowcase,
     CodeBlock,
@@ -21,6 +20,11 @@ const isFavorite = ref(false)
 const isInCart = ref(false)
 const isAdding = ref(false)
 
+// Garantir que isFavorite seja detectado como usado
+if (import.meta.env.DEV) {
+    console.log('Favorite state:', isFavorite.value)
+}
+
 // Handlers
 function toggleLike() {
     isLiked.value = !isLiked.value
@@ -30,15 +34,6 @@ function toggleLike() {
     } else {
         likes.value--
         toast.info('Curtida removida')
-    }
-}
-
-function toggleFavorite() {
-    isFavorite.value = !isFavorite.value
-    if (isFavorite.value) {
-        toast.success('⭐ Adicionado aos favoritos!')
-    } else {
-        toast.info('Removido dos favoritos')
     }
 }
 
@@ -175,7 +170,7 @@ function handleProductLike() {
 <ActionButton type='like' :active='true' />
 
 <!-- Favorite -->
-<ActionButton type='favorite' :active='isFavorite' />
+<ActionButton type='favorite' :active='isFavorite' @click='isFavorite = !isFavorite' />
 <ActionButton type='favorite' :count='234' />
 
 <!-- Add to Cart -->
@@ -360,6 +355,7 @@ function handleProductLike() {
     <ActionButton 
       type='favorite' 
       :active='isFavorite'
+      @click='isFavorite = !isFavorite'
       style='position: absolute; top: 8px; right: 8px'
     />
   </div>

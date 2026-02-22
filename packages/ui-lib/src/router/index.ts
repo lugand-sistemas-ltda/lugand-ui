@@ -218,6 +218,25 @@ const routes: RouteRecordRaw[] = [
     name: 'ui-utilities-file-viewer',
     component: () => import('@/views/ui/utilities/FileViewerView.vue'),
   },
+  // Low-Code Platform
+  {
+    path: '/low-code/page-builder',
+    name: 'low-code-page-builder',
+    component: () => import('@/views/low-code/PageBuilderView.vue'),
+    meta: { fullscreen: true }, // Remove padding/max-width do layout
+  },
+  {
+    path: '/low-code/form-builder',
+    name: 'low-code-form-builder',
+    component: () => import('@/views/low-code/FormBuilderView.vue'),
+    meta: { fullscreen: true }, // Remove padding/max-width do layout
+  },
+  {
+    path: '/low-code/code-generator',
+    name: 'low-code-code-generator',
+    component: () => import('@/views/low-code/CodeGeneratorView.vue'),
+    meta: { fullscreen: true }, // Remove padding/max-width do layout
+  },
   // Docs
   {
     path: '/docs/get-started',

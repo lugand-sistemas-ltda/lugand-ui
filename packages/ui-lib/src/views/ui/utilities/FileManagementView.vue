@@ -6,9 +6,9 @@ import {
     Card,
     Button,
     ComponentShowcase,
-    CodeBlock,
-    type FileItem
+    CodeBlock
 } from '@/shared/components'
+import type { FileItem } from '@/shared/components/display/FileList.vue'
 import { useToast } from '@/modules/toast'
 
 const toast = useToast()
@@ -52,6 +52,8 @@ function handleSingleFileUpload(files: File[]) {
 
     setTimeout(() => {
         const file = files[0]
+        if (!file) return // Guard: file pode ser undefined
+
         const fileItem: FileItem = {
             id: fileIdCounter++,
             name: file.name,

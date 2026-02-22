@@ -3,12 +3,14 @@
  * Layout padrão - estrutura base para todas as views
  * Integra Navbar, Header, Footer e área de conteúdo principal
  */
-import { ref, watch } from 'vue'
+import { ref, watch, computed } from 'vue'
+import { useRoute } from 'vue-router'
 import { Navbar, NavItem, NavLink } from './components'
 import AppHeader from '@/modules/AppShell/components/AppHeader.vue'
 import AppFooter from '@/modules/AppShell/components/AppFooter.vue'
 import ThemeSelector from '@/modules/AppShell/components/ThemeSelector.vue'
 
+const route = useRoute()
 const navbarRef = ref<InstanceType<typeof Navbar>>()
 const navbarVisible = ref(true)
 
@@ -22,6 +24,9 @@ watch(
   },
   { immediate: true }
 )
+
+// Detecta se a rota atual precisa de layout fullscreen
+const isFullscreen = computed(() => route.meta?.fullscreen === true)
 </script>
 
 <template>
@@ -112,6 +117,12 @@ watch(
           </NavItem>
         </NavItem>
 
+        <NavItem label="Low-Code Platform" icon="🏗️" :default-expanded="false">
+          <NavLink to="/low-code/page-builder">Page Builder</NavLink>
+          <NavLink to="/low-code/form-builder">Form Builder</NavLink>
+          <NavLink to="/low-code/code-generator">Code Generator</NavLink>
+        </NavItem>
+
         <NavItem label="Docs" icon="📚" :default-expanded="false">
           <NavLink to="/docs/get-started">Get Started</NavLink>
           <NavLink to="/docs/layout">Layout System</NavLink>
@@ -158,7 +169,7 @@ watch(
       </AppHeader>
 
       <!-- Conteúdo principal -->
-      <main class="default-layout__main">
+      <main :class="['default-layout__main', { 'default-layout__fullscreen-content': isFullscreen }]">
         <router-view />
       </main>
 
@@ -221,6 +232,21 @@ watch(
     @media (max-width: 767px) {
       padding: var(--spacing-md);
     }
+  }
+
+  // ============================================
+  // FULLSCREEN CONTENT VARIANT
+  // ============================================
+  // Use esta classe quando quiser que o conteúdo ocupe
+  // 100% da área disponível sem padding/max-width
+  // Ideal para: builders, editores, dashboards complexos
+  &__fullscreen-content {
+    flex: 1;
+    padding: 0;
+    max-width: none;
+    width: 100%;
+    margin: 0;
+    overflow: hidden;
   }
 }
 </style>

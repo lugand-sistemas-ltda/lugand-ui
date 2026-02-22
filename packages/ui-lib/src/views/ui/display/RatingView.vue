@@ -14,7 +14,6 @@ import {
 // Estados interativos
 const userRating = ref(0)
 const product1Rating = ref(4.5)
-const product2Rating = ref(3)
 const heartRating = ref(0)
 const thumbsRating = ref(0)
 </script>

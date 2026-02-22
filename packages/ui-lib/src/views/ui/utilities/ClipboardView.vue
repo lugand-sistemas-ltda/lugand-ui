@@ -4,7 +4,6 @@ import {
     CopyButton,
     CopyInput,
     Card,
-    Button,
     Badge,
     ComponentShowcase,
     CodeBlock
@@ -38,11 +37,6 @@ const jsonData = ref(JSON.stringify({
 function handleCopied(text: string) {
     toast.success('✅ Copiado para área de transferência!')
     console.log('Copied:', text.substring(0, 50) + '...')
-}
-
-function handleError(error: Error) {
-    toast.error('❌ Erro ao copiar: ' + error.message)
-    console.error('Copy error:', error)
 }
 
 // Exemplo de uso em contexto

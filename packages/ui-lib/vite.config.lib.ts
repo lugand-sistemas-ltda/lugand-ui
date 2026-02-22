@@ -12,7 +12,18 @@ import { resolve } from 'node:path'
  */
 export default defineConfig({
     plugins: [
-        vue(),
+        vue({
+            script: {
+                defineModel: true,
+                propsDestructure: true,
+                // Explicitamente habilita suporte a TypeScript
+                fs: {
+                    // Permite o compiler acessar node_modules
+                    fileExists: undefined,
+                    readFile: undefined,
+                },
+            },
+        }),
         dts({
             // Gerar tipos TypeScript
             insertTypesEntry: true,
@@ -23,6 +34,8 @@ export default defineConfig({
                 'src/core/**/*.ts',
                 'src/modules/**/*.vue',
                 'src/modules/**/*.ts',
+                'src/features/**/*.vue',
+                'src/features/**/*.ts',
             ],
             exclude: [
                 'src/views/**/*',
