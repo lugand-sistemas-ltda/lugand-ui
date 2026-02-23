@@ -61,13 +61,9 @@
           @update:selected-widget-id="selectWidget" @widget-add="handleWidgetAdd" @widget-remove="handleWidgetRemove"
           @widget-move="handleWidgetMove" />
 
-        <!-- Preview Mode (TODO: Implementar PageRenderer) -->
+        <!-- Preview Mode -->
         <div v-else-if="mode === 'preview'" class="preview-mode">
-          <div class="preview-placeholder">
-            <h3>Preview Mode</h3>
-            <p>Preview mode will be available when PageRenderer is implemented.</p>
-            <p>For now, use Code mode to see the generated schema.</p>
-          </div>
+          <PageRenderer :schema="schema" :interactive="true" />
         </div>
 
         <!-- Code Mode -->
@@ -93,8 +89,7 @@ import WidgetPalette from './WidgetPalette.vue'
 import PageCanvas from './PageCanvas.vue'
 import WidgetPropertiesPanel from './WidgetPropertiesPanel.vue'
 import CodeEditor from './CodeEditor.vue'
-// TODO: PageRenderer será criado quando houver necessidade
-// import PageRenderer from '../../../core/widget-system/components/PageRenderer.vue'
+import PageRenderer from '../../../core/widget-system/components/PageRenderer.vue'
 
 // ============================================
 // PROPS & EMITS
@@ -365,28 +360,39 @@ watch(() => props.modelValue, (newSchema) => {
 .preview-mode {
   height: 100%;
   overflow: auto;
-  background: white;
+  background: var(--color-bg-primary);
+  padding: var(--spacing-lg);
 }
 
-.preview-placeholder {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  height: 100%;
-  padding: var(--space-xl);
-  text-align: center;
-  color: var(--text-2);
+/* Page Renderer Styles */
+.preview-mode :deep(.page-renderer) {
+  min-height: 100%;
+
+  &.layout-grid {
+    display: grid;
+  }
+
+  &.layout-flex {
+    display: flex;
+  }
 }
 
-.preview-placeholder h3 {
-  font-size: var(--text-xl);
-  color: var(--text-1);
-  margin-bottom: var(--space-md);
+/* Widget styling in preview */
+.preview-mode :deep([data-widget-type="container"]),
+.preview-mode :deep([data-widget-type="card"]) {
+  border: 1px solid var(--color-border-base);
+  border-radius: var(--radius-md);
+  padding: var(--spacing-md);
+  background: var(--color-bg-elevated);
 }
 
-.preview-placeholder p {
-  font-size: var(--text-md);
-  margin: var(--space-xs) 0;
+.preview-mode :deep([data-widget-type="heading"]) {
+  font-weight: var(--font-weight-bold);
+  margin: var(--spacing-sm) 0;
+}
+
+.preview-mode :deep([data-widget-type="text"]) {
+  color: var(--color-text-primary);
+  line-height: 1.6;
 }
 </style>

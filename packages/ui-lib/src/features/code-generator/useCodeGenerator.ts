@@ -6,7 +6,8 @@
  */
 
 import { ref, computed } from 'vue'
-import type { PageSchema } from '@/core/schema-system/types'
+import type { PageSchema, FormSchema } from '@/core/schema-system/types'
+import type { FormSchema as FormRendererSchema } from '@/features/form-renderer/types'
 import type {
   CodeGeneratorOptions,
   GeneratedCode,
@@ -20,6 +21,7 @@ import type {
   ComponentUsage
 } from './types'
 import { generateVueSFC } from './templates/vue-sfc-generator'
+import { generateFormSFC } from './templates/form-sfc-generator'
 import {
   generateImports,
   optimizeImports,
@@ -96,27 +98,29 @@ export function useCodeGenerator(initialOptions?: Partial<CodeGeneratorOptions>)
       warnings.push('Schema has no widgets - will generate empty page')
     }
 
-    // Validação de widgets
-    schema.widgets.forEach((widget, index) => {
-      if (!widget.id) {
-        errors.push(`Widget at index ${index} has no ID`)
-      }
+    // Validação de widgets (apenas se existir)
+    if (schema.widgets && Array.isArray(schema.widgets)) {
+      schema.widgets.forEach((widget, index) => {
+        if (!widget.id) {
+          errors.push(`Widget at index ${index} has no ID`)
+        }
 
-      if (!widget.type) {
-        errors.push(`Widget ${widget.id || index} has no type`)
-      }
+        if (!widget.type) {
+          errors.push(`Widget ${widget.id || index} has no type`)
+        }
 
-      // Verifica se widget type é conhecido
-      const knownTypes = [
-        'container', 'grid', 'card', 'text', 'image', 'button',
-        'data-table', 'form-renderer', 'form-builder',
-        'tabs', 'breadcrumb', 'alert', 'badge'
-      ]
+        // Verifica se widget type é conhecido
+        const knownTypes = [
+          'container', 'grid', 'card', 'text', 'image', 'button',
+          'data-table', 'form-renderer', 'form-builder',
+          'tabs', 'breadcrumb', 'alert', 'badge'
+        ]
 
-      if (widget.type && !knownTypes.includes(widget.type)) {
-        warnings.push(`Widget ${widget.id} has unknown type: ${widget.type}`)
-      }
-    })
+        if (widget.type && !knownTypes.includes(widget.type)) {
+          warnings.push(`Widget ${widget.id} has unknown type: ${widget.type}`)
+        }
+      })
+    }
 
     // Warnings sobre features complexas
     if (schema.dataSources) {
@@ -183,27 +187,37 @@ export function useCodeGenerator(initialOptions?: Partial<CodeGeneratorOptions>)
   // ============================================
 
   /**
-   * Gera código a partir de PageSchema
+   * Gera código a partir de PageSchema ou FormSchema
    */
-  async function generate(schema: PageSchema): Promise<GeneratedCode> {
+  async function generate(schema: PageSchema | FormSchema | FormRendererSchema): Promise<GeneratedCode> {
     isGenerating.value = true
     lastError.value = null
 
     try {
       // Validação
-      const validation = validateSchema(schema)
+      const validation = validateSchema(schema as PageSchema)
       if (!validation.isValid) {
         throw new Error(`Schema validation failed: ${validation.errors.join(', ')}`)
       }
 
+      // Detectar tipo de schema
+      const isFormSchema = (schema as any).type === 'form' || 'formConfig' in schema || 'fields' in schema
+
       // Gera código baseado no formato
       let content = ''
-      let fileName = getFileName(schema)
+      let fileName = getFileName(schema as PageSchema)
 
       if (options.value.format === 'vue-sfc') {
-        content = generateVueSFC(schema, options.value)
+        // Escolher gerador apropriado
+        if (isFormSchema) {
+          const formResult = generateFormSFC(schema as FormRendererSchema)
+          content = formResult.content
+          fileName = formResult.fileName
+        } else {
+          content = generateVueSFC(schema as PageSchema, options.value)
+        }
       } else if (options.value.format === 'typescript') {
-        content = generateTypeScriptExport(schema)
+        content = generateTypeScriptExport(schema as PageSchema)
       } else if (options.value.format === 'json') {
         content = JSON.stringify(schema, null, 2)
         fileName = fileName.replace(/\.(vue|ts|js)$/, '.json')
@@ -276,8 +290,12 @@ export function useCodeGenerator(initialOptions?: Partial<CodeGeneratorOptions>)
   /**
    * Extrai imports do schema
    */
-  function extractImports(schema: PageSchema): ImportDeclaration[] {
-    const imports = generateImports(schema, options.value)
+  function extractImports(schema: PageSchema | FormSchema | FormRendererSchema): ImportDeclaration[] {
+    // FormRendererSchema não tem widgets, retorna imports básicos
+    if ('fields' in schema) {
+      return []
+    }
+    const imports = generateImports(schema as PageSchema, options.value)
     const optimized = optimizeImports(imports)
     return sortImports(optimized)
   }
@@ -285,10 +303,35 @@ export function useCodeGenerator(initialOptions?: Partial<CodeGeneratorOptions>)
   /**
    * Extrai componentes usados
    */
-  function extractComponents(schema: PageSchema): ComponentUsage[] {
+  function extractComponents(schema: PageSchema | FormSchema | FormRendererSchema): ComponentUsage[] {
+    // FormRendererSchema não tem widgets, retorna componentes de form
+    if ('fields' in schema) {
+      const componentMap = new Map<string, ComponentUsage>()
+      schema.fields.forEach(field => {
+        const componentName = 'Input' // Simplificado por enquanto
+        if (componentMap.has(componentName)) {
+          const usage = componentMap.get(componentName)!
+          usage.count++
+        } else {
+          componentMap.set(componentName, {
+            name: componentName,
+            widgetType: field.type,
+            count: 1,
+            props: ['type', 'name', 'label'],
+            events: [],
+            slots: [],
+            hasVModel: false,
+            hasRefs: false
+          })
+        }
+      })
+      return Array.from(componentMap.values())
+    }
+
     const componentMap = new Map<string, ComponentUsage>()
 
-    schema.widgets.forEach(widget => {
+    const pageSchema = schema as PageSchema
+    pageSchema.widgets.forEach(widget => {
       const componentName = widgetTypeToComponentName(widget.type)
 
       if (componentMap.has(componentName)) {

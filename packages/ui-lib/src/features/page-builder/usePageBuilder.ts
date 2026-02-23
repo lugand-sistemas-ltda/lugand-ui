@@ -105,7 +105,12 @@ export function usePageBuilder(
     } else {
       // Adicionar como filho
       const parent = findWidgetById(schema.value, parentId)
-      if (parent && parent.children) {
+      if (parent) {
+        // Inicializar children se não existir
+        if (!parent.children) {
+          parent.children = []
+        }
+
         if (index !== undefined) {
           parent.children.splice(index, 0, newWidget)
         } else {
