@@ -129,40 +129,40 @@ function removeOption(index: number) {
   display: flex;
   flex-direction: column;
   height: 100%;
-  background: var(--surface-color, #fff);
+  background: var(--color-bg-elevated);
 }
 
 .panel-header {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  padding: 1rem;
-  border-bottom: 1px solid var(--border-color, #e0e0e0);
+  padding: var(--spacing-lg);
+  border-bottom: 1px solid var(--color-border-base);
 }
 
 .panel-title {
   margin: 0;
-  font-size: 1rem;
-  font-weight: 600;
-  color: var(--text-color, #1a1a1a);
+  font-size: var(--font-size-md);
+  font-weight: var(--font-weight-semibold);
+  color: var(--color-text-primary);
 }
 
 .panel-content {
   flex: 1;
   overflow-y: auto;
-  padding: 1rem;
+  padding: var(--spacing-lg);
 }
 
 .prop-group {
-  margin-bottom: 1rem;
+  margin-bottom: var(--spacing-lg);
 }
 
 .prop-label {
   display: block;
-  margin-bottom: 0.375rem;
-  font-size: 0.875rem;
-  font-weight: 500;
-  color: var(--text-color, #1a1a1a);
+  margin-bottom: var(--spacing-xs);
+  font-size: var(--font-size-sm);
+  font-weight: var(--font-weight-medium);
+  color: var(--color-text-primary);
 }
 
 .checkbox-label {

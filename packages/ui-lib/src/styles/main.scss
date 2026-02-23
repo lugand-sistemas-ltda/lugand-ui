@@ -10,10 +10,13 @@
 @use './tokens/colors.scss';
 // Component Tokens (Tier 3 - Granularidade)
 @use './tokens/components.scss';
+// Layout Tokens (sidebar, canvas, panel, widget, etc)
+@use './tokens/layout.scss';
 
 // 3. Utilitários (variáveis, mixins, funções)
 @use './utils/variables.scss';
 @use './utils/mixins.scss';
+@use './utils/grid.scss';
 
 // 4. Temas (todos os temas disponíveis)
 @use './themes/default.scss';

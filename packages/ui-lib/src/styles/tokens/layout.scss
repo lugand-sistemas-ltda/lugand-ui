@@ -1,0 +1,125 @@
+/**
+ * Layout Tokens
+ * Tokens genéricos para layouts, painéis, sidebars, canvas, etc.
+ * Reutilizáveis em qualquer contexto (low-code, dashboards, showcases, etc.)
+ */
+
+:root {
+    // ============================================
+    // SIDEBAR TOKENS
+    // ============================================
+    --sidebar-width-sm: 240px;
+    --sidebar-width-md: 280px;
+    --sidebar-width-lg: 320px;
+    --sidebar-width-xl: 360px;
+    --sidebar-collapsed: 56px;
+    --sidebar-transition: var(--transition-base);
+
+    // ============================================
+    // CANVAS/WORKSPACE TOKENS
+    // ============================================
+    --canvas-bg: var(--color-bg-primary);
+    --canvas-padding: var(--spacing-lg);
+    --canvas-grid-size: 8px;
+    --canvas-grid-color: rgba(0, 0, 0, 0.05);
+    --canvas-border: 1px dashed var(--color-border-base);
+
+    // ============================================
+    // PANEL TOKENS
+    // ============================================
+    --panel-bg: var(--color-bg-elevated);
+    --panel-border: 1px solid var(--color-border-base);
+    --panel-border-radius: var(--radius-md);
+    --panel-shadow: var(--shadow-sm);
+    --panel-header-height: 56px;
+    --panel-footer-height: 48px;
+    --panel-padding: var(--spacing-lg);
+
+    // ============================================
+    // WIDGET/CARD TOKENS
+    // ============================================
+    --widget-border: 1px solid var(--color-border-base);
+    --widget-border-radius: var(--radius-md);
+    --widget-padding: var(--spacing-md);
+    --widget-gap: var(--spacing-md);
+    --widget-shadow: var(--shadow-sm);
+    --widget-hover-shadow: var(--shadow-md);
+    --widget-selected-border: 2px solid var(--color-primary);
+    --widget-hover-border: 1px solid var(--color-primary-light);
+
+    // ============================================
+    // TOOLBAR TOKENS
+    // ============================================
+    --toolbar-height: 48px;
+    --toolbar-bg: var(--color-bg-elevated);
+    --toolbar-border: 1px solid var(--color-border-base);
+    --toolbar-gap: var(--spacing-sm);
+    --toolbar-padding: var(--spacing-sm) var(--spacing-md);
+
+    // ============================================
+    // CODE EDITOR TOKENS
+    // ============================================
+    --editor-bg: #1e1e1e;
+    --editor-fg: #d4d4d4;
+    --editor-line-height: 1.6;
+    --editor-font-size: var(--font-size-sm);
+    --editor-font-family: 'Fira Code', 'Consolas', 'Monaco', monospace;
+    --editor-padding: var(--spacing-md);
+    --editor-border: var(--panel-border);
+    --editor-border-radius: var(--radius-md);
+
+    // ============================================
+    // GRID TOKENS
+    // ============================================
+    --grid-gap: var(--spacing-md);
+    --grid-gap-sm: var(--spacing-sm);
+    --grid-gap-lg: var(--spacing-lg);
+    --grid-columns: 1fr;
+    --grid-rows: auto;
+    --grid-min-width: 250px;
+
+    // ============================================
+    // STATUSBAR TOKENS
+    // ============================================
+    --statusbar-height: 32px;
+    --statusbar-bg: var(--color-bg-secondary);
+    --statusbar-border: 1px solid var(--color-border-base);
+    --statusbar-font-size: var(--font-size-xs);
+    --statusbar-padding: var(--spacing-xs) var(--spacing-md);
+
+    // ============================================
+    // SCROLLBAR TOKENS
+    // Theme-aware scrollbar design tokens
+    // ============================================
+    --scrollbar-width: 12px;
+    --scrollbar-height: 12px;
+    --scrollbar-track-bg: var(--color-bg-secondary);
+    --scrollbar-thumb-bg: var(--color-border-dark);
+    --scrollbar-thumb-hover-bg: var(--color-border-focus);
+    --scrollbar-thumb-active-bg: var(--color-primary);
+    --scrollbar-border-radius: 6px;
+}
+
+// ============================================
+// DARK MODE OVERRIDES
+// ============================================
+:root[data-theme="dark"],
+:root[data-theme="dracula"],
+:root[data-theme="cyberpunk"],
+:root[data-theme="pretona"] {
+    --canvas-grid-color: rgba(255, 255, 255, 0.05);
+    --editor-bg: #0d0d0d;
+    --panel-bg: var(--color-bg-elevated);
+}
+
+// ============================================
+// RESPONSIVE OVERRIDES
+// ============================================
+@media (max-width: 768px) {
+    :root {
+        --sidebar-width-md: 100%;
+        --sidebar-width-lg: 100%;
+        --panel-padding: var(--spacing-md);
+        --toolbar-padding: var(--spacing-xs) var(--spacing-sm);
+    }
+}

@@ -365,47 +365,30 @@ onMounted(() => {
 </script>
 
 <style lang="scss" scoped>
-// ============================================
-// FULLSCREEN LAYOUT (respects navbar/header/footer)
-// ============================================
-
-.fullscreen-view {
-  // Remove padding/margin padrão das views
-  margin: 0;
-  padding: 0;
-  
-  // Ocupa toda a altura disponível
-  min-height: 100vh;
-  height: 100vh;
-  
-  // Evita overflow horizontal
-  overflow-x: hidden;
-}
+@use '@/styles/utils/mixins' as *;
 
 // ============================================
-// PAGE BUILDER VIEW
+// PAGE BUILDER VIEW (usa tokens e mixins da lib)
 // ============================================
 
 .page-builder-view {
-  display: flex;
-  flex-direction: column;
-  height: 100vh;
-  background: var(--color-bg-primary);
+  @include fullscreen-view-base;
+  background: var(--canvas-bg);
 }
 
 // ============================================
-// VIEW HEADER
+// VIEW HEADER (usa toolbar tokens e mixins)
 // ============================================
 
 .view-header {
-  background: var(--color-bg-secondary);
-  border-bottom: 1px solid var(--color-border-base);
-  padding: var(--spacing-lg) var(--spacing-xl);
+  @include panel-header;
+  background: var(--toolbar-bg);
+  border-bottom: var(--toolbar-border);
+  padding: var(--toolbar-padding);
+  min-height: var(--toolbar-height);
 
   &__content {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
+    @include flex-between;
     gap: var(--spacing-lg);
 
     @media (max-width: 1024px) {
@@ -453,7 +436,7 @@ onMounted(() => {
 .view-content {
   flex: 1;
   overflow: hidden;
-  padding: var(--spacing-md);
+  padding: var(--canvas-padding);
 }
 
 // ============================================

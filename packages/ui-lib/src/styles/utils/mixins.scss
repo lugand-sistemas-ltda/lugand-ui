@@ -47,25 +47,36 @@
     white-space: nowrap;
 }
 
-// Scrollbar customization
-@mixin custom-scrollbar($width: 8px, $track-color: transparent, $thumb-color: rgba(0, 0, 0, 0.2)) {
+// Scrollbar customization - Theme-aware
+@mixin custom-scrollbar {
+    // Webkit browsers (Chrome, Safari, Edge)
     &::-webkit-scrollbar {
-        width: $width;
-        height: $width;
+        width: var(--scrollbar-width);
+        height: var(--scrollbar-height);
     }
 
     &::-webkit-scrollbar-track {
-        background: $track-color;
+        background: var(--scrollbar-track-bg);
+        border-radius: var(--scrollbar-border-radius);
     }
 
     &::-webkit-scrollbar-thumb {
-        background: $thumb-color;
-        border-radius: calc($width / 2);
+        background: var(--scrollbar-thumb-bg);
+        border-radius: var(--scrollbar-border-radius);
+        border: 2px solid var(--scrollbar-track-bg);
 
         &:hover {
-            background: rgba(0, 0, 0, 0.3);
+            background: var(--scrollbar-thumb-hover-bg);
+        }
+
+        &:active {
+            background: var(--scrollbar-thumb-active-bg);
         }
     }
+
+    // Firefox
+    scrollbar-width: thin;
+    scrollbar-color: var(--scrollbar-thumb-bg) var(--scrollbar-track-bg);
 }
 
 // Focus visible (acessibilidade)
@@ -97,4 +108,157 @@
     @else {
         box-shadow: none;
     }
+}
+
+// ============================================
+// LAYOUT PATTERNS (Genéricos e reutilizáveis)
+// ============================================
+
+// Grid dinâmico configurável via CSS variables
+@mixin dynamic-grid-layout {
+    display: grid;
+    grid-template-columns: var(--grid-columns, 1fr);
+    grid-template-rows: var(--grid-rows, auto);
+    gap: var(--grid-gap, var(--spacing-md));
+    height: var(--grid-height, 100%);
+    overflow: hidden;
+}
+
+// Grid com áreas nomeadas (para layouts complexos)
+@mixin named-grid-layout($areas, $columns, $rows: auto) {
+    display: grid;
+    grid-template-areas: $areas;
+    grid-template-columns: $columns;
+    grid-template-rows: $rows;
+    gap: var(--grid-gap, var(--spacing-md));
+    height: 100%;
+}
+
+// Grid responsivo (mobile-first)
+@mixin responsive-grid($mobile: 1, $tablet: 2, $desktop: 3, $wide: 4) {
+    display: grid;
+    grid-template-columns: repeat($mobile, 1fr);
+    gap: var(--grid-gap, var(--spacing-md));
+
+    @media (min-width: 768px) {
+        grid-template-columns: repeat($tablet, 1fr);
+    }
+
+    @media (min-width: 1024px) {
+        grid-template-columns: repeat($desktop, 1fr);
+    }
+
+    @media (min-width: 1440px) {
+        grid-template-columns: repeat($wide, 1fr);
+    }
+}
+
+// Split View (2 painéis lado a lado)
+@mixin split-view-layout {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: var(--grid-gap, var(--spacing-lg));
+    height: 100%;
+    overflow: hidden;
+
+    @media (max-width: 768px) {
+        grid-template-columns: 1fr;
+        grid-auto-rows: minmax(300px, auto);
+    }
+}
+
+// Sidebar View (barra lateral + conteúdo)
+@mixin sidebar-view-layout($sidebar-width: var(--sidebar-width-md)) {
+    display: grid;
+    grid-template-columns: $sidebar-width 1fr;
+    gap: var(--grid-gap, var(--spacing-md));
+    height: 100%;
+    overflow: hidden;
+
+    @media (max-width: 768px) {
+        grid-template-columns: 1fr;
+    }
+}
+
+// Triple Layout (sidebar esquerda + main + sidebar direita)
+@mixin triple-view-layout($left-width: var(--sidebar-width-md), $right-width: var(--sidebar-width-lg)) {
+    display: grid;
+    grid-template-columns: $left-width 1fr $right-width;
+    gap: var(--grid-gap, var(--spacing-md));
+    height: 100%;
+    overflow: hidden;
+
+    @media (max-width: 1024px) {
+        grid-template-columns: $left-width 1fr;
+
+        >*:last-child {
+            display: none;
+        }
+    }
+
+    @media (max-width: 768px) {
+        grid-template-columns: 1fr;
+
+        >*:first-child,
+        >*:last-child {
+            display: none;
+        }
+    }
+}
+
+// ============================================
+// PANEL/CARD PATTERNS
+// ============================================
+
+// Panel base (container genérico)
+@mixin panel-base {
+    background: var(--panel-bg);
+    border: var(--panel-border);
+    border-radius: var(--panel-border-radius);
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+}
+
+// Panel header
+@mixin panel-header {
+    padding: var(--spacing-md) var(--spacing-lg);
+    border-bottom: 1px solid var(--color-border-base);
+    background: var(--color-bg-elevated);
+    flex-shrink: 0;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    min-height: var(--panel-header-height);
+}
+
+// Panel content (área principal scrollável)
+@mixin panel-content {
+    flex: 1;
+    overflow: auto;
+    padding: var(--panel-padding);
+    @include custom-scrollbar(8px, transparent, var(--color-border-base));
+}
+
+// Panel footer
+@mixin panel-footer {
+    padding: var(--spacing-md) var(--spacing-lg);
+    border-top: 1px solid var(--color-border-base);
+    background: var(--color-bg-elevated);
+    flex-shrink: 0;
+    min-height: var(--panel-footer-height);
+}
+
+// ============================================
+// FULLSCREEN VIEW
+// ============================================
+
+@mixin fullscreen-view-base {
+    margin: 0;
+    padding: 0;
+    min-height: 100vh;
+    height: 100vh;
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
 }

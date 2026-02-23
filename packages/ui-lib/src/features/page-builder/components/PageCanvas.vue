@@ -161,7 +161,9 @@ function handleWidgetDrop(targetParentId: string | null, targetIndex: number) {
 }
 </script>
 
-<style scoped>
+<style scoped lang="scss">
+@use '@/styles/utils/mixins';
+
 .page-canvas {
   display: flex;
   flex-direction: column;
@@ -266,21 +268,8 @@ function handleWidgetDrop(targetParentId: string | null, targetIndex: number) {
   line-height: 1.6;
 }
 
-/* Scrollbar */
-.canvas-area::-webkit-scrollbar {
-  width: 8px;
-}
-
-.canvas-area::-webkit-scrollbar-track {
-  background: transparent;
-}
-
-.canvas-area::-webkit-scrollbar-thumb {
-  background: var(--color-border);
-  border-radius: 4px;
-}
-
-.canvas-area::-webkit-scrollbar-thumb:hover {
-  background: var(--color-text-secondary);
+/* Scrollbar theme-aware */
+.canvas-area {
+  @include mixins.custom-scrollbar;
 }
 </style>

@@ -396,32 +396,15 @@ function formatBytes(bytes: number): string {
 </script>
 
 <style lang="scss" scoped>
-// ============================================
-// FULLSCREEN LAYOUT (respects navbar/header/footer)
-// ============================================
-
-.fullscreen-view {
-  // Remove padding/margin padrão das views
-  margin: 0;
-  padding: 0;
-  
-  // Ocupa toda a altura disponível
-  min-height: 100vh;
-  height: 100vh;
-  
-  // Evita overflow horizontal
-  overflow-x: hidden;
-}
+@use '@/styles/utils/mixins' as *;
 
 // ============================================
-// CODE GENERATOR VIEW
+// CODE GENERATOR VIEW (usa tokens e mixins da lib)
 // ============================================
 
 .code-generator-view {
-  display: flex;
-  flex-direction: column;
-  height: 100vh;
-  background: var(--color-bg-primary);
+  @include fullscreen-view-base;
+  background: var(--canvas-bg);
 }
 
 // ============================================
@@ -429,15 +412,14 @@ function formatBytes(bytes: number): string {
 // ============================================
 
 .view-header {
-  background: var(--color-bg-secondary);
-  border-bottom: 1px solid var(--color-border-base);
-  padding: var(--spacing-lg) var(--spacing-xl);
-  flex-shrink: 0;
+  @include panel-header;
+  background: var(--toolbar-bg);
+  border-bottom: var(--toolbar-border);
+  padding: var(--toolbar-padding);
+  min-height: var(--toolbar-height);
 
   &__content {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
+    @include flex-between;
     gap: var(--spacing-lg);
 
     @media (max-width: 1024px) {
@@ -479,25 +461,18 @@ function formatBytes(bytes: number): string {
 }
 
 // ============================================
-// VIEW CONTENT (Split View)
+// VIEW CONTENT (usa split-view-layout mixin)
 // ============================================
 
 .view-content {
+  @include split-view-layout;
   flex: 1;
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: var(--spacing-md);
   padding: var(--spacing-md);
-  overflow: hidden;
-
-  @media (max-width: 1280px) {
-    grid-template-columns: 1fr;
-    grid-template-rows: 1fr 1fr;
-  }
 }
 
 // ============================================
-// PANELS
+// PANELS (usa panel mixins da lib)
+// ============================================
 // ============================================
 
 .panel {

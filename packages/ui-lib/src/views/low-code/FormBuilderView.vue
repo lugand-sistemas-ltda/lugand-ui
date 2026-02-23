@@ -299,47 +299,30 @@ onMounted(() => {
 </script>
 
 <style lang="scss" scoped>
-// ============================================
-// FULLSCREEN LAYOUT (respects navbar/header/footer)
-// ============================================
-
-.fullscreen-view {
-  // Remove padding/margin padrão das views
-  margin: 0;
-  padding: 0;
-  
-  // Ocupa toda a altura disponível
-  min-height: 100vh;
-  height: 100vh;
-  
-  // Evita overflow horizontal
-  overflow-x: hidden;
-}
+@use '@/styles/utils/mixins' as *;
 
 // ============================================
-// FORM BUILDER VIEW
+// FORM BUILDER VIEW (usa tokens e mixins da lib)
 // ============================================
 
 .form-builder-view {
-  display: flex;
-  flex-direction: column;
-  height: 100vh;
-  background: var(--color-bg-primary);
+  @include fullscreen-view-base;
+  background: var(--canvas-bg);
 }
 
 // ============================================
-// VIEW HEADER
+// VIEW HEADER (usa toolbar tokens e mixins)
 // ============================================
 
 .view-header {
-  background: var(--color-bg-secondary);
-  border-bottom: 1px solid var(--color-border-base);
-  padding: var(--spacing-lg) var(--spacing-xl);
+  @include panel-header;
+  background: var(--toolbar-bg);
+  border-bottom: var(--toolbar-border);
+  padding: var(--toolbar-padding);
+  min-height: var(--toolbar-height);
 
   &__content {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
+    @include flex-between;
     gap: var(--spacing-lg);
 
     @media (max-width: 1024px) {
@@ -387,7 +370,7 @@ onMounted(() => {
 .view-content {
   flex: 1;
   overflow: hidden;
-  padding: var(--spacing-md);
+  padding: var(--canvas-padding);
 }
 
 // ============================================
@@ -445,7 +428,7 @@ onMounted(() => {
 }
 
 // ============================================
-// SCHEMA PREVIEW MODAL
+// SCHEMA PREVIEW MODAL (usa tokens de editor)
 // ============================================
 
 .schema-preview {
@@ -465,16 +448,16 @@ onMounted(() => {
   &__content {
     flex: 1;
     overflow: auto;
-    background: #1e1e1e;
-    border-radius: var(--radius-md);
-    padding: var(--spacing-md);
+    background: var(--editor-bg);
+    border-radius: var(--editor-border-radius);
+    padding: var(--editor-padding);
 
     pre {
       margin: 0;
-      font-family: 'Consolas', 'Monaco', 'Courier New', monospace;
-      font-size: var(--font-size-sm);
-      line-height: 1.5;
-      color: #d4d4d4;
+      font-family: var(--editor-font-family);
+      font-size: var(--editor-font-size);
+      line-height: var(--editor-line-height);
+      color: var(--editor-fg);
       white-space: pre-wrap;
       word-wrap: break-word;
     }

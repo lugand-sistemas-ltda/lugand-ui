@@ -118,14 +118,16 @@ function downloadFile() {
 }
 </script>
 
-<style scoped>
+<style scoped lang="scss">
+@use '@/styles/utils/mixins';
+
 .code-editor {
   display: flex;
   flex-direction: column;
   height: 100%;
-  background: var(--surface-color, #1e1e1e);
-  color: #d4d4d4;
-  border-radius: 0.5rem;
+  background: var(--editor-bg);
+  color: var(--editor-fg);
+  border-radius: var(--radius-md);
   overflow: hidden;
 }
 
@@ -133,68 +135,55 @@ function downloadFile() {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  padding: 0.75rem 1rem;
-  background: #2d2d2d;
-  border-bottom: 1px solid #3e3e3e;
+  padding: var(--spacing-sm) var(--spacing-md);
+  background: var(--toolbar-bg);
+  border-bottom: var(--toolbar-border);
 }
 
 .toolbar-left,
 .toolbar-right {
   display: flex;
   align-items: center;
-  gap: 0.75rem;
+  gap: var(--spacing-sm);
 }
 
 .format-label {
-  font-size: 0.875rem;
-  color: #8c8c8c;
+  font-size: var(--font-size-sm);
+  color: var(--color-text-secondary);
 }
 
 .format-select {
-  padding: 0.25rem 0.5rem;
-  font-size: 0.875rem;
-  background: #1e1e1e;
-  color: #d4d4d4;
-  border: 1px solid #3e3e3e;
-  border-radius: 0.25rem;
+  padding: var(--spacing-xs) var(--spacing-sm);
+  font-size: var(--font-size-sm);
+  background: var(--color-bg-elevated);
+  color: var(--color-text-primary);
+  border: 1px solid var(--color-border-base);
+  border-radius: var(--radius-sm);
   cursor: pointer;
+  
+  &:focus {
+    outline: 2px solid var(--color-primary);
+    outline-offset: 2px;
+  }
 }
 
 .editor-content {
   flex: 1;
   overflow: auto;
-  padding: 1rem;
+  padding: var(--editor-padding);
+  @include mixins.custom-scrollbar;
 }
 
 .code-block {
   margin: 0;
-  font-family: 'Consolas', 'Monaco', 'Courier New', monospace;
-  font-size: 0.875rem;
-  line-height: 1.6;
+  font-family: var(--editor-font-family);
+  font-size: var(--editor-font-size);
+  line-height: var(--editor-line-height);
   white-space: pre;
   tab-size: 2;
 }
 
 .code-block code {
-  color: #d4d4d4;
-}
-
-/* Dark theme scrollbar */
-.editor-content::-webkit-scrollbar {
-  width: 12px;
-  height: 12px;
-}
-
-.editor-content::-webkit-scrollbar-track {
-  background: #1e1e1e;
-}
-
-.editor-content::-webkit-scrollbar-thumb {
-  background: #424242;
-  border-radius: 6px;
-}
-
-.editor-content::-webkit-scrollbar-thumb:hover {
-  background: #4e4e4e;
+  color: var(--editor-fg);
 }
 </style>

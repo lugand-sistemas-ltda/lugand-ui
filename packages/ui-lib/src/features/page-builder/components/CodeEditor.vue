@@ -38,9 +38,10 @@ interface Props {
 
 const props = defineProps<Props>()
 
-const emit = defineEmits<{
-  'update:schema': [schema: PageSchema]
-}>()
+// Emit declarado para uso futuro (ex: edição de código)
+// const emit = defineEmits<{
+//   'update:schema': [schema: PageSchema]
+// }>()
 
 // ============================================
 // STATE
@@ -120,12 +121,14 @@ function downloadFile() {
 }
 </script>
 
-<style scoped>
+<style scoped lang="scss">
+@use '@/styles/utils/mixins';
+
 .code-editor {
   display: flex;
   flex-direction: column;
   height: 100%;
-  background: var(--surface-2);
+  background: var(--panel-bg);
 }
 
 /* ============================================
@@ -136,24 +139,29 @@ function downloadFile() {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  padding: var(--space-sm) var(--space-md);
-  background: var(--surface-3);
-  border-bottom: 1px solid var(--border);
+  padding: var(--spacing-sm) var(--spacing-md);
+  background: var(--toolbar-bg);
+  border-bottom: var(--toolbar-border);
 }
 
 .format-selector {
-  padding: var(--space-xs) var(--space-sm);
-  border: 1px solid var(--border);
+  padding: var(--spacing-xs) var(--spacing-sm);
+  border: 1px solid var(--color-border-base);
   border-radius: var(--radius-sm);
-  background: var(--surface-1);
-  color: var(--text-1);
-  font-size: var(--text-sm);
+  background: var(--color-bg-elevated);
+  color: var(--color-text-primary);
+  font-size: var(--font-size-sm);
   cursor: pointer;
+  
+  &:focus {
+    outline: 2px solid var(--color-primary);
+    outline-offset: 2px;
+  }
 }
 
 .toolbar__actions {
   display: flex;
-  gap: var(--space-sm);
+  gap: var(--spacing-sm);
 }
 
 /* ============================================
@@ -163,38 +171,20 @@ function downloadFile() {
 .code-editor__content {
   flex: 1;
   margin: 0;
-  padding: var(--space-md);
-  background: #1e1e1e;
-  color: #d4d4d4;
-  font-family: 'Fira Code', 'Consolas', 'Monaco', monospace;
-  font-size: var(--text-sm);
-  line-height: 1.6;
+  padding: var(--editor-padding);
+  background: var(--editor-bg);
+  color: var(--editor-fg);
+  font-family: var(--editor-font-family);
+  font-size: var(--editor-font-size);
+  line-height: var(--editor-line-height);
   overflow: auto;
   white-space: pre;
   tab-size: 2;
+  @include mixins.custom-scrollbar;
 }
 
 .code-editor__content code {
   font-family: inherit;
   font-size: inherit;
-}
-
-/* Custom Scrollbar */
-.code-editor__content::-webkit-scrollbar {
-  width: 12px;
-  height: 12px;
-}
-
-.code-editor__content::-webkit-scrollbar-track {
-  background: #2d2d2d;
-}
-
-.code-editor__content::-webkit-scrollbar-thumb {
-  background: #4d4d4d;
-  border-radius: 6px;
-}
-
-.code-editor__content::-webkit-scrollbar-thumb:hover {
-  background: #5d5d5d;
 }
 </style>

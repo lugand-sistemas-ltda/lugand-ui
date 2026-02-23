@@ -89,6 +89,10 @@ export { default as AppHeader } from '../src/modules/AppShell/components/AppHead
 export { default as AppFooter } from '../src/modules/AppShell/components/AppFooter.vue'
 export { default as ThemeSelector } from '../src/modules/AppShell/components/ThemeSelector.vue'
 
+// Workspace Layout (Generic layout for builders, editors, maps, etc.)
+export { default as WorkspaceLayout } from '../src/shared/layouts/WorkspaceLayout.vue'
+export type { WorkspaceLayoutProps } from '../src/shared/layouts/WorkspaceLayout.vue'
+
 // ============================================
 // SHARED - Componentes Atômicos e Utilitários
 // ============================================

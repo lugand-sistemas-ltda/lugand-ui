@@ -108,7 +108,9 @@ function handleDragEnd() {
 }
 </script>
 
-<style scoped>
+<style scoped lang="scss">
+@use '@/styles/utils/mixins';
+
 .widget-palette {
   display: flex;
   flex-direction: column;
@@ -278,24 +280,11 @@ function handleDragEnd() {
 
 .empty-text {
   color: var(--color-text-secondary);
-  font-size: 0.875rem;
+  font-size: var(--font-size-sm);
 }
 
-/* Scrollbar */
-.widget-list::-webkit-scrollbar {
-  width: 6px;
-}
-
-.widget-list::-webkit-scrollbar-track {
-  background: transparent;
-}
-
-.widget-list::-webkit-scrollbar-thumb {
-  background: var(--color-border);
-  border-radius: 3px;
-}
-
-.widget-list::-webkit-scrollbar-thumb:hover {
-  background: var(--color-text-secondary);
+/* Scrollbar theme-aware */
+.widget-list {
+  @include mixins.custom-scrollbar;
 }
 </style>

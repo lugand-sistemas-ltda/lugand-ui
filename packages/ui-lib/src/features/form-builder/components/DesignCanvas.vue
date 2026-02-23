@@ -203,38 +203,38 @@ function getFieldIcon(type: string): string {
 .canvas-drop-zone {
   flex: 1;
   min-height: 300px;
-  border: 2px dashed var(--border-color, #e0e0e0);
-  border-radius: 0.5rem;
-  transition: all 0.2s;
+  border: 2px dashed var(--color-border-base);
+  border-radius: var(--radius-md);
+  transition: all var(--transition-fast);
 }
 
 .canvas-drop-zone.drag-over {
-  border-color: var(--primary-color, #2563eb);
-  background: rgba(37, 99, 235, 0.05);
+  border-color: var(--color-primary);
+  background: var(--color-primary-alpha);
 }
 
 .fields-list {
-  padding: 1rem;
+  padding: var(--spacing-lg);
 }
 
 .field-item {
-  margin-bottom: 0.75rem;
-  padding: 1rem;
-  background: var(--surface-color, #fff);
-  border: 2px solid var(--border-color, #e0e0e0);
-  border-radius: 0.5rem;
+  margin-bottom: var(--spacing-sm);
+  padding: var(--spacing-lg);
+  background: var(--color-bg-elevated);
+  border: 2px solid var(--color-border-base);
+  border-radius: var(--radius-md);
   cursor: pointer;
-  transition: all 0.2s;
+  transition: all var(--transition-fast);
 }
 
 .field-item:hover {
-  border-color: var(--primary-color, #2563eb);
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  border-color: var(--color-primary);
+  box-shadow: var(--shadow-md);
 }
 
 .field-item.selected {
-  border-color: var(--primary-color, #2563eb);
-  background: rgba(37, 99, 235, 0.05);
+  border-color: var(--color-primary);
+  background: var(--color-primary-alpha);
 }
 
 .field-header {
@@ -252,16 +252,16 @@ function getFieldIcon(type: string): string {
 }
 
 .field-name {
-  font-size: 0.75rem;
-  color: var(--text-secondary, #666);
-  font-family: monospace;
+  font-size: var(--font-size-xs);
+  color: var(--color-text-secondary);
+  font-family: var(--editor-font-family);
 }
 
 .field-label {
-  font-size: 0.875rem;
-  font-weight: 500;
-  color: var(--text-color, #1a1a1a);
-  margin-top: 0.125rem;
+  font-size: var(--font-size-sm);
+  font-weight: var(--font-weight-medium);
+  color: var(--color-text-primary);
+  margin-top: var(--spacing-2xs);
 }
 
 .canvas-empty {
@@ -269,25 +269,25 @@ function getFieldIcon(type: string): string {
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  padding: 4rem 2rem;
+  padding: var(--spacing-2xl) var(--spacing-xl);
   text-align: center;
 }
 
 .empty-icon {
-  font-size: 4rem;
-  margin-bottom: 1rem;
+  font-size: var(--font-size-3xl);
+  margin-bottom: var(--spacing-lg);
   opacity: 0.3;
 }
 
 .empty-title {
-  font-size: 1.125rem;
-  font-weight: 600;
-  color: var(--text-color, #1a1a1a);
-  margin-bottom: 0.5rem;
+  font-size: var(--font-size-lg);
+  font-weight: var(--font-weight-semibold);
+  color: var(--color-text-primary);
+  margin-bottom: var(--spacing-xs);
 }
 
 .empty-subtitle {
-  font-size: 0.875rem;
-  color: var(--text-secondary, #666);
+  font-size: var(--font-size-sm);
+  color: var(--color-text-secondary);
 }
 </style>

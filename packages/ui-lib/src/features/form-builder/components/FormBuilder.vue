@@ -249,9 +249,9 @@ function handleExport() {
 .form-builder {
   display: flex;
   flex-direction: column;
-  background: var(--primary-color, #fafafa);
-  border: 1px solid var(--border-color, #e0e0e0);
-  border-radius: 0.5rem;
+  background: var(--color-bg-primary);
+  border: 1px solid var(--color-border-base);
+  border-radius: var(--radius-md);
   overflow: hidden;
 }
 
@@ -259,27 +259,27 @@ function handleExport() {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  gap: 1rem;
-  padding: 0.75rem 1rem;
-  background: var(--surface-color, #fff);
-  border-bottom: 1px solid var(--border-color, #e0e0e0);
+  gap: var(--spacing-md);
+  padding: var(--spacing-sm) var(--spacing-md);
+  background: var(--color-bg-elevated);
+  border-bottom: 1px solid var(--color-border-base);
 }
 
 .toolbar-section {
   display: flex;
   align-items: center;
-  gap: 0.5rem;
+  gap: var(--spacing-sm);
 }
 
 .toolbar-section button.active {
-  background: var(--primary-color, #2563eb);
-  color: white;
+  background: var(--color-primary);
+  color: var(--color-primary-contrast);
 }
 
 .field-count {
-  font-size: 0.875rem;
-  color: var(--text-secondary, #666);
-  padding: 0 0.5rem;
+  font-size: var(--font-size-sm);
+  color: var(--color-text-secondary);
+  padding: 0 var(--spacing-sm);
 }
 
 .builder-content {
@@ -289,7 +289,7 @@ function handleExport() {
 }
 
 .builder-sidebar {
-  width: 280px;
+  width: var(--sidebar-width-md);
   flex-shrink: 0;
   overflow: hidden;
 }
@@ -297,14 +297,14 @@ function handleExport() {
 .builder-canvas {
   flex: 1;
   overflow: auto;
-  background: var(--surface-color, #fff);
+  background: var(--canvas-bg);
 }
 
 .canvas-design,
 .canvas-preview,
 .canvas-code {
   height: 100%;
-  padding: 2rem;
+  padding: var(--spacing-xl);
 }
 
 .canvas-preview {
@@ -313,9 +313,9 @@ function handleExport() {
 }
 
 .builder-properties {
-  width: 320px;
+  width: var(--sidebar-width-lg);
   flex-shrink: 0;
   overflow: hidden;
-  border-left: 1px solid var(--border-color, #e0e0e0);
+  border-left: 1px solid var(--color-border-base);
 }
 </style>
