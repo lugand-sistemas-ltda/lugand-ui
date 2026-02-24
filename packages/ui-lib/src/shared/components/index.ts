@@ -104,3 +104,14 @@ export { default as Skeleton } from './feedback/Skeleton.vue'
 export { default as EmptyState } from './feedback/EmptyState.vue'
 export { default as Alert } from './feedback/Alert.vue'
 export { default as AlertDialog } from './feedback/AlertDialog.vue'
+
+// ============================================
+// DOCUMENT - Componentes de documento/PDF
+// ============================================
+export { LgQRCode } from '../../components/qrcode'
+export type { LgQRCodeProps } from '../../components/qrcode'
+
+export { LgSignaturePad } from '../../components/signature'
+
+export { LgDocumentEditor } from '../../components/document'
+export type { DocumentVariable } from '../../components/document'

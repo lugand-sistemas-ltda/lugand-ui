@@ -228,7 +228,7 @@ export async function exemploBatchGeneration() {
   console.log('- Tempo:', result.duration, 'ms')
   console.log('- Tamanho total:', result.totalSize, 'bytes')
 
-  result.files.forEach(file => {
+  result.files.forEach((file: any) => {
     if (file.success) {
       console.log(`✅ ${file.fileName} → ${file.filePath}`)
     } else {
@@ -309,14 +309,14 @@ export async function exemploAnalise() {
   // Extrai imports
   const imports = generator.extractImports(schema)
   console.log('Imports necessários:')
-  imports.forEach(imp => {
+  imports.forEach((imp: any) => {
     console.log(`- ${imp.source}:`, imp.named?.join(', '))
   })
 
   // Extrai componentes
   const components = generator.extractComponents(schema)
   console.log('\nComponentes usados:')
-  components.forEach(comp => {
+  components.forEach((comp: any) => {
     console.log(`- ${comp.name} (${comp.widgetType}): usado ${comp.count}x`)
     console.log(`  Props:`, comp.props.join(', '))
   })

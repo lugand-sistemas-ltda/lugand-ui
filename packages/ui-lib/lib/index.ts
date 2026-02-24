@@ -150,6 +150,11 @@ export {
   RadioGroup,
   CopyInput,
   FileUpload,
+  
+  // Document
+  LgQRCode,
+  LgSignaturePad,
+  LgDocumentEditor,
 } from '../src/shared/components/index'
 
 // ============================================
@@ -239,7 +244,7 @@ export {
 // ============================================
 // TYPES
 // ============================================
-export type { FileViewerFile } from '../src/shared/components/index'
+export type { FileViewerFile, DocumentVariable } from '../src/shared/components/index'
 
 // ============================================
 // FEATURES (Advanced Functionality)
@@ -545,6 +550,17 @@ export type {
   ComponentValidationOptions,
   ComponentValidationResult
 } from '../src/core/component-registry'
+
+// ============================================
+// UTILS - PDF Generation (OPCIONAL - não incluído no bundle principal)
+// ============================================
+// Para usar PDF generation, importe diretamente:
+// import { generatePDFFromHTML, generatePDFFromTemplate } from '@lugand-sistemas-ltda/vue-ui-lib/pdf'
+// E instale as dependências: npm install jspdf qrcode
+
+// Nota: PDF utils NÃO são exportados aqui para manter o bundle leve
+// Os componentes LgQRCode, LgSignaturePad e LgDocumentEditor estão disponíveis
+// e podem ser usados independentemente
 
 // ============================================
 // VERSION
