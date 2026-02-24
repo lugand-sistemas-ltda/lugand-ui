@@ -1,7 +1,7 @@
 <template>
   <div class="lg-qrcode" :style="containerStyle">
     <canvas ref="canvasRef" :style="canvasStyle"></canvas>
-    
+
     <div v-if="label" class="qrcode-label">
       {{ label }}
     </div>
@@ -17,36 +17,36 @@ export interface LgQRCodeProps {
    * Data to encode in the QR Code
    */
   value: string
-  
+
   /**
    * Size of the QR Code in pixels
    * @default 128
    */
   size?: number
-  
+
   /**
    * Optional label below QR Code
    */
   label?: string
-  
+
   /**
    * Error correction level
    * @default 'M'
    */
   errorCorrectionLevel?: 'L' | 'M' | 'Q' | 'H'
-  
+
   /**
    * Foreground color (dark modules)
    * @default '#000000'
    */
   color?: string
-  
+
   /**
    * Background color (light modules)
    * @default '#ffffff'
    */
   backgroundColor?: string
-  
+
   /**
    * Margin around QR Code in modules
    * @default 4
@@ -81,7 +81,7 @@ const canvasStyle = computed<Record<string, string>>(() => ({
 
 async function generateQRCode() {
   if (!canvasRef.value || !props.value) return
-  
+
   try {
     await QRCode.toCanvas(canvasRef.value, props.value, {
       width: props.size,

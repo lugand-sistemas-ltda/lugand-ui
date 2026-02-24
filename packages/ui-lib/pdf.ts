@@ -20,22 +20,22 @@
  */
 
 export {
-  generatePDFFromHTML,
-  generatePDFFromTemplate,
-  exportPDFAsBlob,
-  exportPDFAsBase64
+    generatePDFFromHTML,
+    generatePDFFromTemplate,
+    exportPDFAsBlob,
+    exportPDFAsBase64
 } from './src/utils/pdf'
 
 export type {
-  PageSize,
-  PageOrientation,
-  PDFMargins,
-  PDFOptions,
-  PDFMetadata,
-  DocumentBlock,
-  DocumentBlockStyle,
-  DocumentTemplate,
-  TemplateVariable,
-  DocumentData,
-  PDFGenerationResult
+    PageSize,
+    PageOrientation,
+    PDFMargins,
+    PDFOptions,
+    PDFMetadata,
+    DocumentBlock,
+    DocumentBlockStyle,
+    DocumentTemplate,
+    TemplateVariable,
+    DocumentData,
+    PDFGenerationResult
 } from './src/utils/pdf'

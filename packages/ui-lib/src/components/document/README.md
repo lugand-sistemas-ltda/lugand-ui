@@ -19,24 +19,25 @@ Editor de texto rico com suporte a variáveis dinâmicas.
 </template>
 
 <script setup>
-import { ref } from 'vue'
-import { LgDocumentEditor } from '@lugand-sistemas-ltda/vue-ui-lib'
+import { ref } from "vue";
+import { LgDocumentEditor } from "@lugand-sistemas-ltda/vue-ui-lib";
 
-const content = ref('<p>Olá {{nome}}, bem-vindo!</p>')
+const content = ref("<p>Olá {{nome}}, bem-vindo!</p>");
 
 const variables = [
-  { name: 'nome', label: 'Nome do Cliente' },
-  { name: 'data', label: 'Data' },
-  { name: 'total', label: 'Valor Total' }
-]
+  { name: "nome", label: "Nome do Cliente" },
+  { name: "data", label: "Data" },
+  { name: "total", label: "Valor Total" },
+];
 
 function handleChange(newContent) {
-  console.log('Conteúdo alterado:', newContent)
+  console.log("Conteúdo alterado:", newContent);
 }
 </script>
 ```
 
 **Props:**
+
 - `modelValue` (string): Conteúdo HTML
 - `variables` (DocumentVariable[]): Variáveis disponíveis
 - `placeholder` (string): Texto placeholder
@@ -48,6 +49,7 @@ function handleChange(newContent) {
 - `showFooter` (boolean): Mostrar rodapé (default: true)
 
 **Métodos expostos:**
+
 - `getHTML()`: Retorna HTML
 - `getPlainText()`: Retorna texto puro
 - `clear()`: Limpa conteúdo
@@ -72,11 +74,12 @@ Componente para gerar QR Codes.
 </template>
 
 <script setup>
-import { LgQRCode } from '@lugand-sistemas-ltda/vue-ui-lib'
+import { LgQRCode } from "@lugand-sistemas-ltda/vue-ui-lib";
 </script>
 ```
 
 **Props:**
+
 - `value` (string, required): Conteúdo do QR Code
 - `size` (number): Tamanho em pixels (default: 200)
 - `errorCorrectionLevel` ('L' | 'M' | 'Q' | 'H'): Nível de correção (default: 'M')
@@ -85,6 +88,7 @@ import { LgQRCode } from '@lugand-sistemas-ltda/vue-ui-lib'
 - `margin` (number): Margem ao redor (default: 4)
 
 **Métodos expostos:**
+
 - `toDataURL()`: Exporta como data URL
 - `download(filename)`: Faz download do QR Code
 
@@ -106,19 +110,20 @@ Canvas para capturar assinaturas digitais.
 </template>
 
 <script setup>
-import { ref } from 'vue'
-import { LgSignaturePad } from '@lugand-sistemas-ltda/vue-ui-lib'
+import { ref } from "vue";
+import { LgSignaturePad } from "@lugand-sistemas-ltda/vue-ui-lib";
 
-const signature = ref(null)
+const signature = ref(null);
 
 function handleSave(dataUrl) {
-  console.log('Assinatura salva:', dataUrl)
+  console.log("Assinatura salva:", dataUrl);
   // Enviar para servidor, etc
 }
 </script>
 ```
 
 **Props:**
+
 - `modelValue` (string): Data URL da assinatura
 - `width` (number): Largura do canvas (default: 400)
 - `height` (number): Altura do canvas (default: 200)
@@ -128,6 +133,7 @@ function handleSave(dataUrl) {
 - `disabled` (boolean): Desabilitar desenho
 
 **Métodos expostos:**
+
 - `clear()`: Limpa assinatura
 - `undo()`: Desfaz último traço
 - `toDataURL(format, quality)`: Exporta como imagem
@@ -150,65 +156,65 @@ npm install jspdf qrcode @types/qrcode
 ### Uso Básico
 
 ```typescript
-import { generatePDFFromHTML } from '@lugand-sistemas-ltda/vue-ui-lib/pdf'
+import { generatePDFFromHTML } from "@lugand-sistemas-ltda/vue-ui-lib/pdf";
 
 // Gerar PDF de HTML com variáveis
 await generatePDFFromHTML(
-  '<h1>Contrato</h1><p>Cliente: {{nome}}</p>',
-  { nome: 'João Silva', data: '23/02/2026' },
+  "<h1>Contrato</h1><p>Cliente: {{nome}}</p>",
+  { nome: "João Silva", data: "23/02/2026" },
   {
-    filename: 'contrato.pdf',
-    pageSize: 'a4',
-    orientation: 'portrait'
-  }
-)
+    filename: "contrato.pdf",
+    pageSize: "a4",
+    orientation: "portrait",
+  },
+);
 ```
 
 ### Gerar PDF de Template
 
 ```typescript
-import { generatePDFFromTemplate } from '@lugand-sistemas-ltda/vue-ui-lib/pdf'
+import { generatePDFFromTemplate } from "@lugand-sistemas-ltda/vue-ui-lib/pdf";
 
 const template = {
-  id: 'contrato-001',
-  name: 'Contrato Padrão',
-  version: '1.0',
+  id: "contrato-001",
+  name: "Contrato Padrão",
+  version: "1.0",
   layout: {
-    pageSize: 'a4',
-    orientation: 'portrait',
-    margins: { top: 20, right: 20, bottom: 20, left: 20 }
+    pageSize: "a4",
+    orientation: "portrait",
+    margins: { top: 20, right: 20, bottom: 20, left: 20 },
   },
   blocks: [
     {
-      id: 'titulo',
-      type: 'heading',
-      content: 'CONTRATO Nº {{numero}}',
-      style: { fontSize: 18, align: 'center', bold: true }
+      id: "titulo",
+      type: "heading",
+      content: "CONTRATO Nº {{numero}}",
+      style: { fontSize: 18, align: "center", bold: true },
     },
     {
-      id: 'corpo',
-      type: 'text',
-      content: 'Contratante: {{contratante}}\nData: {{data}}'
+      id: "corpo",
+      type: "text",
+      content: "Contratante: {{contratante}}\nData: {{data}}",
     },
     {
-      id: 'qrcode',
-      type: 'qrcode',
-      content: 'https://verify.com/{{numero}}',
-      position: { x: 160, y: 260 }
-    }
+      id: "qrcode",
+      type: "qrcode",
+      content: "https://verify.com/{{numero}}",
+      position: { x: 160, y: 260 },
+    },
   ],
   variables: [
-    { name: 'numero', label: 'Número', type: 'text', required: true },
-    { name: 'contratante', label: 'Contratante', type: 'text', required: true },
-    { name: 'data', label: 'Data', type: 'date', required: true }
-  ]
-}
+    { name: "numero", label: "Número", type: "text", required: true },
+    { name: "contratante", label: "Contratante", type: "text", required: true },
+    { name: "data", label: "Data", type: "date", required: true },
+  ],
+};
 
 await generatePDFFromTemplate(template, {
-  numero: 'CTR-2026-001',
-  contratante: 'João Silva',
-  data: '23/02/2026'
-})
+  numero: "CTR-2026-001",
+  contratante: "João Silva",
+  data: "23/02/2026",
+});
 ```
 
 ---
@@ -219,14 +225,14 @@ await generatePDFFromTemplate(template, {
 <template>
   <div class="document-app">
     <h2>Editor de Documentos</h2>
-    
+
     <!-- Editor -->
     <lg-document-editor
       v-model="content"
       :variables="variables"
       placeholder="Digite o documento aqui..."
     />
-    
+
     <!-- Preview de Variáveis -->
     <div class="preview">
       <h3>Preencha os dados:</h3>
@@ -234,67 +240,67 @@ await generatePDFFromTemplate(template, {
       <input v-model="data.data" type="date" />
       <input v-model="data.valor" placeholder="Valor" />
     </div>
-    
+
     <!-- Assinatura -->
     <div class="signature-section">
       <h3>Assinatura:</h3>
       <lg-signature-pad v-model="signature" />
     </div>
-    
+
     <!-- QR Code -->
     <div class="qrcode-section">
       <h3>QR Code de Verificação:</h3>
       <lg-qr-code :value="qrUrl" />
     </div>
-    
+
     <!-- Exportar -->
     <button @click="exportPDF">Gerar PDF</button>
   </div>
 </template>
 
 <script setup>
-import { ref, computed } from 'vue'
-import { 
-  LgDocumentEditor, 
-  LgSignaturePad, 
-  LgQRCode 
-} from '@lugand-sistemas-ltda/vue-ui-lib'
-import { generatePDFFromHTML } from '@lugand-sistemas-ltda/vue-ui-lib/pdf'
+import { ref, computed } from "vue";
+import {
+  LgDocumentEditor,
+  LgSignaturePad,
+  LgQRCode,
+} from "@lugand-sistemas-ltda/vue-ui-lib";
+import { generatePDFFromHTML } from "@lugand-sistemas-ltda/vue-ui-lib/pdf";
 
 const content = ref(`
   <h1>CONTRATO DE PRESTAÇÃO DE SERVIÇOS</h1>
   <p>Cliente: {{cliente}}</p>
   <p>Data: {{data}}</p>
   <p>Valor: {{valor}}</p>
-`)
+`);
 
 const variables = [
-  { name: 'cliente', label: 'Nome do Cliente' },
-  { name: 'data', label: 'Data' },
-  { name: 'valor', label: 'Valor do Contrato' }
-]
+  { name: "cliente", label: "Nome do Cliente" },
+  { name: "data", label: "Data" },
+  { name: "valor", label: "Valor do Contrato" },
+];
 
 const data = ref({
-  cliente: 'João Silva',
-  data: '2026-02-23',
-  valor: 'R$ 5.000,00'
-})
+  cliente: "João Silva",
+  data: "2026-02-23",
+  valor: "R$ 5.000,00",
+});
 
-const signature = ref(null)
+const signature = ref(null);
 
-const qrUrl = computed(() => 
-  `https://verify.example.com/contract/${Date.now()}`
-)
+const qrUrl = computed(
+  () => `https://verify.example.com/contract/${Date.now()}`,
+);
 
 async function exportPDF() {
   await generatePDFFromHTML(content.value, data.value, {
-    filename: 'contrato.pdf',
+    filename: "contrato.pdf",
     metadata: {
-      title: 'Contrato de Prestação de Serviços',
-      author: 'Sistema',
-      subject: 'Contrato'
-    }
-  })
+      title: "Contrato de Prestação de Serviços",
+      author: "Sistema",
+      subject: "Contrato",
+    },
+  });
 }
 </script>
 ```
@@ -305,23 +311,23 @@ async function exportPDF() {
 
 ```typescript
 interface DocumentVariable {
-  name: string
-  label?: string
-  defaultValue?: string
+  name: string;
+  label?: string;
+  defaultValue?: string;
 }
 
 interface PDFOptions {
-  filename?: string
-  pageSize?: 'a4' | 'letter' | 'legal'
-  orientation?: 'portrait' | 'landscape'
-  margins?: { top: number; right: number; bottom: number; left: number }
+  filename?: string;
+  pageSize?: "a4" | "letter" | "legal";
+  orientation?: "portrait" | "landscape";
+  margins?: { top: number; right: number; bottom: number; left: number };
   metadata?: {
-    title?: string
-    author?: string
-    subject?: string
-    keywords?: string
-  }
-  preview?: boolean
+    title?: string;
+    author?: string;
+    subject?: string;
+    keywords?: string;
+  };
+  preview?: boolean;
 }
 ```
 
