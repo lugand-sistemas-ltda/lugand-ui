@@ -237,6 +237,12 @@ const routes: RouteRecordRaw[] = [
     component: () => import('@/views/low-code/CodeGeneratorView.vue'),
     meta: { fullscreen: true }, // Remove padding/max-width do layout
   },
+  {
+    path: '/low-code/doc-builder',
+    name: 'low-code-doc-builder',
+    component: () => import('@/views/low-code/DocBuilderView.vue'),
+    meta: { fullscreen: true }, // Remove padding/max-width do layout
+  },
   // Docs
   {
     path: '/docs/get-started',

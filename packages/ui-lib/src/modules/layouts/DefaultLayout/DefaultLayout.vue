@@ -120,6 +120,7 @@ const isFullscreen = computed(() => route.meta?.fullscreen === true)
         <NavItem label="Low-Code Platform" icon="🏗️" :default-expanded="false">
           <NavLink to="/low-code/page-builder">Page Builder</NavLink>
           <NavLink to="/low-code/form-builder">Form Builder</NavLink>
+          <NavLink to="/low-code/doc-builder">Doc Builder</NavLink>
           <NavLink to="/low-code/code-generator">Code Generator</NavLink>
         </NavItem>
 

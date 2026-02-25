@@ -20,6 +20,9 @@ export { default as CodeEditor } from './components/CodeEditor.vue'
 // Composable
 export { useFormBuilder } from './useFormBuilder'
 
+// Schema Bridge (para refatoração futura)
+export * from './schema-bridge'
+
 // Config & Utils
 export { FIELD_PALETTE, getPaletteItem, getPaletteItemsByCategory } from './field-palette-config'
 

@@ -244,7 +244,7 @@ export {
 // ============================================
 // TYPES
 // ============================================
-export type { FileViewerFile, DocumentVariable } from '../src/shared/components/index'
+export type { FileViewerFile, DocumentVariable as LegacyDocumentVariable } from '../src/shared/components/index'
 
 // ============================================
 // FEATURES (Advanced Functionality)
@@ -550,6 +550,215 @@ export type {
   ComponentValidationOptions,
   ComponentValidationResult
 } from '../src/core/component-registry'
+
+// ============================================
+// CORE - Schema Builder (Generic Builder Infrastructure)
+// ============================================
+export {
+  // Composable
+  useSchemaBuilder,
+  
+  // Utilities
+  useSchemaHistory,
+  validateBaseSchema,
+  createValidator,
+  createValidationSuccess,
+  createValidationError,
+  serializeSchema as serializeGenericSchema,
+  deserializeSchema,
+  cloneSchema as cloneGenericSchema,
+  isValidSchemaStructure,
+  migrateSchema,
+  generateId,
+  generateTimestamp
+} from '../src/core/schema-builder'
+
+export type {
+  BaseSchema,
+  BaseSchemaItem,
+  SchemaBuilderOperations,
+  SchemaBuilderState,
+  SchemaBuilderHistory,
+  SchemaBuilderPersistence,
+  ValidationResult,
+  ValidationError,
+  UseSchemaBuilderOptions
+} from '../src/core/schema-builder'
+
+// ============================================
+// CORE - Adapters (Pluggable System)
+// ============================================
+export {
+  // Registry
+  adapterRegistry,
+  registerAdapter,
+  getAdapter,
+  hasAdapter,
+  listAdapters,
+  unregisterAdapter,
+  
+  // Default Adapters - Storage (sempre disponível)
+  LocalStorageAdapter,
+  IndexedDBAdapter,
+  MemoryStorageAdapter,
+  
+  // Optional Adapters - PDF/QRCode (requerem instalação manual)
+  JSPDFAdapter,
+  QRCodeLibAdapter,
+  NativeQRCodeAdapter
+} from '../src/core/adapters'
+
+export type {
+  // Adapter Types
+  AdapterType,
+  PDFAdapter,
+  PDFContent,
+  PDFMetadata,
+  PDFPage,
+  PDFElement,
+  PDFTextElement,
+  PDFImageElement,
+  PDFQRCodeElement,
+  PDFLineElement,
+  PDFRectElement,
+  PDFPathElement,
+  PDFOptions,
+  PDFCapabilities,
+  PDFPermissions,
+  PDFWatermark,
+  
+  QRCodeAdapter,
+  QRCodeOptions,
+  
+  StorageAdapter,
+  
+  SignatureAdapter,
+  SignatureCertificate,
+  SignatureVerificationResult
+} from '../src/core/adapters'
+
+// ============================================
+// CORE - Validation (Custom Validators + Brazilian)
+// ============================================
+export {
+  // Generic Validators
+  ValidationBuilder,
+  
+  // Brazilian Validators
+  validateCPF,
+  validateCNPJ,
+  validateCEP,
+  validatePhone,
+  validatePlate,
+  validateBRDate,
+  validateBRTime,
+  validateBRCurrency,
+  validatePIS,
+  validateTituloEleitor
+} from '../src/core/validation'
+
+// ============================================
+// FEATURES - Document Builder
+// ============================================
+export {
+  // Composable
+  useDocBuilder,
+  
+  // Validators
+  validateDocumentSchema,
+  validateDocumentData,
+  
+  // Components
+  DocBuilderEditor,
+  DocBlockPalette,
+  DocBlockInspector,
+  DocPreview,
+  
+  // Blocks
+  DocBlockText,
+  DocBlockHeading,
+  DocBlockVariable,
+  DocBlockQRCode,
+  DocBlockImage,
+  
+  // Templates
+  contractTemplate,
+  invoiceTemplate,
+  reportTemplate,
+  certificateTemplate,
+  templateRegistry,
+  templates,
+  getTemplateById,
+  getTemplatesByCategory,
+  searchTemplatesByTag,
+  searchTemplates
+} from '../src/features/doc-builder'
+
+export type {
+  // Core Types
+  DocumentSchema,
+  DocumentMetadata,
+  DocumentLayout,
+  DocumentBlock,
+  DocumentVariable,
+  DocumentStyles,
+  DocumentData,
+  DocumentTemplate,
+  TemplateCategory,
+  TemplateRegistry,
+  
+  // Layout Types
+  PageSize,
+  PageOrientation,
+  PageMargins,
+  
+  // Block Types
+  BlockType,
+  BlockContent,
+  BlockStyle,
+  BlockConditions,
+  TextBlockContent,
+  HeadingBlockContent,
+  VariableBlockContent,
+  QRCodeBlockContent,
+  SignatureBlockContent,
+  ImageBlockContent,
+  TableBlockContent,
+  DocTableColumn,
+  SpacerBlockContent,
+  LineBlockContent,
+  GroupBlockContent,
+  RepeaterBlockContent,
+  
+  // Variable Types
+  VariableType,
+  VariableOption,
+  VariableValidation,
+  
+  // Font Types
+  FontDefinition,
+  
+  // Component Types
+  DocBuilderEditorProps,
+  DocBlockPaletteProps,
+  DocBlockPaletteEmits,
+  BlockDefinition,
+  BlockCategory,
+  DocBlockInspectorProps,
+  DocBlockInspectorEmits,
+  DocPreviewProps,
+  DocPreviewEmits,
+  
+  // Block Component Types
+  DocBlockTextProps,
+  DocBlockHeadingProps,
+  DocBlockVariableProps,
+  DocBlockQRCodeProps,
+  DocBlockImageProps,
+  
+  // Composable Types
+  UseDocBuilderOptions
+} from '../src/features/doc-builder'
 
 // ============================================
 // UTILS - PDF Generation (OPCIONAL - não incluído no bundle principal)
