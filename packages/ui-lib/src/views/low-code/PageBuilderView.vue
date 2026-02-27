@@ -128,7 +128,7 @@ function createEmptySchema(): PageSchema {
         gap: 16
       }
     },
-    widgets: []
+    items: []
   }
 }
 
@@ -155,7 +155,7 @@ function loadExample() {
         gap: 16
       }
     },
-    widgets: [
+    items: [
       {
         id: 'page-header',
         type: 'card',

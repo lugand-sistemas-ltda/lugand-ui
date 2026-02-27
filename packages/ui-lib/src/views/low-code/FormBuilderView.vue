@@ -52,7 +52,7 @@
         </div>
 
         <div class="schema-preview__stats">
-          <span>📊 {{ currentSchema?.fields.length || 0 }} campos</span>
+          <span>📊 {{ currentSchema?.items?.length || 0 }} campos</span>
           <span>🔍 {{ validationCount }} validações</span>
           <span>📦 {{ formatBytes(schemaSize) }}</span>
         </div>
@@ -90,8 +90,8 @@ const schemaSize = computed(() => {
 })
 
 const validationCount = computed(() => {
-  if (!currentSchema.value?.fields) return 0
-  return currentSchema.value.fields.reduce((count: number, field: FormField) => {
+  if (!currentSchema.value?.items) return 0
+  return currentSchema.value.items.reduce((count: number, field: FormField) => {
     return count + (field.validation?.length || 0)
   }, 0)
 })
@@ -107,7 +107,7 @@ function createEmptySchema(): FormSchema {
   return {
     id: 'new-form',
     description: 'Design your form here',
-    fields: []
+    items: []
   }
 }
 
@@ -118,7 +118,7 @@ function loadExample() {
   currentSchema.value = {
     id: 'contact-form',
     description: 'Formulário de contato completo com validações',
-    fields: [
+    items: [
       {
         name: 'fullName',
         label: 'Full Name',
