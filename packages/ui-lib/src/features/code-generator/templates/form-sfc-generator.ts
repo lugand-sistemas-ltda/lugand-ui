@@ -11,7 +11,7 @@ import type { GeneratedCode } from "../types";
  * Gera um componente Vue SFC a partir de FormSchema
  */
 export function generateFormSFC(schema: FormSchema): GeneratedCode {
-  const componentName = toPascalCase(schema.id);
+  const componentName = toPascalCase(schema.id || 'FormComponent');
 
   // Gerar template
   const template = generateFormTemplate(schema);
@@ -45,7 +45,7 @@ ${style ? `<style scoped lang="scss">\n${style}\n</style>` : ""}
       templateLines: 0,
       scriptLines: 0,
       styleLines: 0,
-      componentCount: schema.fields?.length || 0,
+      componentCount: schema.items?.length || 0,
       importCount: 0,
       estimatedSize: new Blob([content]).size,
     },
@@ -56,7 +56,7 @@ ${style ? `<style scoped lang="scss">\n${style}\n</style>` : ""}
  * Gera o template do formulário
  */
 function generateFormTemplate(schema: FormSchema): string {
-  const fields = schema.fields || [];
+  const fields = schema.items || [];
 
   const formAttrs = [
     `@submit.prevent="handleSubmit"`,
@@ -262,7 +262,7 @@ function generateFormScript(
   lines.push(``);
 
   // Form data interface
-  const formFields = schema.fields || [];
+  const formFields = schema.items || [];
   const fieldTypes = formFields.map((f) => ({
     name: f.name,
     type: getTypeFromField(f),

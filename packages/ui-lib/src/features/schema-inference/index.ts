@@ -133,7 +133,16 @@ export function inferSchemaFromDTO(
 
       // Merge com validações já inferidas
       if (result.field.validation) {
-        result.field.validation.push(...advancedValidations)
+        // Normalize validation format before pushing
+        if (Array.isArray(result.field.validation)) {
+          result.field.validation.push(...advancedValidations)
+        } else {
+          // Object format: add to rules array
+          if (!result.field.validation.rules) {
+            result.field.validation.rules = []
+          }
+          result.field.validation.rules.push(...advancedValidations)
+        }
       } else {
         result.field.validation = advancedValidations
       }
@@ -168,7 +177,10 @@ export function inferSchemaFromDTO(
 
   // 10. Coletar warnings dos campos
   inferredFields.forEach(r => {
-    warnings.push(...r.warnings.map(w => ({ property: r.field.name, message: w })))
+    warnings.push(...r.warnings.map(w => ({ 
+      property: r.field.name || r.field.id || 'unknown', 
+      message: w 
+    })))
   })
 
   return {
@@ -292,7 +304,16 @@ export function inferSchemaFromMetadata(
       )
 
       if (result.field.validation) {
-        result.field.validation.push(...advancedValidations)
+        // Normalize validation format before pushing
+        if (Array.isArray(result.field.validation)) {
+          result.field.validation.push(...advancedValidations)
+        } else {
+          // Object format: add to rules array
+          if (!result.field.validation.rules) {
+            result.field.validation.rules = []
+          }
+          result.field.validation.rules.push(...advancedValidations)
+        }
       } else {
         result.field.validation = advancedValidations
       }

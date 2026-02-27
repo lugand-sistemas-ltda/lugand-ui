@@ -94,19 +94,19 @@ const hasChildren = computed(() =>
 
 function getWidgetIcon(type: string): string {
   const icons: Record<string, string> = {
-    Container: '📦',
-    Grid: '▦',
-    Section: '📄',
-    Text: '📝',
-    Image: '🖼️',
-    DataTable: '📊',
-    Card: '🃏',
-    FormRenderer: '📋',
-    FormBuilder: '🏗️',
-    Tabs: '📑',
-    Breadcrumb: '🍞',
-    Alert: '⚠️',
-    Badge: '🏷️'
+    container: '📦',
+    grid: '▦',
+    section: '📄',
+    text: '📝',
+    image: '🖼️',
+    datatable: '📊',
+    card: '🏏',
+    formrenderer: '📋',
+    formbuilder: '🏯️',
+    tabs: '📑',
+    breadcrumb: '🍞',
+    alert: '⚠️',
+    badge: '🏷️'
   }
   return icons[type] || '🔲'
 }

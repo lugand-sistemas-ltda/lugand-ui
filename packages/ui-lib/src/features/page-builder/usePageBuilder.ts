@@ -1,676 +1,554 @@
 /**
- * @file FASE 5 - Page Builder Composable
- * @description Lógica central do editor visual de páginas
+ * usePageBuilder - Composable para Page Builder
  * 
- * Gerencia estado, operações CRUD de widgets, histórico (undo/redo),
- * validação e export de PageSchema
+ * Composable para gerenciar estado e lógica do Page Builder.
+ * Herda funcionalidade CRUD, history e validação de useSchemaBuilder.
+ * Suporta aninhamento de widgets.
  */
 
-import { ref, computed, watch, type Ref } from 'vue'
-import type { PageSchema, WidgetSchema } from '../../core/schema-system/types'
-import { createSchemaMetadata, createGridLayout } from '../../core/schema-system/types'
+import { computed, ref } from 'vue'
+import { useSchemaBuilder } from '@/core/schema-builder'
 import type {
-  BuilderSettings,
-  HistoryAction,
-  WidgetDragEvent,
-  PageSchemaValidationResult,
-  ExportOptions,
-  WidgetTreeNode
+  PageSchema,
+  PageWidget,
+  WidgetType,
+  BuilderSettings
+} from './types'
+import {
+  createEmptyPageSchema,
+  createPageWidget,
+  findWidgetById,
+  removeWidgetById,
+  flattenWidgets,
+  countWidgets
 } from './types'
 
 /**
- * Configurações default do Page Builder
+ * Opções do usePageBuilder
  */
-const DEFAULT_SETTINGS: BuilderSettings = {
-  showGrid: true,
-  snapToGrid: true,
-  showOutlines: true,
-  autoSaveInterval: 30000, // 30s
-  liveValidation: true,
-  theme: 'auto',
-  showBreadcrumb: true
+export interface UsePageBuilderOptions {
+  /** Schema inicial */
+  initialSchema?: PageSchema
+  
+  /** Auto-save ativo */
+  autoSave?: boolean
+  
+  /** Delay do auto-save (ms) */
+  autoSaveDelay?: number
+  
+  /** Storage key para persistência */
+  storageKey?: string
+  
+  /** Habilitar undo/redo */
+  enableHistory?: boolean
+  
+  /** Tamanho do histórico */
+  historySize?: number
+  
+  /** Configurações do builder */
+  settings?: Partial<BuilderSettings>
 }
 
 /**
- * Máximo de ações no histórico
+ * Composable para Page Builder
+ * Herda CRUD, history, validation de useSchemaBuilder
+ * Adiciona suporte a aninhamento de widgets
  */
-const MAX_HISTORY = 50
-
-/**
- * Composable principal do Page Builder
- */
-export function usePageBuilder(
-  initialSchema?: Ref<PageSchema | undefined>,
-  settings?: Partial<BuilderSettings>
-) {
+export function usePageBuilder(options: UsePageBuilderOptions = {}) {
   // ============================================
-  // STATE
+  // CORE - Herda TUDO do useSchemaBuilder
   // ============================================
-
-  const schema = ref<PageSchema>(initialSchema?.value || createEmptySchema())
-  const selectedWidgetId = ref<string | null>(null)
-  const mode = ref<'design' | 'preview' | 'code'>('design')
-  const history = ref<HistoryAction[]>([])
-  const historyIndex = ref(-1)
-  const isDirty = ref(false)
-  const hoveredWidgetId = ref<string | null>(null)
-
-  const builderSettings = ref<BuilderSettings>({
-    ...DEFAULT_SETTINGS,
-    ...settings
+  
+  const core = useSchemaBuilder<PageSchema, PageWidget>({
+    initialSchema: options.initialSchema || createEmptyPageSchema(),
+    storageKey: options.storageKey || 'page-builder-state',
+    enableHistory: options.enableHistory ?? true,
+    historySize: options.historySize ?? 50,
+    autoSaveDelay: options.autoSaveDelay ?? 30000
   })
-
+  
+  // ============================================
+  // COMPATIBILIDADE (para componentes Vue legados)
+  // ============================================
+  
+  /**
+   * Modo do builder (design/preview/code)
+   */
+  const mode = ref<'design' | 'preview' | 'code'>('design')
+  
+  /**
+   * ID do widget selecionado (alias de selectedItem)
+   */
+  const selectedWidgetId = core.selectedItem
+  
+  /**
+   * ID do widget com hover
+   */
+  const hoveredWidgetId = ref<string | null>(null)
+  
+  /**
+   * Settings (expõe para componentes)
+   */
+  const settings = options.settings || {}
+  
   // ============================================
   // COMPUTED
   // ============================================
-
-  const selectedWidget = computed(() => {
-    if (!selectedWidgetId.value) return null
-    return findWidgetById(schema.value, selectedWidgetId.value)
-  })
-
-  const canUndo = computed(() => historyIndex.value >= 0)
-  const canRedo = computed(() => historyIndex.value < history.value.length - 1)
-
-  const widgetTree = computed(() => buildWidgetTree(schema.value))
-
-  const widgetCount = computed(() => countWidgets(schema.value))
-
-  // ============================================
-  // WIDGET OPERATIONS
-  // ============================================
-
+  
   /**
-   * Adiciona um widget
+   * Lista de widgets (alias de items)
+   */
+  const widgets = computed(() => core.schema.value.items)
+  
+  /**
+   * Quantidade total de widgets (incluindo filhos)
+   */
+  const widgetCount = computed(() => countWidgets(widgets.value as PageWidget[]))
+  
+  /**
+   * Widgets em formato flat (árvore achatada)
+   */
+  const flatWidgets = computed(() => flattenWidgets(widgets.value as PageWidget[]))
+  
+  /**
+   * Widget selecionado
+   */
+  const selectedWidget = computed(() => {
+    if (!core.selectedItem.value) return null
+    return findWidgetById(widgets.value as PageWidget[], core.selectedItem.value)
+  })
+  
+  // ============================================
+  // PAGE-SPECIFIC METHODS
+  // ============================================
+  
+  /**
+   * Adiciona um widget à página
+   * 
+   * @param type - Tipo do widget
+   * @param props - Propriedades customizadas
+   * @param parentId - ID do widget pai (para aninhamento)
+   * @param position - Posição (opcional)
+   * @returns Widget criado
    */
   function addWidget(
-    widget: Omit<WidgetSchema, 'id'>,
-    parentId: string | null = null,
-    index?: number
-  ): string {
-    const newWidget: WidgetSchema = {
-      ...widget,
-      id: generateWidgetId()
-    }
-
-    const before = cloneSchema(schema.value)
-
-    if (parentId === null) {
-      // Adicionar ao root
-      if (index !== undefined) {
-        schema.value.widgets.splice(index, 0, newWidget)
-      } else {
-        schema.value.widgets.push(newWidget)
-      }
-    } else {
-      // Adicionar como filho
-      const parent = findWidgetById(schema.value, parentId)
+    type: WidgetType,
+    props?: Partial<PageWidget['props']>,
+    parentId?: string,
+    position?: number
+  ): PageWidget {
+    const widget = createPageWidget(type, props)
+    
+    if (parentId) {
+      // Adicionar como filho de outro widget
+      const parent = findWidgetById(widgets.value as PageWidget[], parentId)
       if (parent) {
-        // Inicializar children se não existir
         if (!parent.children) {
           parent.children = []
         }
-
-        if (index !== undefined) {
-          parent.children.splice(index, 0, newWidget)
+        
+        if (position !== undefined) {
+          parent.children.splice(position, 0, widget)
         } else {
-          parent.children.push(newWidget)
+          parent.children.push(widget)
         }
       }
+    } else {
+      // Adicionar ao root
+      core.addItem(widget, position)
     }
-
-    const after = cloneSchema(schema.value)
-    addToHistory({ type: 'add', before, after, timestamp: Date.now() })
-
-    isDirty.value = true
-    return newWidget.id
+    
+    return widget
   }
-
+  
   /**
-   * Remove um widget
+   * Remove um widget (e seus filhos)
    */
-  function removeWidget(widgetId: string): boolean {
-    const before = cloneSchema(schema.value)
-
-    const removed = removeWidgetRecursive(schema.value.widgets, widgetId)
-
-    if (removed) {
-      const after = cloneSchema(schema.value)
-      addToHistory({ type: 'remove', before, after, timestamp: Date.now() })
-
-      if (selectedWidgetId.value === widgetId) {
-        selectedWidgetId.value = null
-      }
-
-      isDirty.value = true
+  function removeWidget(widgetId: string): void {
+    if (!widgets.value) return
+    
+    // Tentar remover do root primeiro
+    const rootIndex = widgets.value.findIndex(w => w.id === widgetId)
+    if (rootIndex !== -1) {
+      core.removeItem(widgetId)
+      return
     }
-
-    return removed
+    
+    // Se não está no root, buscar recursivamente
+    removeWidgetById(widgets.value as PageWidget[], widgetId)
   }
-
+  
   /**
    * Atualiza um widget
    */
-  function updateWidget(widgetId: string, updates: Partial<WidgetSchema>): boolean {
-    const widget = findWidgetById(schema.value, widgetId)
-    if (!widget) return false
-
-    const before = cloneSchema(schema.value)
-
-    // Não permitir alterar ID
-    const { id, ...safeUpdates } = updates
-    Object.assign(widget, safeUpdates)
-
-    const after = cloneSchema(schema.value)
-    addToHistory({ type: 'update', before, after, timestamp: Date.now() })
-
-    isDirty.value = true
-    return true
-  }
-
-  /**
-   * Move um widget para nova posição
-   */
-  function moveWidget(
+  function updateWidget(
     widgetId: string,
-    newParentId: string | null,
-    newIndex: number
-  ): boolean {
-    const before = cloneSchema(schema.value)
-
-    // 1. Remover do local atual
-    const widget = findWidgetById(schema.value, widgetId)
-    if (!widget) return false
-
-    const clonedWidget = { ...widget }
-    const removed = removeWidgetRecursive(schema.value.widgets, widgetId)
-    if (!removed) return false
-
-    // 2. Inserir no novo local
-    if (newParentId === null) {
-      schema.value.widgets.splice(newIndex, 0, clonedWidget)
-    } else {
-      const newParent = findWidgetById(schema.value, newParentId)
-      if (!newParent || !newParent.children) return false
-      newParent.children.splice(newIndex, 0, clonedWidget)
+    updates: Partial<PageWidget>
+  ): void {
+    const widget = findWidgetById(widgets.value as PageWidget[], widgetId)
+    if (widget) {
+      Object.assign(widget, updates)
     }
-
-    const after = cloneSchema(schema.value)
-    addToHistory({ type: 'move', before, after, timestamp: Date.now() })
-
-    isDirty.value = true
-    return true
   }
-
+  
   /**
-   * Duplica um widget
+   * Move widget para cima
    */
-  function duplicateWidget(widgetId: string): string | null {
-    const widget = findWidgetById(schema.value, widgetId)
-    if (!widget) return null
-
-    const duplicate = cloneWidget(widget)
-    const parent = findParentWidget(schema.value, widgetId)
-    const parentId = parent?.id || null
-
-    const widgets = parentId
-      ? findWidgetById(schema.value, parentId)?.children || []
-      : schema.value.widgets
-
-    const index = widgets.findIndex(w => w.id === widgetId)
-
-    return addWidget(duplicate, parentId, index + 1)
+  function moveWidgetUp(widgetId: string): void {
+    // TODO: Implementar movimentação em widgets aninhados
+    core.moveItem(widgetId, 'up')
   }
-
+  
   /**
-   * Manipula evento de drag-drop
+   * Move widget para baixo
    */
-  function handleDragEvent(event: WidgetDragEvent): void {
-    if (event.action === 'add' && event.widgetType) {
-      // Adicionar novo widget da paleta
-      // Isso será implementado com base no widgetType
-      console.log('Add widget from palette:', event.widgetType)
-    } else if (event.action === 'move' && event.sourceId) {
-      // Mover widget existente
-      moveWidget(event.sourceId, event.targetParentId, event.targetIndex)
-    } else if (event.action === 'copy' && event.widget) {
-      // Copiar widget
-      const newId = addWidget(event.widget, event.targetParentId, event.targetIndex)
-      if (newId) {
-        selectWidget(newId)
+  function moveWidgetDown(widgetId: string): void {
+    // TODO: Implementar movimentação em widgets aninhados
+    core.moveItem(widgetId, 'down')
+  }
+  
+  /**
+   * Duplica um widget (e seus filhos)
+   */
+  function duplicateWidget(widgetId: string): void {
+    const widget = findWidgetById(widgets.value as PageWidget[], widgetId)
+    if (widget) {
+      const duplicate = JSON.parse(JSON.stringify(widget))
+      duplicate.id = `widget-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`
+      
+      // Gerar novos IDs para filhos recursivamente
+      if (duplicate.children) {
+        regenerateChildrenIds(duplicate.children)
+      }
+      
+      // Adicionar duplicata após o original
+      const parent = findParentWidget(widgets.value as PageWidget[], widgetId)
+      if (parent) {
+        const index = parent.children!.findIndex(w => w.id === widgetId)
+        parent.children!.splice(index + 1, 0, duplicate)
+      } else if (widgets.value) {
+        const index = widgets.value.findIndex(w => w.id === widgetId)
+        core.addItem(duplicate, index + 1)
       }
     }
   }
-
-  // ============================================
-  // SCHEMA OPERATIONS
-  // ============================================
-
+  
   /**
-   * Atualiza o schema completo
+   * Aninha um widget dentro de outro (arrasta para container)
+   */
+  function nestWidget(widgetId: string, newParentId: string): void {
+    // Remove do local atual
+    const widget = removeWidgetById(widgets.value as PageWidget[], widgetId)
+    if (!widget) return
+    
+    // Adiciona ao novo pai
+    const newParent = findWidgetById(widgets.value as PageWidget[], newParentId)
+    if (newParent) {
+      if (!newParent.children) {
+        newParent.children = []
+      }
+      newParent.children.push(widget)
+    }
+  }
+  
+  /**
+   * Remove widget de container (move para root)
+   */
+  function unnestWidget(widgetId: string): void {
+    const widget = removeWidgetById(widgets.value as PageWidget[], widgetId)
+    if (widget) {
+      core.addItem(widget)
+    }
+  }
+  
+  /**
+   * Gera HTML da página
+   */
+  function generateHTML(): string {
+    const { metadata } = core.schema.value
+    const parts: string[] = []
+    
+    parts.push('<!DOCTYPE html>')
+    parts.push('<html>')
+    parts.push('<head>')
+    parts.push(`  <title>${metadata?.title || 'Page'}</title>`)
+    
+    // SEO
+    if (metadata?.seo) {
+      const seo = metadata.seo
+      if (seo.description) {
+        parts.push(`  <meta name="description" content="${seo.description}">`)
+      }
+      if (seo.keywords) {
+        const keywordsStr = Array.from(seo.keywords).join(', ')
+        parts.push(`  <meta name="keywords" content="${keywordsStr}">`)
+      }
+    }
+    
+    parts.push('</head>');
+    parts.push('<body>');
+    
+    // Renderizar widgets
+    (widgets.value as PageWidget[]).forEach((widget: PageWidget) => {
+      parts.push(renderWidgetToHTML(widget, 1))
+    })
+    
+    parts.push('</body>')
+    parts.push('</html>')
+    
+    return parts.join('\n')
+  }
+  
+  /**
+   * Gera componente Vue da página
+   */
+  function generateVueComponent(): {
+    template: string
+    script: string
+    style: string
+  } {
+    // TODO: Implementar geração de componente Vue
+    return {
+      template: '<!-- Generated page template -->',
+      script: '// Generated page script',
+      style: '/* Generated page styles */'
+    }
+  }
+  
+  /**
+   * Gera tags SEO
+   */
+  function generateSEOTags(): string {
+    const seo = core.schema.value.metadata?.seo
+    if (!seo) return ''
+    
+    let tags = ''
+    
+    if (seo.title) {
+      tags += `<title>${seo.title}</title>\n`
+      tags += `<meta property="og:title" content="${seo.title}">\n`
+    }
+    
+    if (seo.description) {
+      tags += `<meta name="description" content="${seo.description}">\n`
+      tags += `<meta property="og:description" content="${seo.description}">\n`
+    }
+    
+    if (seo.keywords) {
+      tags += `<meta name="keywords" content="${seo.keywords.join(', ')}">\n`
+    }
+    
+    if (seo.ogImage) {
+      tags += `<meta property="og:image" content="${seo.ogImage}">\n`
+    }
+    
+    if (seo.canonicalUrl) {
+      tags += `<link rel="canonical" href="${seo.canonicalUrl}">\n`
+    }
+    
+    return tags
+  }
+  
+  // ============================================
+  // MÉTODOS DE COMPATIBILIDADE
+  // ============================================
+  
+  /**
+   * Move widget (alias para moveWidgetUp/Down)
+   */
+  function moveWidget(widgetId: string, newParentId?: string, newIndex?: number): void {
+    if (typeof newParentId === 'string') {
+      // Move para novo parent (nesting)
+      if (newIndex !== undefined) {
+        nestWidget(widgetId, newParentId)
+      } else {
+        nestWidget(widgetId, newParentId)
+      }
+    } else {
+      // newParentId é na verdade direction: 'up' | 'down'
+      const direction = newParentId as any
+      if (direction === 'up') {
+        moveWidgetUp(widgetId)
+      } else if (direction === 'down') {
+        moveWidgetDown(widgetId)
+      }
+    }
+  }
+  
+  /**
+   * Export schema (alias para exportJSON)
+   */
+  function exportSchema(_format?: 'json' | 'yaml'): string {
+    return core.exportJSON()
+  }
+  
+  /**
+   * Select widget (alias para selectedItem)
+   */
+  function selectWidget(widgetId: string | null): void {
+    // selectedItem é um ref, pode atribuir diretamente
+    if (core.selectedItem) {
+      (core.selectedItem as any).value = widgetId
+    }
+  }
+  
+  /**
+   * Update schema (alias para load)
    */
   function updateSchema(updates: Partial<PageSchema>): void {
-    const before = cloneSchema(schema.value)
-
-    Object.assign(schema.value, updates)
-
-    const after = cloneSchema(schema.value)
-    addToHistory({ type: 'update', before, after, timestamp: Date.now() })
-
-    isDirty.value = true
+    // Directly update schema instead of calling load()
+    Object.assign(core.schema.value, {
+      ...core.schema.value,
+      ...updates
+    })
   }
-
-  /**
-   * Reseta o schema
-   */
-  function resetSchema(): void {
-    const before = cloneSchema(schema.value)
-
-    schema.value = createEmptySchema()
-    selectedWidgetId.value = null
-
-    const after = cloneSchema(schema.value)
-    addToHistory({ type: 'update', before, after, timestamp: Date.now() })
-
-    isDirty.value = true
-  }
-
-  /**
-   * Carrega um schema novo
-   */
-  function loadSchema(newSchema: PageSchema): void {
-    const before = cloneSchema(schema.value)
-
-    schema.value = cloneSchema(newSchema)
-    selectedWidgetId.value = null
-
-    const after = cloneSchema(schema.value)
-    addToHistory({ type: 'update', before, after, timestamp: Date.now() })
-
-    isDirty.value = true
-  }
-
+  
   // ============================================
-  // HISTORY (UNDO/REDO)
+  // RETURN API
   // ============================================
-
-  function addToHistory(action: HistoryAction): void {
-    // Remover ações futuras se estamos no meio do histórico
-    if (historyIndex.value < history.value.length - 1) {
-      history.value = history.value.slice(0, historyIndex.value + 1)
-    }
-
-    // Adicionar nova ação
-    history.value.push(action)
-
-    // Limitar tamanho do histórico
-    if (history.value.length > MAX_HISTORY) {
-      history.value.shift()
-    } else {
-      historyIndex.value++
-    }
-  }
-
-  function undo(): void {
-    if (!canUndo.value) return
-
-    const action = history.value[historyIndex.value]
-    if (action) {
-      schema.value = cloneSchema(action.before)
-      historyIndex.value--
-      isDirty.value = true
-    }
-  }
-
-  function redo(): void {
-    if (!canRedo.value) return
-
-    historyIndex.value++
-    const action = history.value[historyIndex.value]
-    if (action) {
-      schema.value = cloneSchema(action.after)
-      isDirty.value = true
-    }
-  }
-
-  function clearHistory(): void {
-    history.value = []
-    historyIndex.value = -1
-  }
-
-  // ============================================
-  // VALIDATION
-  // ============================================
-
-  function validateSchema(): PageSchemaValidationResult {
-    const errors: Array<{ widgetId: string; property: string; message: string }> = []
-    const warnings: Array<{ widgetId: string; property: string; message: string }> = []
-
-    // Validar schema ID
-    if (!schema.value.id) {
-      errors.push({
-        widgetId: 'root',
-        property: 'id',
-        message: 'Schema ID is required'
-      })
-    }
-
-    // Validar widgets recursivamente (parentId será usado para validar hierarquia)
-    function validateWidgets(widgets: WidgetSchema[], _parentId: string | null = null): void {
-      const usedIds = new Set<string>()
-
-      for (const widget of widgets) {
-        // IDs únicos
-        if (usedIds.has(widget.id)) {
-          errors.push({
-            widgetId: widget.id,
-            property: 'id',
-            message: `Duplicate widget ID: ${widget.id}`
-          })
-        }
-        usedIds.add(widget.id)
-
-        // Type obrigatório
-        if (!widget.type) {
-          errors.push({
-            widgetId: widget.id,
-            property: 'type',
-            message: 'Widget type is required'
-          })
-        }
-
-        // Validar filhos
-        if (widget.children && widget.children.length > 0) {
-          validateWidgets(widget.children, widget.id)
-        }
-      }
-    }
-
-    validateWidgets(schema.value.widgets)
-
-    return {
-      isValid: errors.length === 0,
-      errors,
-      warnings
-    }
-  }
-
-  // ============================================
-  // EXPORT
-  // ============================================
-
-  function exportSchema(options: Partial<ExportOptions> = {}): string {
-    const opts: ExportOptions = {
-      format: 'json',
-      includeDefaults: false,
-      minify: false,
-      includeComments: false,
-      validate: true,
-      ...options
-    }
-
-    // Validar se requisitado
-    if (opts.validate) {
-      const validation = validateSchema()
-      if (!validation.isValid) {
-        throw new Error('Schema has validation errors')
-      }
-    }
-
-    // Limpar defaults se requisitado
-    const exportSchema = opts.includeDefaults
-      ? schema.value
-      : removeDefaults(schema.value)
-
-    switch (opts.format) {
-      case 'json':
-        return opts.minify
-          ? JSON.stringify(exportSchema)
-          : JSON.stringify(exportSchema, null, 2)
-
-      case 'typescript':
-        return generateTypeScript(exportSchema, opts)
-
-      case 'vue':
-        return generateVue(exportSchema, opts)
-
-      default:
-        return JSON.stringify(exportSchema, null, 2)
-    }
-  }
-
-  // ============================================
-  // SELECTION
-  // ============================================
-
-  function selectWidget(widgetId: string | null): void {
-    selectedWidgetId.value = widgetId
-  }
-
-  function selectParent(): void {
-    if (!selectedWidgetId.value) return
-
-    const parent = findParentWidget(schema.value, selectedWidgetId.value)
-    selectedWidgetId.value = parent?.id || null
-  }
-
-  function selectFirstChild(): void {
-    const widget = selectedWidget.value
-    if (!widget || !widget.children || widget.children.length === 0) return
-
-    const firstChild = widget.children[0]
-    if (!firstChild) return
-
-    selectedWidgetId.value = firstChild.id
-  }
-
-  // ============================================
-  // HELPERS
-  // ============================================
-
-  function createEmptySchema(): PageSchema {
-    return {
-      id: `page-${Date.now()}`,
-      type: 'page',
-      metadata: createSchemaMetadata('New Page', 'Nova página criada no Page Builder'),
-      layout: createGridLayout(12, 16),
-      widgets: []
-    }
-  }
-
-  function generateWidgetId(): string {
-    return `widget-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`
-  }
-
-  function cloneSchema(schema: PageSchema): PageSchema {
-    return JSON.parse(JSON.stringify(schema))
-  }
-
-  function cloneWidget(widget: WidgetSchema): Omit<WidgetSchema, 'id'> {
-    const { id, ...rest } = JSON.parse(JSON.stringify(widget))
-
-    // Recursivamente atualizar IDs dos filhos
-    if (rest.children) {
-      rest.children = rest.children.map((child: WidgetSchema) => ({
-        ...cloneWidget(child),
-        id: generateWidgetId()
-      }))
-    }
-
-    return rest
-  }
-
-  function findWidgetById(schema: PageSchema, widgetId: string): WidgetSchema | null {
-    function search(widgets: WidgetSchema[]): WidgetSchema | null {
-      for (const widget of widgets) {
-        if (widget.id === widgetId) return widget
-        if (widget.children) {
-          const found = search(widget.children)
-          if (found) return found
-        }
-      }
-      return null
-    }
-
-    return search(schema.widgets)
-  }
-
-  function findParentWidget(schema: PageSchema, widgetId: string): WidgetSchema | null {
-    function search(widgets: WidgetSchema[], parent: WidgetSchema | null = null): WidgetSchema | null {
-      for (const widget of widgets) {
-        if (widget.id === widgetId) return parent
-        if (widget.children) {
-          const found = search(widget.children, widget)
-          if (found !== null) return found
-        }
-      }
-      return null
-    }
-
-    return search(schema.widgets)
-  }
-
-  function removeWidgetRecursive(widgets: WidgetSchema[], widgetId: string): boolean {
-    const index = widgets.findIndex(w => w.id === widgetId)
-    if (index !== -1) {
-      widgets.splice(index, 1)
-      return true
-    }
-
-    for (const widget of widgets) {
-      if (widget.children && removeWidgetRecursive(widget.children, widgetId)) {
-        return true
-      }
-    }
-
-    return false
-  }
-
-  function countWidgets(schema: PageSchema): number {
-    function count(widgets: WidgetSchema[]): number {
-      return widgets.reduce((sum, widget) => {
-        return sum + 1 + (widget.children ? count(widget.children) : 0)
-      }, 0)
-    }
-
-    return count(schema.widgets)
-  }
-
-  function buildWidgetTree(schema: PageSchema): WidgetTreeNode[] {
-    function build(widgets: WidgetSchema[], parentId: string | null = null, depth = 0): WidgetTreeNode[] {
-      return widgets.map(widget => ({
-        widget,
-        children: widget.children ? build(widget.children, widget.id, depth + 1) : [],
-        parentId,
-        depth,
-        expanded: true
-      }))
-    }
-
-    return build(schema.widgets)
-  }
-
-  function removeDefaults(schema: PageSchema): PageSchema {
-    // Implementação simplificada - limpar schema
-    const cleaned = cloneSchema(schema)
-
-    function cleanWidget(widget: WidgetSchema): void {
-      // Limpar widgets filhos recursivamente
-      if (widget.children) {
-        widget.children.forEach(cleanWidget)
-      }
-    }
-
-    cleaned.widgets.forEach(cleanWidget)
-
-    return cleaned
-  }
-
-  function generateTypeScript(schema: PageSchema, _opts: ExportOptions): string {
-    return `import type { PageSchema } from '@lugand-sistemas-ltda/vue-ui-lib'
-
-export const pageSchema: PageSchema = ${JSON.stringify(schema, null, 2)}
-`
-  }
-
-  function generateVue(schema: PageSchema, _opts: ExportOptions): string {
-    return `<template>
-  <PageRenderer :schema="pageSchema" />
-</template>
-
-<script setup lang="ts">
-import { PageRenderer } from '@lugand-sistemas-ltda/vue-ui-lib'
-import type { PageSchema } from '@lugand-sistemas-ltda/vue-ui-lib'
-
-const pageSchema: PageSchema = ${JSON.stringify(schema, null, 2)}
-</script>
-`
-  }
-
-  // ============================================
-  // WATCHERS
-  // ============================================
-
-  // Sincronizar com prop externa
-  if (initialSchema) {
-    watch(initialSchema, (newSchema) => {
-      if (newSchema && !isDirty.value) {
-        schema.value = cloneSchema(newSchema)
-      }
-    }, { deep: true })
-  }
-
-  // ============================================
-  // RETURN
-  // ============================================
-
+  
   return {
-    // State
-    schema,
-    selectedWidgetId,
-    selectedWidget,
-    mode,
-    isDirty,
-    hoveredWidgetId,
-    settings: builderSettings,
-
+    // Core (herdado)
+    schema: core.schema,
+    selectedItem: core.selectedItem,
+    isDirty: core.isDirty,
+    isValid: core.isValid,
+    validation: core.validation,
+    
+    // History (herdado)
+    undo: core.undo,
+    redo: core.redo,
+    canUndo: core.canUndo,
+    canRedo: core.canRedo,
+    
+    // CRUD (herdado)
+    addItem: core.addItem,
+    removeItem: core.removeItem,
+    updateItem: core.updateItem,
+    duplicateItem: core.duplicateItem,
+    clearItems: core.clearItems,
+    
+    // Save/Load (herdado)
+    save: core.save,
+    load: core.load,
+    exportJSON: core.exportJSON,
+    importJSON: core.importJSON,
+    
     // Computed
-    canUndo,
-    canRedo,
-    widgetTree,
+    widgets,
     widgetCount,
-
-    // Widget operations
+    flatWidgets,
+    selectedWidget,
+    
+    // Compatibilidade
+    mode,
+    selectedWidgetId,
+    hoveredWidgetId,
+    settings,
+    hasChanges: core.isDirty, // Alias
+    
+    // Page-specific methods
     addWidget,
     removeWidget,
     updateWidget,
-    moveWidget,
+    moveWidgetUp,
+    moveWidgetDown,
     duplicateWidget,
-    handleDragEvent,
-
-    // Schema operations
-    updateSchema,
-    resetSchema,
-    loadSchema,
-
-    // History
-    undo,
-    redo,
-    clearHistory,
-
-    // Validation
-    validateSchema,
-
-    // Export
+    nestWidget,
+    unnestWidget,
+    generateHTML,
+    generateVueComponent,
+    generateSEOTags,
+    
+    // Métodos de compatibilidade
+    moveWidget,
     exportSchema,
-
-    // Selection
     selectWidget,
-    selectParent,
-    selectFirstChild,
-
-    // Helpers
-    findWidgetById,
-    findParentWidget
+    updateSchema
   }
+}
+
+// ============================================
+// HELPER FUNCTIONS
+// ============================================
+
+/**
+ * Encontra widget pai de um widget
+ */
+function findParentWidget(
+  widgets: PageWidget[],
+  childId: string
+): PageWidget | null {
+  for (const widget of widgets) {
+    if (widget.children) {
+      if (widget.children.some(w => w.id === childId)) {
+        return widget
+      }
+      
+      const found = findParentWidget(widget.children, childId)
+      if (found) return found
+    }
+  }
+  
+  return null
+}
+
+/**
+ * Regenera IDs de widgets filhos recursivamente
+ */
+function regenerateChildrenIds(widgets: PageWidget[]): void {
+  widgets.forEach(widget => {
+    widget.id = `widget-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`
+    if (widget.children) {
+      regenerateChildrenIds(widget.children)
+    }
+  })
+}
+
+/**
+ * Renderiza widget para HTML
+ */
+function renderWidgetToHTML(widget: PageWidget, indent: number): string {
+  const tabs = '  '.repeat(indent)
+  let html = ''
+  
+  switch (widget.type) {
+    case 'heading':
+      const level = widget.props?.level || 2
+      html = `${tabs}<h${level}>${widget.props?.content || ''}</h${level}>\n`
+      break
+    
+    case 'paragraph':
+      html = `${tabs}<p>${widget.props?.content || ''}</p>\n`
+      break
+    
+    case 'button':
+      html = `${tabs}<button>${widget.props?.content || 'Button'}</button>\n`
+      break
+    
+    case 'container':
+      html = `${tabs}<div class="container">\n`
+      if (widget.children) {
+        widget.children.forEach(child => {
+          html += renderWidgetToHTML(child, indent + 1)
+        })
+      }
+      html += `${tabs}</div>\n`
+      break
+    
+    case 'grid':
+      html = `${tabs}<div class="grid">\n`
+      if (widget.children) {
+        widget.children.forEach(child => {
+          html += renderWidgetToHTML(child, indent + 1)
+        })
+      }
+      html += `${tabs}</div>\n`
+      break
+    
+    default:
+      html = `${tabs}<!-- ${widget.type} widget -->\n`
+  }
+  
+  return html
 }

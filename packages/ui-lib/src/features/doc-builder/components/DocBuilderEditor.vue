@@ -8,7 +8,7 @@
       <header class="canvas-header">
         <div class="header-left">
           <h2>{{ schema.name }}</h2>
-          <span class="document-info">{{ schema.items.length }} blocos</span>
+          <span class="document-info">{{ schema.items?.length || 0 }} blocos</span>
         </div>
         
         <div class="header-actions">
@@ -25,7 +25,7 @@
       </header>
       
       <div class="canvas-content">
-        <div v-if="schema.items.length === 0" class="canvas-empty">
+        <div v-if="!schema.items || schema.items.length === 0" class="canvas-empty">
           <div class="empty-icon">📄</div>
           <h3>Documento Vazio</h3>
           <p>Adicione blocos da paleta à esquerda para começar</p>
@@ -53,7 +53,7 @@
                 </button>
                 <button
                   class="btn-icon"
-                  :disabled="index === schema.items.length - 1"
+                  :disabled="index === (schema.items?.length || 0) - 1"
                   title="Mover para baixo"
                   @click.stop="moveBlock(block.id, 'down')"
                 >
@@ -147,7 +147,7 @@ const previewData = ref<DocumentData>({})
  */
 const selectedBlock = computed((): DocumentBlock | null => {
   if (!selectedBlockId.value) return null
-  return schema.value.items.find(b => b.id === selectedBlockId.value) || null
+  return schema.value.items?.find(b => b.id === selectedBlockId.value) || null
 })
 
 /**

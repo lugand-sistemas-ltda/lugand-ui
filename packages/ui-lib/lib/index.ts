@@ -374,7 +374,13 @@ export type {
   HistoryAction as PageHistoryAction,
   ExportOptions as PageExportOptions,
   PageBuilderProps,
-  PageBuilderEmits
+  PageBuilderEmits,
+  
+  // Schema Types
+  PageSchema,
+  PageWidget,
+  PageMetadata,
+  WidgetType
 } from '../src/features/page-builder'
 
 // ============================================
@@ -465,46 +471,6 @@ export type {
   EventDefinition,
   WidgetRenderOptions
 } from '../src/core/widget-system'
-
-// Schema System
-export {
-  // Validator
-  validatePageSchema,
-  canMigrate,
-  quickValidate,
-
-  // Parser
-  parseSchema,
-  serializeSchema,
-  cloneSchema,
-  mergeSchemas,
-  diffSchemas,
-  extractWidgetsByType,
-  extractWidgetById,
-  createEmptySchema,
-  exportSchemaForDebug
-} from '../src/core/schema-system'
-
-// Schema System Types
-export type {
-  SchemaVersion,
-  SchemaType,
-  LayoutStrategy,
-  Breakpoint,
-  ResponsiveLayout,
-  SchemaMetadata,
-  SchemaPermissions,
-  SchemaTheme,
-  SchemaValidation,
-  PageSchema,
-  FormSchema,
-  DashboardSchema,
-  SchemaValidationResult,
-  SchemaParseOptions,
-  SchemaSerializeOptions,
-  SchemaContext,
-  SchemaChangeEvent
-} from '../src/core/schema-system'
 
 // Component Registry
 export {

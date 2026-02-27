@@ -35,5 +35,5 @@ export type {
 } from './types'
 
 // Re-export core types for convenience
-export type { PageSchema } from '../../core/schema-system/types'
+export type { PageSchema, PageWidget, PageMetadata, WidgetType } from './types'
 export type { WidgetSchema } from '../../core/widget-system/types'

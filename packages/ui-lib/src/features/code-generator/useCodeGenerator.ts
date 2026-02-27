@@ -6,7 +6,8 @@
  */
 
 import { ref, computed } from 'vue'
-import type { PageSchema, FormSchema } from '@/core/schema-system/types'
+import type { PageSchema } from '@/features/page-builder/types'
+import type { FormSchema } from '@/features/form-builder/types'
 import type { FormSchema as FormRendererSchema } from '@/features/form-renderer/types'
 import type {
   CodeGeneratorOptions,
@@ -94,13 +95,13 @@ export function useCodeGenerator(initialOptions?: Partial<CodeGeneratorOptions>)
       errors.push('Schema must have an ID')
     }
 
-    if (!schema.widgets || schema.widgets.length === 0) {
-      warnings.push('Schema has no widgets - will generate empty page')
+    if (!schema.items || schema.items.length === 0) {
+      warnings.push('Schema has no items - will generate empty page')
     }
 
     // Validação de widgets (apenas se existir)
-    if (schema.widgets && Array.isArray(schema.widgets)) {
-      schema.widgets.forEach((widget, index) => {
+    if (schema.items && Array.isArray(schema.items)) {
+      schema.items.forEach((widget: any, index) => {
         if (!widget.id) {
           errors.push(`Widget at index ${index} has no ID`)
         }
@@ -123,17 +124,19 @@ export function useCodeGenerator(initialOptions?: Partial<CodeGeneratorOptions>)
     }
 
     // Warnings sobre features complexas
-    if (schema.dataSources) {
-      const apiSources = Object.values(schema.dataSources).filter(ds => ds.type === 'api')
-      if (apiSources.length > 0) {
-        warnings.push('Schema uses API data sources - you need to implement API calls')
-        suggestions.push('Consider using a composable like useApi() for data fetching')
-      }
-    }
+    // TODO: Migrate to metadata - schema.dataSources no longer exists
+    // if (schema.dataSources) {
+    //   const apiSources = Object.values(schema.dataSources).filter(ds => ds.type === 'api')
+    //   if (apiSources.length > 0) {
+    //     warnings.push('Schema uses API data sources - you need to implement API calls')
+    //     suggestions.push('Consider using a composable like useApi() for data fetching')
+    //   }
+    // }
 
-    if (schema.eventHandlers && Object.keys(schema.eventHandlers).length > 0) {
-      warnings.push('Schema has event handlers - you need to implement handler logic')
-    }
+    // TODO: Migrate to metadata - schema.eventHandlers no longer exists
+    // if (schema.eventHandlers && Object.keys(schema.eventHandlers).length > 0) {
+    //   warnings.push('Schema has event handlers - you need to implement handler logic')
+    // }
 
     // Análise do schema
     const analysis = analyzeSchema(schema)
@@ -152,7 +155,7 @@ export function useCodeGenerator(initialOptions?: Partial<CodeGeneratorOptions>)
    */
   function analyzeSchema(schema: PageSchema): SchemaAnalysis {
     const uniqueWidgets = Array.from(
-      new Set(schema.widgets.map(w => w.type))
+      new Set((schema.items || []).map((w: any) => w.type))
     )
 
     const complexComponents = uniqueWidgets.filter(type =>
@@ -161,13 +164,14 @@ export function useCodeGenerator(initialOptions?: Partial<CodeGeneratorOptions>)
 
     return {
       uniqueWidgets,
-      totalWidgets: schema.widgets.length,
-      maxDepth: calculateMaxDepth(schema.widgets),
-      hasDataSources: !!schema.dataSources && Object.keys(schema.dataSources).length > 0,
-      hasEventHandlers: !!schema.eventHandlers && Object.keys(schema.eventHandlers).length > 0,
-      hasValidation: !!schema.validation,
-      hasPermissions: !!schema.permissions,
-      hasCustomTheme: !!schema.theme,
+      totalWidgets: schema.items?.length || 0,
+      maxDepth: calculateMaxDepth(schema.items || []),
+      // TODO: Migrate to metadata - removed properties
+      hasDataSources: false, // !!schema.dataSources && Object.keys(schema.dataSources).length > 0,
+      hasEventHandlers: false, // !!schema.eventHandlers && Object.keys(schema.eventHandlers).length > 0,
+      hasValidation: false, // !!schema.validation,
+      hasPermissions: false, // !!schema.permissions,
+      hasCustomTheme: false, // !!schema.theme,
       complexComponents,
       warnings: []
     }
@@ -269,8 +273,8 @@ export function useCodeGenerator(initialOptions?: Partial<CodeGeneratorOptions>)
 
     if (options.value.includeComments) {
       lines.push('/**')
-      lines.push(` * ${schema.metadata.title || 'Page Schema'}`)
-      if (schema.metadata.description) {
+      lines.push(` * ${schema.metadata?.title || 'Page Schema'}`)
+      if (schema.metadata?.description) {
         lines.push(` * ${schema.metadata.description}`)
       }
       lines.push(` * Generated: ${new Date().toISOString()}`)
@@ -307,7 +311,8 @@ export function useCodeGenerator(initialOptions?: Partial<CodeGeneratorOptions>)
     // FormRendererSchema não tem widgets, retorna componentes de form
     if ('fields' in schema) {
       const componentMap = new Map<string, ComponentUsage>()
-      schema.fields.forEach(field => {
+      const items = schema.items || []
+      items.forEach(field => {
         const componentName = 'Input' // Simplificado por enquanto
         if (componentMap.has(componentName)) {
           const usage = componentMap.get(componentName)!
@@ -331,7 +336,7 @@ export function useCodeGenerator(initialOptions?: Partial<CodeGeneratorOptions>)
     const componentMap = new Map<string, ComponentUsage>()
 
     const pageSchema = schema as PageSchema
-    pageSchema.widgets.forEach(widget => {
+    pageSchema.items?.forEach((widget: any) => {
       const componentName = widgetTypeToComponentName(widget.type)
 
       if (componentMap.has(componentName)) {
@@ -452,7 +457,7 @@ export function useCodeGenerator(initialOptions?: Partial<CodeGeneratorOptions>)
       } catch (error) {
         const message = error instanceof Error ? error.message : 'Unknown error'
         results.push({
-          fileName: schema.metadata.title || 'unknown',
+          fileName: schema.metadata?.title || 'unknown',
           success: false,
           error: message
         })
@@ -522,7 +527,7 @@ export function useCodeGenerator(initialOptions?: Partial<CodeGeneratorOptions>)
    * Gera nome de arquivo baseado no schema
    */
   function getFileName(schema: PageSchema): string {
-    const baseName = schema.metadata.title || schema.id || 'generated-page'
+    const baseName = schema.metadata?.title || schema.id || 'generated-page'
     const formatted = formatFileName(baseName, options.value.namingConvention!)
 
     const extension = options.value.format === 'vue-sfc'
@@ -570,7 +575,7 @@ export function useCodeGenerator(initialOptions?: Partial<CodeGeneratorOptions>)
    * Gera nome de const para schema TypeScript
    */
   function getSchemaConstName(schema: PageSchema): string {
-    const baseName = schema.metadata.title || schema.id || 'page'
+    const baseName = schema.metadata?.title || schema.id || 'page'
     return formatFileName(baseName, 'camelCase') + 'Schema'
   }
 

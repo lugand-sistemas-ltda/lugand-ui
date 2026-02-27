@@ -140,8 +140,7 @@ Exemplo:
 <script setup lang="ts">
 import { ref, computed } from 'vue'
 import { useCodeGenerator } from '@/features/code-generator'
-import type { PageSchema } from '@/core/schema-system/types'
-import { createSchemaMetadata, createGridLayout } from '@/core/schema-system/types'
+import type { PageSchema } from '@/features/page-builder/types'
 
 // ============================================
 // STATE

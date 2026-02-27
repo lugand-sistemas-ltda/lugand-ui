@@ -1,25 +1,25 @@
 <template>
   <div class="design-canvas">
     <div class="canvas-header">
-      <Input :model-value="schema.title || ''" @update:model-value="updateSchemaTitle" placeholder="Form Title"
+      <Input :model-value="schema.metadata?.title || ''" @update:model-value="updateSchemaTitle" placeholder="Form Title"
         class="title-input" />
-      <Input :model-value="schema.description || ''" @update:model-value="updateSchemaDescription"
+      <Input :model-value="schema.metadata?.description || ''" @update:model-value="updateSchemaDescription"
         placeholder="Form Description" class="description-input" />
     </div>
 
     <div class="canvas-drop-zone" @drop="handleDrop" @dragover.prevent="handleDragOver" @dragleave="handleDragLeave"
       :class="{ 'drag-over': isDragOver }">
       <!-- Fields List -->
-      <div v-if="schema.fields.length > 0" class="fields-list">
-        <div v-for="(field, index) in schema.fields" :key="field.name"
+      <div v-if="schema.items && schema.items.length > 0" class="fields-list">
+        <div v-for="(field, index) in schema.items" :key="field.id"
           :class="['field-item', { selected: isSelected(field) }]" :draggable="true" @click="selectField(field)"
           @dragstart="handleFieldDragStart(field, index, $event)" @dragover.prevent="handleFieldDragOver(index)"
           @drop.stop="handleFieldDrop(index, $event)">
           <div class="field-header">
             <div class="field-icon">{{ getFieldIcon(field.type) }}</div>
             <div class="field-info">
-              <div class="field-name">{{ field.name }}</div>
-              <div class="field-label">{{ field.label }}</div>
+              <div class="field-name">{{ field.id }}</div>
+              <div class="field-label">{{ field.props?.label }}</div>
             </div>
             <Button size="sm" variant="ghost" @click.stop="duplicateField(field)">📋</Button>
             <Button size="sm" variant="ghost" @click.stop="removeFieldAtIndex(index)">🗑️</Button>
@@ -40,7 +40,7 @@
 <script setup lang="ts">
 import { ref } from 'vue'
 import { Button, Input } from '../../../shared/components'
-import type { FormSchema, FormField } from '../../form-renderer/types'
+import type { FormSchema, FormField } from '../types'
 
 interface Props {
   schema: FormSchema
@@ -63,19 +63,33 @@ const dragOverIndex = ref<number | null>(null)
 const draggedField = ref<{ field: FormField; index: number } | null>(null)
 
 function isSelected(field: FormField) {
-  return props.selectedFieldId === field.name
+  return props.selectedFieldId === field.id
 }
 
 function selectField(field: FormField) {
-  emit('update:selectedFieldId', field.name)
+  emit('update:selectedFieldId', field.id || null)
 }
 
 function updateSchemaTitle(title: string | number) {
-  emit('update:schema', { ...props.schema, title: String(title) })
+  const currentMetadata = props.schema.metadata || { title: '' }
+  emit('update:schema', { 
+    ...props.schema, 
+    metadata: { 
+      ...currentMetadata,
+      title: String(title)
+    }
+  })
 }
 
 function updateSchemaDescription(description: string | number) {
-  emit('update:schema', { ...props.schema, description: String(description) })
+  const currentMetadata = props.schema.metadata || { title: '' }
+  emit('update:schema', { 
+    ...props.schema, 
+    metadata: { 
+      ...currentMetadata,
+      description: String(description)
+    }
+  })
 }
 
 function handleDragOver(event: DragEvent) {
@@ -97,7 +111,7 @@ function handleDrop(event: DragEvent) {
   try {
     const parsed = JSON.parse(data)
     if (parsed.type === 'palette-field' && parsed.field) {
-      emit('field-add', parsed.field as FormField, props.schema.fields.length)
+      emit('field-add', parsed.field as FormField, props.schema.items?.length || 0)
     }
   } catch (error) {
     console.error('Failed to parse drag data:', error)
@@ -118,7 +132,10 @@ function handleFieldDrop(targetIndex: number, event: DragEvent) {
 
   if (draggedField.value) {
     // Internal move
-    emit('field-move', draggedField.value.field.name, targetIndex)
+    const fieldId = draggedField.value.field.id
+    if (fieldId) {
+      emit('field-move', fieldId, targetIndex)
+    }
     draggedField.value = null
   } else {
     // External drop from palette
@@ -139,7 +156,8 @@ function handleFieldDrop(targetIndex: number, event: DragEvent) {
 }
 
 function removeFieldAtIndex(index: number) {
-  const field = props.schema.fields[index]
+  if (!props.schema.items) return
+  const field = props.schema.items[index]
   if (!field) return // Guard: field pode ser undefined
 
   emit('field-remove', field, index)
@@ -148,10 +166,13 @@ function removeFieldAtIndex(index: number) {
 function duplicateField(field: FormField) {
   const duplicate: FormField = {
     ...field,
-    name: `${field.name}_copy_${Date.now()}`,
-    label: `${field.label} (Copy)`
+    id: `${field.id}_copy_${Date.now()}`,
+    props: {
+      ...field.props,
+      label: `${field.props?.label || field.id} (Copy)`
+    }
   }
-  const index = props.schema.fields.findIndex(f => f.name === field.name)
+  const index = props.schema.items?.findIndex(f => f.id === field.id) ?? -1
   emit('field-add', duplicate, index + 1)
 }
 

@@ -80,9 +80,9 @@
 </template>
 
 <script setup lang="ts">
-import { watch, toRef } from 'vue'
+import { watch } from 'vue'
 import { Button } from '../../../shared/components'
-import type { PageSchema, WidgetSchema } from '../../../core/schema-system/types'
+import type { PageSchema, PageWidget, WidgetSchema } from '../types'
 import type { WidgetTypePalette } from '../types'
 import { usePageBuilder } from '../usePageBuilder'
 import WidgetPalette from './WidgetPalette.vue'
@@ -145,10 +145,10 @@ const {
   exportSchema,
   selectWidget,
   updateSchema
-} = usePageBuilder(
-  toRef(props, 'modelValue'),
-  props.settings
-)
+} = usePageBuilder({
+  initialSchema: props.modelValue,
+  settings: props.settings
+})
 
 // ============================================
 // HANDLERS
@@ -162,13 +162,15 @@ function handleWidgetDragEnd() {
   // Limpar feedback visual
 }
 
-function handleSchemaUpdate(updates: Partial<PageSchema>) {
-  updateSchema(updates)
+function handleSchemaUpdate(newSchema: PageSchema) {
+  const schemaClone = JSON.parse(JSON.stringify(newSchema))
+  emit('update:modelValue', schemaClone)
 }
 
-function handleWidgetAdd(widget: Omit<WidgetSchema, 'id'>, parentId: string | null, index: number) {
-  const id = addWidget(widget, parentId, index)
-  emit('widget-add', { ...widget, id })
+function handleWidgetAdd(widget: Omit<PageWidget, 'id'>, parentId: string | null, index: number) {
+  const newWidget = addWidget(widget.type, widget.props, parentId || undefined, index)
+  const widgetClone = JSON.parse(JSON.stringify(newWidget))
+  emit('widget-add', widgetClone)
 }
 
 function handleWidgetRemove(widgetId: string) {
@@ -177,7 +179,7 @@ function handleWidgetRemove(widgetId: string) {
 }
 
 function handleWidgetMove(widgetId: string, newParentId: string | null, newIndex: number) {
-  moveWidget(widgetId, newParentId, newIndex)
+  moveWidget(widgetId, newParentId || undefined, newIndex)
   emit('widget-move', widgetId, newIndex)
 }
 
@@ -194,15 +196,19 @@ function handleCodeUpdate(newSchema: PageSchema) {
 
 function handleSave() {
   if (props.onAutoSave) {
-    props.onAutoSave(schema.value)
+    // Clone para evitar problemas com readonly
+    const schemaClone = JSON.parse(JSON.stringify(schema.value))
+    props.onAutoSave(schemaClone)
   }
-  isDirty.value = false
+  console.log('Schema saved')
 }
 
 function handleExport() {
   try {
-    const exported = exportSchema({ format: 'json', minify: false })
-    emit('export', schema.value, 'json')
+    const exported = exportSchema('json')
+    // Clone para evitar problemas com readonly
+    const schemaClone = JSON.parse(JSON.stringify(schema.value))
+    emit('export', schemaClone, 'json')
 
     // Download file
     const blob = new Blob([exported], { type: 'application/json' })
@@ -223,7 +229,7 @@ function handleExport() {
 
 // Sync schema changes to parent
 watch(schema, (newSchema) => {
-  emit('update:modelValue', newSchema)
+  emit('update:modelValue', newSchema as PageSchema)
 }, { deep: true })
 
 // Emit widget selection

@@ -23,12 +23,14 @@ export const FIELD_PALETTE: FieldTypePalette[] = [
     icon: '📝',
     category: 'basic',
     defaultField: {
-      name: 'text_field',
-      label: 'Text Field',
+      id: 'text_field',
       type: 'text',
-      placeholder: 'Enter text...'
+      props: {
+        label: 'Text Field',
+        placeholder: 'Enter text...'
+      }
     },
-    editableProps: ['name', 'label', 'placeholder', 'required', 'disabled', 'readonly', 'maxLength']
+
   },
   {
     type: 'email',
@@ -36,16 +38,20 @@ export const FIELD_PALETTE: FieldTypePalette[] = [
     icon: '✉️',
     category: 'basic',
     defaultField: {
-      name: 'email',
-      label: 'Email Address',
+      id: 'email',
       type: 'email',
-      placeholder: 'email@example.com',
-      validation: [
-        { type: 'required', message: 'Email is required' },
-        { type: 'email', message: 'Invalid email format' }
-      ]
+      props: {
+        label: 'Email Address',
+        placeholder: 'email@example.com',
+        validation: {
+          rules: [
+            { type: 'required', message: 'Email is required' },
+            { type: 'email', message: 'Invalid email format' }
+          ]
+        }
+      }
     },
-    editableProps: ['name', 'label', 'placeholder', 'required']
+
   },
   {
     type: 'password',
@@ -53,16 +59,19 @@ export const FIELD_PALETTE: FieldTypePalette[] = [
     icon: '🔒',
     category: 'basic',
     defaultField: {
-      name: 'password',
-      label: 'Password',
+      id: 'password',
       type: 'password',
-      placeholder: 'Enter password...',
-      validation: [
-        { type: 'required', message: 'Password is required' },
-        { type: 'minLength', value: 8, message: 'Min 8 characters' }
-      ]
+      props: {
+        label: 'Password',
+        placeholder: 'Enter password...',
+        validation: {
+          rules: [
+            { type: 'required', message: 'Password is required' }
+          ]
+        }
+      }
     },
-    editableProps: ['name', 'label', 'placeholder', 'required', 'minLength', 'maxLength']
+
   },
   {
     type: 'number',
@@ -70,12 +79,14 @@ export const FIELD_PALETTE: FieldTypePalette[] = [
     icon: '🔢',
     category: 'basic',
     defaultField: {
-      name: 'number',
-      label: 'Number',
+      id: 'number',
       type: 'number',
-      placeholder: '0'
+      props: {
+        label: 'Number',
+        placeholder: '0'
+      }
     },
-    editableProps: ['name', 'label', 'placeholder', 'required', 'min', 'max', 'step']
+
   },
   {
     type: 'textarea',
@@ -83,13 +94,15 @@ export const FIELD_PALETTE: FieldTypePalette[] = [
     icon: '📄',
     category: 'basic',
     defaultField: {
-      name: 'textarea',
-      label: 'Description',
+      id: 'textarea',
       type: 'textarea',
-      placeholder: 'Enter description...',
-      rows: 4
+      props: {
+        label: 'Description',
+        placeholder: 'Enter description...',
+        rows: 4
+      }
     },
-    editableProps: ['name', 'label', 'placeholder', 'required', 'rows', 'maxLength']
+
   },
   {
     type: 'tel',
@@ -97,12 +110,14 @@ export const FIELD_PALETTE: FieldTypePalette[] = [
     icon: '📞',
     category: 'basic',
     defaultField: {
-      name: 'phone',
-      label: 'Phone Number',
+      id: 'phone',
       type: 'tel',
-      placeholder: '(11) 99999-9999'
+      props: {
+        label: 'Phone Number',
+        placeholder: '(11) 99999-9999'
+      }
     },
-    editableProps: ['name', 'label', 'placeholder', 'required']
+
   },
   {
     type: 'url',
@@ -110,12 +125,14 @@ export const FIELD_PALETTE: FieldTypePalette[] = [
     icon: '🔗',
     category: 'basic',
     defaultField: {
-      name: 'url',
-      label: 'Website',
+      id: 'url',
       type: 'url',
-      placeholder: 'https://example.com'
+      props: {
+        label: 'Website',
+        placeholder: 'https://example.com'
+      }
     },
-    editableProps: ['name', 'label', 'placeholder', 'required']
+
   },
 
   // ============================================
@@ -127,17 +144,19 @@ export const FIELD_PALETTE: FieldTypePalette[] = [
     icon: '📋',
     category: 'selection',
     defaultField: {
-      name: 'select',
-      label: 'Select Option',
+      id: 'select',
       type: 'select',
-      placeholder: 'Choose an option...',
-      options: [
-        { label: 'Option 1', value: '1' },
-        { label: 'Option 2', value: '2' },
-        { label: 'Option 3', value: '3' }
-      ]
+      props: {
+        label: 'Select Option',
+        placeholder: 'Choose an option...',
+        options: [
+          { label: 'Option 1', value: '1' },
+          { label: 'Option 2', value: '2' },
+          { label: 'Option 3', value: '3' }
+        ]
+      }
     },
-    editableProps: ['name', 'label', 'placeholder', 'required', 'options', 'multiple']
+
   },
   {
     type: 'radio',
@@ -145,16 +164,18 @@ export const FIELD_PALETTE: FieldTypePalette[] = [
     icon: '🔘',
     category: 'selection',
     defaultField: {
-      name: 'radio',
-      label: 'Choose One',
+      id: 'radio',
       type: 'radio',
-      options: [
-        { label: 'Option 1', value: '1' },
-        { label: 'Option 2', value: '2' },
-        { label: 'Option 3', value: '3' }
-      ]
+      props: {
+        label: 'Choose One',
+        options: [
+          { label: 'Option 1', value: '1' },
+          { label: 'Option 2', value: '2' },
+          { label: 'Option 3', value: '3' }
+        ]
+      }
     },
-    editableProps: ['name', 'label', 'required', 'options']
+
   },
   {
     type: 'checkbox',
@@ -162,11 +183,13 @@ export const FIELD_PALETTE: FieldTypePalette[] = [
     icon: '☑️',
     category: 'selection',
     defaultField: {
-      name: 'checkbox',
-      label: 'I agree to terms and conditions',
-      type: 'checkbox'
+      id: 'checkbox',
+      type: 'checkbox',
+      props: {
+        label: 'I agree to terms and conditions'
+      }
     },
-    editableProps: ['name', 'label', 'required']
+
   },
   {
     type: 'switch',
@@ -174,11 +197,13 @@ export const FIELD_PALETTE: FieldTypePalette[] = [
     icon: '🎚️',
     category: 'selection',
     defaultField: {
-      name: 'switch',
-      label: 'Enable notifications',
-      type: 'switch'
+      id: 'switch',
+      type: 'switch',
+      props: {
+        label: 'Enable notifications'
+      }
     },
-    editableProps: ['name', 'label']
+
   },
 
   // ============================================
@@ -190,11 +215,13 @@ export const FIELD_PALETTE: FieldTypePalette[] = [
     icon: '📅',
     category: 'advanced',
     defaultField: {
-      name: 'date',
-      label: 'Date',
-      type: 'date'
+      id: 'date',
+      type: 'date',
+      props: {
+        label: 'Date'
+      }
     },
-    editableProps: ['name', 'label', 'required', 'min', 'max']
+
   },
   {
     type: 'time',
@@ -202,11 +229,13 @@ export const FIELD_PALETTE: FieldTypePalette[] = [
     icon: '🕐',
     category: 'advanced',
     defaultField: {
-      name: 'time',
-      label: 'Time',
-      type: 'time'
+      id: 'time',
+      type: 'time',
+      props: {
+        label: 'Time'
+      }
     },
-    editableProps: ['name', 'label', 'required']
+
   },
   {
     type: 'date',
@@ -214,11 +243,13 @@ export const FIELD_PALETTE: FieldTypePalette[] = [
     icon: '📆',
     category: 'advanced',
     defaultField: {
-      name: 'datetime',
-      label: 'Date and Time',
-      type: 'date'
+      id: 'datetime',
+      type: 'date',
+      props: {
+        label: 'Date and Time'
+      }
     },
-    editableProps: ['name', 'label', 'required']
+
   },
   {
     type: 'file',
@@ -226,11 +257,12 @@ export const FIELD_PALETTE: FieldTypePalette[] = [
     icon: '📎',
     category: 'advanced',
     defaultField: {
-      name: 'file',
-      label: 'Upload File',
-      type: 'file'
+      id: 'file',
+      type: 'file',
+      props: {
+        label: 'Upload File'
+      }
     },
-    editableProps: ['name', 'label', 'required', 'accept', 'multiple'],
     isPro: true
   },
   {
@@ -239,12 +271,14 @@ export const FIELD_PALETTE: FieldTypePalette[] = [
     icon: '🎨',
     category: 'advanced',
     defaultField: {
-      name: 'color',
-      label: 'Choose Color',
+      id: 'color',
       type: 'color',
-      defaultValue: '#000000'
+      props: {
+        label: 'Choose Color',
+        defaultValue: '#000000'
+      }
     },
-    editableProps: ['name', 'label', 'required']
+
   },
   {
     type: 'range',
@@ -252,14 +286,15 @@ export const FIELD_PALETTE: FieldTypePalette[] = [
     icon: '🎚️',
     category: 'advanced',
     defaultField: {
-      name: 'range',
-      label: 'Range',
+      id: 'range',
       type: 'range',
-      min: 0,
-      max: 100,
-      step: 1
+      props: {
+        label: 'Range',
+        min: 0,
+        max: 100,
+        step: 1
+      }
     },
-    editableProps: ['name', 'label', 'required', 'min', 'max', 'step'],
     isPro: true
   },
 
@@ -272,11 +307,13 @@ export const FIELD_PALETTE: FieldTypePalette[] = [
     icon: '👁️',
     category: 'layout',
     defaultField: {
-      name: 'hidden',
-      label: 'Hidden',
-      type: 'hidden'
+      id: 'hidden',
+      type: 'hidden',
+      props: {
+        label: 'Hidden'
+      }
     },
-    editableProps: ['name', 'defaultValue']
+
   }
 ]
 

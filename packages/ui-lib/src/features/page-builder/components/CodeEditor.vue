@@ -26,7 +26,7 @@
 <script setup lang="ts">
 import { ref, computed } from 'vue'
 import { Button } from '../../../shared/components'
-import type { PageSchema } from '../../../core/schema-system/types'
+import type { PageSchema } from '../types'
 
 // ============================================
 // PROPS & EMITS

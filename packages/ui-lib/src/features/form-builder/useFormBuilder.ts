@@ -1,661 +1,532 @@
 /**
- * useFormBuilder.ts
+ * useFormBuilder - Composable para Form Builder
  * 
  * Composable para gerenciar estado e lógica do Form Builder.
- * Responsável por add/remove/update fields, undo/redo, validação, export.
- * 
- * @module features/form-builder
- * @created 2025-01-XX
+ * Herda funcionalidade CRUD, history e validação de useSchemaBuilder.
  */
 
-import { ref, computed, watch, type Ref } from 'vue'
-import type { FormSchema, FormField } from '../form-renderer/types'
+import { computed, ref } from 'vue'
+import { useSchemaBuilder } from '@/core/schema-builder'
 import type {
-  BuilderSettings,
-  FieldDragEvent,
-  SchemaValidationResult,
-  HistoryAction,
-  ExportOptions
+  FormSchema,
+  FormField,
+  FieldType,
+  FormValidationResult,
+  BuilderSettings
 } from './types'
+import { createEmptyFormSchema, createFormField } from './types'
 
 /**
- * Configurações padrão do builder
+ * Opções do useFormBuilder
  */
-const DEFAULT_SETTINGS: BuilderSettings = {
-  showGrid: true,
-  snapToGrid: false,
-  showLabels: true,
-  autoSaveInterval: 30000, // 30s
-  liveValidation: true,
-  theme: 'auto'
+export interface UseFormBuilderOptions {
+  /** Schema inicial */
+  initialSchema?: FormSchema
+  
+  /** Auto-save ativo */
+  autoSave?: boolean
+  
+  /** Delay do auto-save (ms) */
+  autoSaveDelay?: number
+  
+  /** Storage key para persistência */
+  storageKey?: string
+  
+  /** Habilitar undo/redo */
+  enableHistory?: boolean
+  
+  /** Tamanho do histórico */
+  historySize?: number
+  
+  /** Configurações do builder */
+  settings?: Partial<BuilderSettings>
 }
 
 /**
  * Composable para Form Builder
- * 
- * @param initialSchema - Schema inicial
- * @param settings - Configurações customizadas
- * @returns Estado e métodos do builder
- * 
- * @example
- * const {
- *   schema,
- *   selectedField,
- *   addField,
- *   removeField,
- *   updateField,
- *   undo,
- *   redo,
- *   exportSchema
- * } = useFormBuilder()
+ * Herda CRUD, history, validation de useSchemaBuilder
  */
-export function useFormBuilder(
-  initialSchema?: Ref<FormSchema | undefined>,
-  settings?: Partial<BuilderSettings>
-) {
+export function useFormBuilder(options: UseFormBuilderOptions = {}) {
   // ============================================
-  // STATE
+  // CORE - Herda TUDO do useSchemaBuilder
   // ============================================
-
-  const schema = ref<FormSchema>(initialSchema?.value || createEmptySchema())
-  const selectedFieldId = ref<string | null>(null)
-  const mode = ref<'design' | 'preview' | 'code'>('design')
-  const history = ref<HistoryAction[]>([])
-  const historyIndex = ref(-1)
-  const isDirty = ref(false)
-  const builderSettings = ref<BuilderSettings>({
-    ...DEFAULT_SETTINGS,
-    ...settings
+  
+  const core = useSchemaBuilder<FormSchema, FormField>({
+    initialSchema: options.initialSchema || createEmptyFormSchema(),
+    storageKey: options.storageKey || 'form-builder-state',
+    enableHistory: options.enableHistory ?? true,
+    historySize: options.historySize ?? 50,
+    autoSaveDelay: options.autoSaveDelay ?? 30000
   })
-
+  
+  // ============================================
+  // COMPATIBILIDADE (para componentes Vue legados)
+  // ============================================
+  
+  /**
+   * Modo do builder (design/preview/code)
+   */
+  const mode = ref<'design' | 'preview' | 'code'>('design')
+  
+  /**
+   * ID do campo selecionado (alias de selectedItem)
+   */
+  const selectedFieldId = core.selectedItem
+  
+  /**
+   * Settings (expõe para componentes)
+   */
+  const settings = options.settings || {}
+  
   // ============================================
   // COMPUTED
   // ============================================
-
+  
+  /**
+   * Lista de campos (alias de items)
+   */
+  const fields = computed(() => core.schema.value.items || [])
+  
+  /**
+   * Quantidade de campos
+   */
+  const fieldCount = computed(() => fields.value.length)
+  
+  /**
+   * Campo selecionado
+   */
   const selectedField = computed(() => {
-    if (!selectedFieldId.value) return null
-    return schema.value.fields.find(f => f.name === selectedFieldId.value) || null
+    if (!core.selectedItem.value) return null
+    return fields.value.find(f => f.id === core.selectedItem.value) || null
   })
-
-  const canUndo = computed(() => historyIndex.value > 0)
-  const canRedo = computed(() => historyIndex.value < history.value.length - 1)
-
-  const fieldCount = computed(() => schema.value.fields.length)
-
-  const hasChanges = computed(() => isDirty.value)
-
+  
   // ============================================
-  // METHODS - FIELD MANAGEMENT
+  // FORM-SPECIFIC METHODS
   // ============================================
-
+  
   /**
    * Adiciona um campo ao formulário
+   * 
+   * @param type - Tipo do campo
+   * @param props - Propriedades customizadas
+   * @param position - Posição (opcional, default: final)
+   * @returns Campo criado
    */
-  function addField(field: Partial<FormField>, index?: number) {
-    const newField: FormField = {
-      name: field.name || `field_${Date.now()}`,
-      label: field.label || 'New Field',
-      type: field.type || 'text',
-      required: field.required || false,
-      ...field
-    }
-
-    const targetIndex = index !== undefined ? index : schema.value.fields.length
-
-    const before = cloneSchema(schema.value)
-    schema.value.fields.splice(targetIndex, 0, newField)
-    const after = cloneSchema(schema.value)
-
-    addToHistory({
-      type: 'add',
-      fieldName: newField.name,
-      before,
-      after,
-      timestamp: Date.now()
-    })
-
-    selectedFieldId.value = newField.name
-    isDirty.value = true
-
-    return newField
+  function addField(
+    type: FieldType,
+    props?: Partial<FormField['props']>,
+    position?: number
+  ): FormField {
+    const field = createFormField(type, props)
+    core.addItem(field, position)
+    return field
   }
-
+  
   /**
-   * Remove um campo do formulário
+   * Remove um campo
    */
-  function removeField(fieldName: string) {
-    const fieldIndex = schema.value.fields.findIndex(f => f.name === fieldName)
-    if (fieldIndex === -1) return false
-
-    const before = cloneSchema(schema.value)
-    const [removedField] = schema.value.fields.splice(fieldIndex, 1)
-    const after = cloneSchema(schema.value)
-
-    addToHistory({
-      type: 'remove',
-      fieldName,
-      before,
-      after,
-      timestamp: Date.now()
-    })
-
-    if (selectedFieldId.value === fieldName) {
-      selectedFieldId.value = null
-    }
-
-    isDirty.value = true
-    return removedField
+  function removeField(fieldId: string): void {
+    core.removeItem(fieldId)
   }
-
+  
   /**
-   * Atualiza propriedades de um campo
+   * Atualiza um campo
    */
-  function updateField(fieldName: string, updates: Partial<FormField>) {
-    const fieldIndex = schema.value.fields.findIndex(f => f.name === fieldName)
-    if (fieldIndex === -1) return false
-
-    const before = cloneSchema(schema.value)
-
-    // Merge updates mantendo required fields
-    const currentField = schema.value.fields[fieldIndex]
-    if (!currentField) {
-      console.warn(`Field ${fieldName} not found at index ${fieldIndex}`)
-      return
-    }
-
-    schema.value.fields[fieldIndex] = {
-      ...currentField,
-      ...updates,
-      // Garantir campos obrigatórios
-      name: updates.name ?? currentField.name,
-      type: updates.type ?? currentField.type,
-      label: updates.label ?? currentField.label
-    }
-
-    const after = cloneSchema(schema.value)
-
-    addToHistory({
-      type: 'update',
-      fieldName,
-      before,
-      after,
-      timestamp: Date.now()
-    })
-
-    isDirty.value = true
-    return true
+  function updateField(
+    fieldId: string,
+    updates: Partial<FormField>
+  ): void {
+    core.updateItem(fieldId, updates)
   }
-
+  
   /**
-   * Move um campo para nova posição
+   * Move um campo para cima
    */
-  function moveField(fieldName: string, newIndex: number) {
-    const currentIndex = schema.value.fields.findIndex(f => f.name === fieldName)
-    if (currentIndex === -1) return false
-
-    const before = cloneSchema(schema.value)
-
-    const [field] = schema.value.fields.splice(currentIndex, 1)
-    if (!field) return false // Guard: field pode ser undefined
-
-    schema.value.fields.splice(newIndex, 0, field)
-
-    const after = cloneSchema(schema.value)
-
-    addToHistory({
-      type: 'move',
-      fieldName,
-      before,
-      after,
-      timestamp: Date.now()
-    })
-
-    isDirty.value = true
-    return true
+  function moveFieldUp(fieldId: string): void {
+    core.moveItem(fieldId, 'up')
   }
-
+  
+  /**
+   * Move um campo para baixo
+   */
+  function moveFieldDown(fieldId: string): void {
+    core.moveItem(fieldId, 'down')
+  }
+  
   /**
    * Duplica um campo
    */
-  function duplicateField(fieldName: string) {
-    const field = schema.value.fields.find(f => f.name === fieldName)
-    if (!field) return null
-
-    const duplicate = {
-      ...field,
-      name: `${field.name}_copy_${Date.now()}`,
-      label: `${field.label} (Copy)`
-    }
-
-    const fieldIndex = schema.value.fields.findIndex(f => f.name === fieldName)
-    return addField(duplicate, fieldIndex + 1)
+  function duplicateField(fieldId: string): void {
+    core.duplicateItem(fieldId)
   }
-
+  
   /**
-   * Processa evento de drag and drop
+   * Valida dados do formulário contra o schema
+   * 
+   * @param formData - Dados do formulário
+   * @returns Resultado da validação
    */
-  function handleDragEvent(event: FieldDragEvent) {
-    switch (event.action) {
-      case 'add':
-        if (event.field) {
-          addField(event.field, event.targetIndex)
+  async function validateFormData(
+    formData: Record<string, any>
+  ): Promise<FormValidationResult> {
+    const errors: Record<string, string> = {}
+    const warnings: Record<string, string> = {}
+    
+    for (const field of fields.value) {
+      const value = formData[field.id]
+      
+      // Skip campos condicionais não visíveis
+      if (field.props?.conditional && !isFieldVisible(field as any, formData)) {
+        continue
+      }
+      
+      // Validação required
+      if (field.props?.required && isEmpty(value)) {
+        errors[field.id] = `${field.props.label || field.id} é obrigatório`
+        continue
+      }
+      
+      // Validação de tipo
+      const typeValidation = validateFieldType(field.type, value)
+      if (!typeValidation.valid) {
+        errors[field.id] = typeValidation.message
+        continue
+      }
+      
+      // Validações customizadas
+      if (field.props?.validation) {
+        const rules = Array.isArray(field.props.validation) 
+          ? field.props.validation 
+          : field.props.validation.rules || []
+        
+        for (const rule of rules) {
+          const result = await validateRule(rule, value, formData)
+          if (!result.valid) {
+            errors[field.id] = result.message
+            break
+          }
         }
-        break
-
-      case 'move':
-        if (event.field && event.sourceIndex !== undefined) {
-          moveField(event.field.name, event.targetIndex)
-        }
-        break
-
-      case 'copy':
-        if (event.field) {
-          const copy = { ...event.field, name: `${event.field.name}_copy` }
-          addField(copy, event.targetIndex)
-        }
-        break
-    }
-  }
-
-  // ============================================
-  // METHODS - SCHEMA MANAGEMENT
-  // ============================================
-
-  /**
-   * Atualiza propriedades do schema
-   */
-  function updateSchema(updates: Partial<FormSchema>) {
-    const before = cloneSchema(schema.value)
-
-    schema.value = {
-      ...schema.value,
-      ...updates
-    }
-
-    const after = cloneSchema(schema.value)
-
-    addToHistory({
-      type: 'update',
-      before,
-      after,
-      timestamp: Date.now()
-    })
-
-    isDirty.value = true
-  }
-
-  /**
-   * Reseta schema para vazio
-   */
-  function resetSchema() {
-    const before = cloneSchema(schema.value)
-    schema.value = createEmptySchema()
-    const after = cloneSchema(schema.value)
-
-    addToHistory({
-      type: 'update',
-      before,
-      after,
-      timestamp: Date.now()
-    })
-
-    selectedFieldId.value = null
-    isDirty.value = false
-  }
-
-  /**
-   * Carrega schema externo
-   */
-  function loadSchema(newSchema: FormSchema) {
-    const before = cloneSchema(schema.value)
-    schema.value = cloneSchema(newSchema)
-    const after = cloneSchema(schema.value)
-
-    addToHistory({
-      type: 'update',
-      before,
-      after,
-      timestamp: Date.now()
-    })
-
-    selectedFieldId.value = null
-    isDirty.value = false
-  }
-
-  // ============================================
-  // METHODS - HISTORY (UNDO/REDO)
-  // ============================================
-
-  function addToHistory(action: HistoryAction) {
-    // Remover histórico futuro se não estamos no final
-    if (historyIndex.value < history.value.length - 1) {
-      history.value = history.value.slice(0, historyIndex.value + 1)
-    }
-
-    history.value.push(action)
-    historyIndex.value++
-
-    // Limitar histórico a 50 ações
-    if (history.value.length > 50) {
-      history.value.shift()
-      historyIndex.value--
-    }
-  }
-
-  function undo() {
-    if (!canUndo.value) return
-
-    const action = history.value[historyIndex.value]
-    if (!action) return // Guard: action pode ser undefined
-
-    schema.value = cloneSchema(action.before)
-    historyIndex.value--
-    isDirty.value = true
-  }
-
-  function redo() {
-    if (!canRedo.value) return
-
-    historyIndex.value++
-    const action = history.value[historyIndex.value]
-    if (!action) return // Guard: action pode ser undefined
-
-    schema.value = cloneSchema(action.after)
-    isDirty.value = true
-  }
-
-  function clearHistory() {
-    history.value = []
-    historyIndex.value = -1
-  }
-
-  // ============================================
-  // METHODS - VALIDATION
-  // ============================================
-
-  function validateSchema(): SchemaValidationResult {
-    const errors: SchemaValidationResult['errors'] = []
-    const warnings: SchemaValidationResult['warnings'] = []
-
-    // Validar ID
-    if (!schema.value.id) {
-      errors.push({
-        field: '_schema',
-        property: 'id',
-        message: 'Schema must have an ID'
-      })
-    }
-
-    // Validar campos
-    const fieldNames = new Set<string>()
-
-    for (const field of schema.value.fields) {
-      // Nome único
-      if (fieldNames.has(field.name)) {
-        errors.push({
-          field: field.name,
-          property: 'name',
-          message: `Duplicate field name: ${field.name}`
-        })
-      }
-      fieldNames.add(field.name)
-
-      // Nome válido (sem espaços, caracteres especiais)
-      if (!/^[a-zA-Z_][a-zA-Z0-9_]*$/.test(field.name)) {
-        errors.push({
-          field: field.name,
-          property: 'name',
-          message: 'Field name must start with letter/underscore and contain only alphanumeric/underscore'
-        })
-      }
-
-      // Label presente
-      if (!field.label) {
-        warnings.push({
-          field: field.name,
-          message: 'Field has no label'
-        })
-      }
-
-      // Select/Radio precisa de options
-      if (['select', 'radio'].includes(field.type) && (!field.options || field.options.length === 0)) {
-        errors.push({
-          field: field.name,
-          property: 'options',
-          message: `${field.type} field requires options`
-        })
       }
     }
-
+    
     return {
-      isValid: errors.length === 0,
+      valid: Object.keys(errors).length === 0,
       errors,
       warnings
     }
   }
-
-  // ============================================
-  // METHODS - EXPORT
-  // ============================================
-
-  function exportSchema(options: Partial<ExportOptions> = {}): string {
-    const opts: ExportOptions = {
-      format: 'json',
-      includeDefaults: false,
-      minify: false,
-      includeComments: true,
-      validate: true,
-      ...options
-    }
-
-    // Validar se solicitado
-    if (opts.validate) {
-      const validation = validateSchema()
-      if (!validation.isValid) {
-        throw new Error(`Schema validation failed: ${validation.errors.map(e => e.message).join(', ')}`)
-      }
-    }
-
-    switch (opts.format) {
-      case 'json':
-        return exportAsJSON(opts)
-
-      case 'typescript':
-        return exportAsTypeScript(opts)
-
-      case 'vue':
-        return exportAsVue(opts)
-
-      case 'html':
-        return exportAsHTML(opts)
-
+  
+  /**
+   * Verifica se campo está visível (baseado em conditional)
+   */
+  function isFieldVisible(
+    field: FormField,
+    formData: Record<string, any>
+  ): boolean {
+    if (!field.props?.conditional) return true
+    
+    const { field: condField, operator, value } = field.props.conditional
+    const condValue = formData[condField]
+    
+    switch (operator) {
+      case 'equals':
+        return condValue === value
+      case 'notEquals':
+        return condValue !== value
+      case 'contains':
+        return String(condValue).includes(String(value))
+      case 'greaterThan':
+        return Number(condValue) > Number(value)
+      case 'lessThan':
+        return Number(condValue) < Number(value)
       default:
-        return exportAsJSON(opts)
+        return true
     }
   }
-
-  function exportAsJSON(opts: ExportOptions): string {
-    const data = opts.includeDefaults ? schema.value : removeDefaults(schema.value)
-    return opts.minify ? JSON.stringify(data) : JSON.stringify(data, null, 2)
-  }
-
-  function exportAsTypeScript(opts: ExportOptions): string {
-    const json = exportAsJSON({ ...opts, minify: false })
-    return `import type { FormSchema } from '@lugand-sistemas-ltda/vue-ui-lib'\n\nexport const formSchema: FormSchema = ${json}`
-  }
-
-  function exportAsVue(opts: ExportOptions): string {
-    const json = exportAsJSON({ ...opts, minify: false })
-    return `<template>
-  <FormRenderer
-    :schema="schema"
-    @submit="handleSubmit"
-  />
-</template>
-
-<script setup lang="ts">
-import { FormRenderer } from '@lugand-sistemas-ltda/vue-ui-lib'
-import type { FormSchema } from '@lugand-sistemas-ltda/vue-ui-lib'
-
-const schema: FormSchema = ${json}
-
-function handleSubmit(data: Record<string, any>) {
-  console.log('Form submitted:', data)
-}
-</script>`
-  }
-
-  function exportAsHTML(_opts: ExportOptions): string {
-    // Gerar HTML nativo do form
-    let html = `<form id="${schema.value.id}">\n`
-
-    for (const field of schema.value.fields) {
-      html += `  <div class="form-field">\n`
-      html += `    <label for="${field.name}">${field.label}${field.required ? ' *' : ''}</label>\n`
-      html += `    <input type="${field.type}" id="${field.name}" name="${field.name}" ${field.required ? 'required' : ''} />\n`
-      html += `  </div>\n`
+  
+  /**
+   * Define condição de visibilidade para um campo
+   */
+  function setFieldCondition(
+    fieldId: string,
+    condition: NonNullable<FormField['props']>['conditional']
+  ): void {
+    const field = fields.value.find(f => f.id === fieldId)
+    if (field && field.props) {
+      // Cast para any para permitir mutação
+      (field.props as any).conditional = condition
     }
-
-    html += `  <button type="submit">Submit</button>\n`
-    html += `</form>`
-
-    return html
   }
-
-  // ============================================
-  // METHODS - SELECTION
-  // ============================================
-
-  function selectField(fieldName: string | null) {
-    selectedFieldId.value = fieldName
+  
+  /**
+   * Adiciona um step (multi-step form)
+   */
+  function addStep(title: string, fieldIds: string[] = []): void {
+    const metadata = core.schema.value.metadata as any
+    
+    if (!metadata.steps) {
+      metadata.steps = []
+    }
+    
+    metadata.steps.push({
+      id: `step-${Date.now()}`,
+      title,
+      fieldIds
+    })
   }
-
-  function selectNext() {
-    if (!selectedFieldId.value) {
-      if (schema.value.fields.length > 0) {
-        const firstField = schema.value.fields[0]
-        if (firstField) {
-          selectedFieldId.value = firstField.name
+  
+  /**
+   * Move field para um step específico
+   */
+  function moveFieldToStep(fieldId: string, stepId: string): void {
+    const metadata = core.schema.value.metadata as any
+    const steps = metadata.steps
+    
+    if (!steps) return
+    
+    // Remove de outros steps
+    steps.forEach((step: any) => {
+      step.fieldIds = step.fieldIds.filter((id: string) => id !== fieldId)
+    })
+    
+    // Adiciona ao novo step
+    const step = steps.find((s: any) => s.id === stepId)
+    if (step) {
+      step.fieldIds.push(fieldId)
+    }
+  }
+  
+  /**
+   * Gera componente Vue do formulário
+   */
+  function generateVueComponent(): {
+    template: string
+    script: string
+    style: string
+  } {
+    // TODO: Implementar geração de componente Vue
+    return {
+      template: '<!-- Generated form template -->',
+      script: '// Generated form script',
+      style: '/* Generated form styles */'
+    }
+  }
+  
+  // ============================================
+  // MÉTODOS DE COMPATIBILIDADE
+  // ============================================
+  
+  /**
+   * Move field (alias para moveFieldUp/Down)
+   */
+  function moveField(fieldId: string, direction: 'up' | 'down' | number): void {
+    if (direction === 'up') {
+      moveFieldUp(fieldId)
+    } else if (direction === 'down') {
+      moveFieldDown(fieldId)
+    } else {
+      // direction é o novo índice
+      const currentIndex = fields.value.findIndex(f => f.id === fieldId)
+      if (currentIndex !== -1 && typeof direction === 'number') {
+        const items = [...fields.value]
+        const [item] = items.splice(currentIndex, 1)
+        if (item) {
+          items.splice(direction, 0, item)
+          // Directly update schema instead of calling load()
+          if (core.schema.value.items) {
+            Object.assign(core.schema.value, { ...core.schema.value, items })
+          }
         }
       }
-      return
-    }
-
-    const currentIndex = schema.value.fields.findIndex(f => f.name === selectedFieldId.value)
-    if (currentIndex < schema.value.fields.length - 1) {
-      const nextField = schema.value.fields[currentIndex + 1]
-      if (nextField) {
-        selectedFieldId.value = nextField.name
-      }
     }
   }
-
-  function selectPrevious() {
-    if (!selectedFieldId.value) return
-
-    const currentIndex = schema.value.fields.findIndex(f => f.name === selectedFieldId.value)
-    if (currentIndex > 0) {
-      const prevField = schema.value.fields[currentIndex - 1]
-      if (prevField) {
-        selectedFieldId.value = prevField.name
-      }
+  
+  /**
+   * Export schema (alias para exportJSON)
+   */
+  function exportSchema(_format?: 'json' | 'yaml'): string {
+    return core.exportJSON()
+  }
+  
+  /**
+   * Load schema (alias para importJSON)
+   */
+  function loadSchema(data: string | FormSchema): void {
+    if (typeof data === 'string') {
+      core.importJSON(data)
+    } else {
+      // Directly update schema by assigning each property
+      Object.assign(core.schema.value, data)
     }
   }
-
+  
   // ============================================
-  // WATCHERS
+  // RETURN API
   // ============================================
-
-  // Sync com initialSchema prop
-  watch(
-    () => initialSchema?.value,
-    (newSchema) => {
-      if (newSchema && !isDirty.value) {
-        schema.value = cloneSchema(newSchema)
-      }
-    },
-    { deep: true }
-  )
-
-  // ============================================
-  // HELPERS
-  // ============================================
-
-  function createEmptySchema(): FormSchema {
-    return {
-      id: `form_${Date.now()}`,
-      fields: []
-    }
-  }
-
-  function cloneSchema(s: FormSchema): FormSchema {
-    return JSON.parse(JSON.stringify(s))
-  }
-
-  function removeDefaults(s: FormSchema): FormSchema {
-    // Remove propriedades com valores padrão
-    const clone = cloneSchema(s)
-
-    clone.fields = clone.fields.map(field => {
-      const cleaned: any = { ...field }
-
-      // Remove false booleans
-      if (cleaned.required === false) delete cleaned.required
-      if (cleaned.disabled === false) delete cleaned.disabled
-      if (cleaned.readonly === false) delete cleaned.readonly
-
-      return cleaned
-    })
-
-    return clone
-  }
-
-  // ============================================
-  // RETURN
-  // ============================================
-
+  
   return {
-    // State
-    schema,
-    selectedFieldId,
-    selectedField,
-    mode,
-    isDirty,
-    settings: builderSettings,
-
+    // Core (herdado)
+    schema: core.schema,
+    selectedItem: core.selectedItem,
+    isDirty: core.isDirty,
+    isValid: core.isValid,
+    validation: core.validation,
+    
+    // History (herdado)
+    undo: core.undo,
+    redo: core.redo,
+    canUndo: core.canUndo,
+    canRedo: core.canRedo,
+    
+    // CRUD (herdado)
+    addItem: core.addItem,
+    removeItem: core.removeItem,
+    updateItem: core.updateItem,
+    duplicateItem: core.duplicateItem,
+    clearItems: core.clearItems,
+    
+    // Save/Load (herdado)
+    save: core.save,
+    load: core.load,
+    exportJSON: core.exportJSON,
+    importJSON: core.importJSON,
+    
     // Computed
-    canUndo,
-    canRedo,
+    fields,
     fieldCount,
-    hasChanges,
-
-    // Field Methods
+    selectedField,
+    
+    // Compatibilidade
+    mode,
+    selectedFieldId,
+    settings,
+    hasChanges: core.isDirty, // Alias
+    
+    // Form-specific methods
     addField,
     removeField,
     updateField,
-    moveField,
+    moveFieldUp,
+    moveFieldDown,
     duplicateField,
-    handleDragEvent,
-
-    // Schema Methods
-    updateSchema,
-    resetSchema,
-    loadSchema,
-
-    // History Methods
-    undo,
-    redo,
-    clearHistory,
-
-    // Validation
-    validateSchema,
-
-    // Export
+    validateFormData,
+    isFieldVisible,
+    setFieldCondition,
+    addStep,
+    moveFieldToStep,
+    generateVueComponent,
+    
+    // Métodos de compatibilidade
+    moveField,
     exportSchema,
+    loadSchema
+  }
+}
 
-    // Selection
-    selectField,
-    selectNext,
-    selectPrevious
+// ============================================
+// HELPER FUNCTIONS
+// ============================================
+
+/**
+ * Verifica se valor está vazio
+ */
+function isEmpty(value: any): boolean {
+  return (
+    value === null ||
+    value === undefined ||
+    value === '' ||
+    (Array.isArray(value) && value.length === 0)
+  )
+}
+
+/**
+ * Valida tipo do campo
+ */
+function validateFieldType(
+  type: FieldType,
+  value: any
+): { valid: boolean; message: string } {
+  // Email
+  if (type === 'email') {
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
+    if (!emailRegex.test(String(value))) {
+      return { valid: false, message: 'Email inválido' }
+    }
+  }
+  
+  // Number
+  if (type === 'number') {
+    if (isNaN(Number(value))) {
+      return { valid: false, message: 'Deve ser um número' }
+    }
+  }
+  
+  // URL
+  if (type === 'url') {
+    try {
+      new URL(String(value))
+    } catch {
+      return { valid: false, message: 'URL inválida' }
+    }
+  }
+  
+  return { valid: true, message: '' }
+}
+
+/**
+ * Valida regra customizada
+ */
+async function validateRule(
+  rule: any,
+  value: any,
+  formData: Record<string, any>
+): Promise<{ valid: boolean; message: string }> {
+  switch (rule.type) {
+    case 'required':
+      return {
+        valid: !isEmpty(value),
+        message: rule.message || 'Campo obrigatório'
+      }
+    
+    case 'email':
+      const emailValid = /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(String(value))
+      return {
+        valid: emailValid,
+        message: rule.message || 'Email inválido'
+      }
+    
+    case 'min':
+      const minValid = String(value).length >= rule.value
+      return {
+        valid: minValid,
+        message: rule.message || `Mínimo ${rule.value} caracteres`
+      }
+    
+    case 'max':
+      const maxValid = String(value).length <= rule.value
+      return {
+        valid: maxValid,
+        message: rule.message || `Máximo ${rule.value} caracteres`
+      }
+    
+    case 'pattern':
+      const patternValid = rule.value.test(String(value))
+      return {
+        valid: patternValid,
+        message: rule.message || 'Formato inválido'
+      }
+    
+    case 'custom':
+      if (rule.validator) {
+        const result = await rule.validator(value, formData)
+        return {
+          valid: result,
+          message: rule.message || 'Validação falhou'
+        }
+      }
+      return { valid: true, message: '' }
+    
+    default:
+      return { valid: true, message: '' }
   }
 }

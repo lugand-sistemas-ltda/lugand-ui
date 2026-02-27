@@ -13,19 +13,19 @@
  */
 export interface BaseSchema<TItem = any, TMetadata = Record<string, any>> {
   /** Identificador único do schema */
-  id: string
+  id?: string
   
   /** Nome amigável do schema */
-  name: string
+  name?: string
   
   /** Versão do schema (semver: 1.0.0) */
-  version: string
+  version?: string
   
   /** Metadados customizados específicos do builder */
-  metadata: TMetadata
+  metadata?: TMetadata
   
   /** Items do schema (fields, blocks, components, etc) */
-  items: TItem[]
+  items?: TItem[]
   
   /** Timestamp de criação (ISO 8601) */
   createdAt: string
@@ -48,7 +48,7 @@ export interface BaseSchemaItem {
   label?: string
   
   /** Propriedades customizadas do item */
-  props: Record<string, any>
+  props?: Record<string, any>
 }
 
 /**

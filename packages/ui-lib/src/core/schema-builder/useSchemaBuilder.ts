@@ -64,11 +64,16 @@ export function useSchemaBuilder<
   
   // === STATE ===
   
-  const schema = ref<TSchema>(
-    typeof initialSchema === 'function'
-      ? initialSchema()
-      : initialSchema || createEmptySchema()
-  ) as Ref<TSchema>
+  // Ensure schema always has items array initialized
+  const initialSchemaValue = typeof initialSchema === 'function'
+    ? initialSchema()
+    : initialSchema || createEmptySchema()
+  
+  if (!initialSchemaValue.items) {
+    initialSchemaValue.items = [] as TItem[]
+  }
+  
+  const schema = ref<TSchema>(initialSchemaValue) as Ref<TSchema>
   
   const selectedItem = ref<string | null>(null)
   const isDirty = ref(false)
@@ -125,6 +130,8 @@ export function useSchemaBuilder<
    * Adicionar item ao schema
    */
   function addItem(item: TItem, position?: number): void {
+    if (!schema.value.items) return
+    
     if (position !== undefined && position >= 0 && position <= schema.value.items.length) {
       schema.value.items.splice(position, 0, item)
     } else {
@@ -138,6 +145,8 @@ export function useSchemaBuilder<
    * Remover item do schema
    */
   function removeItem(id: string): void {
+    if (!schema.value.items) return
+    
     const index = schema.value.items.findIndex(item => item.id === id)
     if (index !== -1) {
       schema.value.items.splice(index, 1)
@@ -152,6 +161,8 @@ export function useSchemaBuilder<
    * Atualizar item existente
    */
   function updateItem(id: string, updates: Partial<TItem>): void {
+    if (!schema.value.items) return
+    
     const item = schema.value.items.find(item => item.id === id)
     if (item) {
       Object.assign(item, updates)
@@ -163,6 +174,8 @@ export function useSchemaBuilder<
    * Mover item para cima ou baixo
    */
   function moveItem(id: string, direction: 'up' | 'down'): void {
+    if (!schema.value.items) return
+    
     const index = schema.value.items.findIndex(item => item.id === id)
     if (index === -1) return
     
@@ -180,6 +193,8 @@ export function useSchemaBuilder<
    * Duplicar item
    */
   function duplicateItem(id: string): void {
+    if (!schema.value.items) return
+    
     const item = schema.value.items.find(item => item.id === id)
     if (item) {
       const duplicate = {
@@ -210,7 +225,11 @@ export function useSchemaBuilder<
    * Atualizar metadados do schema
    */
   function updateMetadata(updates: Partial<TSchema['metadata']>): void {
-    Object.assign(schema.value.metadata, updates)
+    if (schema.value.metadata) {
+      Object.assign(schema.value.metadata, updates)
+    } else {
+      schema.value.metadata = updates as TSchema['metadata']
+    }
     markDirty()
   }
   
@@ -358,7 +377,7 @@ export function useSchemaBuilder<
    */
   function getSelectedItem(): TItem | undefined {
     if (!selectedItem.value) return undefined
-    return schema.value.items.find(item => item.id === selectedItem.value)
+    return schema.value.items?.find(item => item.id === selectedItem.value)
   }
   
   // === HELPERS ===
@@ -406,11 +425,11 @@ export function useSchemaBuilder<
   
   return {
     // State
-    schema: readonly(schema),
-    selectedItem: readonly(selectedItem),
-    isDirty: readonly(isDirty),
+    schema,
+    selectedItem,
+    isDirty,
     isValid,
-    validation: readonly(validation),
+    validation,
     
     // Item operations
     addItem,

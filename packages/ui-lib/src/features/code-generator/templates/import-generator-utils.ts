@@ -5,7 +5,7 @@
  * Suporta named, default, namespace imports e tree-shaking.
  */
 
-import type { PageSchema } from "../../../core/schema-system/types";
+import type { PageSchema } from "../../page-builder/types";
 import type { ImportDeclaration, CodeGeneratorOptions } from "../types";
 
 // ============================================
@@ -274,7 +274,7 @@ export function renderImports(
 function extractUniqueComponents(schema: PageSchema): Set<string> {
   const components = new Set<string>();
 
-  schema.widgets.forEach((widget) => {
+  schema.items?.forEach((widget) => {
     const componentName = widgetTypeToComponentName(widget.type);
     components.add(componentName);
   });
@@ -313,11 +313,11 @@ function extractWidgetTypes(schema: PageSchema): Set<string> {
   const types = new Set<string>();
 
   // Adiciona types específicos baseado nos widgets
-  schema.widgets.forEach((widget) => {
-    if (widget.type === "data-table") {
+  schema.items?.forEach((widget) => {
+    if (widget.type === "datatable") {
       types.add("TableColumn");
     }
-    if (widget.type === "form-renderer") {
+    if (widget.type === "formrenderer") {
       types.add("FormField");
     }
   });
@@ -367,8 +367,8 @@ function needsOnMounted(schema: PageSchema): boolean {
  * Verifica se precisa de onUnmounted
  */
 function needsOnUnmounted(schema: PageSchema): boolean {
-  // Se tem scripts onUnmount
-  return !!schema.scripts?.onUnmount;
+  // Se tem scripts onMount
+  return !!schema.metadata?.scripts?.onMount;
 }
 
 /**
@@ -386,16 +386,16 @@ function hasComplexObjects(schema: PageSchema): boolean {
  * Verifica se tem data tables
  */
 function hasDataTables(schema: PageSchema): boolean {
-  return schema.widgets.some((w) => w.type === "data-table");
+  return schema.items?.some((w) => w.type === "datatable") ?? false;
 }
 
 /**
  * Verifica se tem forms
  */
 function hasForms(schema: PageSchema): boolean {
-  return schema.widgets.some(
-    (w) => w.type === "form-renderer" || w.type === "form-builder",
-  );
+  return schema.items?.some(
+    (w) => w.type === "formrenderer" || w.type === "formbuilder",
+  ) ?? false;
 }
 
 // ============================================

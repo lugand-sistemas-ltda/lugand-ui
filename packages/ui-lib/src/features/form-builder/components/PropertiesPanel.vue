@@ -6,16 +6,16 @@
     </div>
 
     <div class="panel-content">
-      <!-- Field Name -->
+      <!-- Field ID -->
       <div class="prop-group">
-        <label class="prop-label">Name</label>
-        <Input :model-value="field.name" @update:model-value="updateProp('name', $event)" placeholder="field_name" />
+        <label class="prop-label">ID</label>
+        <Input :model-value="field.id" readonly disabled />
       </div>
 
       <!-- Field Label -->
       <div class="prop-group">
         <label class="prop-label">Label</label>
-        <Input :model-value="field.label" @update:model-value="updateProp('label', $event)" placeholder="Field Label" />
+        <Input :model-value="field.props?.label" @update:model-value="updateProp('label', $event)" placeholder="Field Label" />
       </div>
 
       <!-- Field Type (readonly) -->
@@ -27,14 +27,14 @@
       <!-- Placeholder -->
       <div class="prop-group">
         <label class="prop-label">Placeholder</label>
-        <Input :model-value="field.placeholder || ''" @update:model-value="updateProp('placeholder', $event)"
+        <Input :model-value="field.props?.placeholder || ''" @update:model-value="updateProp('placeholder', $event)"
           placeholder="Enter placeholder..." />
       </div>
 
       <!-- Required -->
       <div class="prop-group">
         <label class="prop-label checkbox-label">
-          <Checkbox :model-value="field.required || false" @update:model-value="updateProp('required', $event)" />
+          <Checkbox :model-value="field.props?.required || false" @update:model-value="updateProp('required', $event)" />
           <span>Required</span>
         </label>
       </div>
@@ -42,7 +42,7 @@
       <!-- Disabled -->
       <div class="prop-group">
         <label class="prop-label checkbox-label">
-          <Checkbox :model-value="field.disabled || false" @update:model-value="updateProp('disabled', $event)" />
+          <Checkbox :model-value="field.props?.disabled || false" @update:model-value="updateProp('disabled', $event)" />
           <span>Disabled</span>
         </label>
       </div>
@@ -50,7 +50,7 @@
       <!-- Readonly -->
       <div class="prop-group">
         <label class="prop-label checkbox-label">
-          <Checkbox :model-value="field.readonly || false" @update:model-value="updateProp('readonly', $event)" />
+          <Checkbox :model-value="field.props?.readonly || false" @update:model-value="updateProp('readonly', $event)" />
           <span>Read-only</span>
         </label>
       </div>
@@ -59,7 +59,7 @@
       <div v-if="['select', 'radio'].includes(field.type)" class="prop-group">
         <label class="prop-label">Options</label>
         <div class="options-editor">
-          <div v-for="(option, index) in (field.options || [])" :key="index" class="option-row">
+          <div v-for="(option, index) in (field.props?.options || [])" :key="index" class="option-row">
             <Input :model-value="option.label" @update:model-value="updateOptionLabel(index, $event)"
               placeholder="Label" size="sm" />
             <Input :model-value="option.value" @update:model-value="updateOptionValue(index, $event)"
@@ -90,37 +90,38 @@ const props = defineProps<Props>()
 const emit = defineEmits<Emits>()
 
 function updateProp(key: string, value: any) {
-  emit('update:field', { [key]: value })
+  // Update inside props object for new FormField structure
+  emit('update:field', { props: { ...props.field.props, [key]: value } })
 }
 
 function updateOptionLabel(index: number, label: string | number) {
-  const options = [...(props.field.options || [])]
+  const options = [...(props.field.props?.options || [])]
   if (options[index]) {
     options[index] = { ...options[index], label: String(label), value: options[index].value || '' }
-    emit('update:field', { options })
+    emit('update:field', { props: { ...props.field.props, options } })
   }
 }
 
 function updateOptionValue(index: number, value: string | number) {
-  const options = [...(props.field.options || [])]
+  const options = [...(props.field.props?.options || [])]
   if (options[index]) {
     options[index] = { ...options[index], value, label: options[index].label || '' }
-    emit('update:field', { options })
+    emit('update:field', { props: { ...props.field.props, options } })
   }
 }
 
 function addOption() {
   const options = [
-    ...(props.field.options || []),
+    ...(props.field.props?.options || []),
     { label: 'New Option', value: `option_${Date.now()}` }
   ]
-  emit('update:field', { options })
+  emit('update:field', { props: { ...props.field.props, options } })
 }
 
 function removeOption(index: number) {
-  const options = [...(props.field.options || [])]
+  const options = [...(props.field.props?.options || [])]
   options.splice(index, 1)
-  emit('update:field', { options })
+  emit('update:field', { props: { ...props.field.props, options } })
 }
 </script>
 

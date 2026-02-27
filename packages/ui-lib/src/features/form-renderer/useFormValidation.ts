@@ -49,7 +49,12 @@ export function useFormValidation(
 
     // 2. Custom validations
     if (field.validation && value !== undefined && value !== null && value !== '') {
-      for (const rule of field.validation) {
+      // Normalize validation format (support both array and object format)
+      const rules = Array.isArray(field.validation) 
+        ? field.validation 
+        : field.validation.rules || []
+      
+      for (const rule of rules) {
         const error = await validateRule(rule, value, field)
         if (error) {
           fieldErrors.push(error)
@@ -201,10 +206,11 @@ export function useFormValidation(
         if (!shouldShow) continue
       }
 
-      const result = await validateField(field.name)
+      const fieldId = (field.id || field.name) as string
+      const result = await validateField(fieldId)
 
       if (!result.valid) {
-        newErrors.fields[field.name] = result.errors
+        newErrors.fields[fieldId] = result.errors
       }
     }
 

@@ -2,40 +2,40 @@
   <div v-if="shouldShow" :class="[
     'field-renderer',
     `field-renderer--${field.type}`,
-    field.className,
+    getFieldProp('className'),
     { 'field-renderer--error': hasError }
   ]" :style="fieldStyle">
     <!-- Label -->
-    <label v-if="field.label && field.type !== 'checkbox' && field.type !== 'switch'" :for="fieldId"
+    <label v-if="fieldLabel && field.type !== 'checkbox' && field.type !== 'switch'" :for="fieldId"
       class="field-renderer__label">
-      {{ field.label }}
-      <span v-if="field.required" class="field-renderer__required">*</span>
+      {{ fieldLabel }}
+      <span v-if="fieldRequired" class="field-renderer__required">*</span>
     </label>
 
     <!-- Text inputs -->
-    <Input v-if="isTextInput" :id="fieldId" :model-value="modelValue" :type="inputType" :placeholder="field.placeholder"
-      :disabled="field.disabled" :readonly="field.readonly" :min="field.min" :max="field.max" :step="field.step"
-      :pattern="field.pattern" :accept="field.accept" @update:model-value="handleInput" @blur="handleBlur" />
+    <Input v-if="isTextInput" :id="fieldId" :model-value="modelValue" :type="inputType" :placeholder="fieldPlaceholder"
+      :disabled="fieldDisabled" :readonly="fieldReadonly" :min="fieldMin" :max="fieldMax" :step="fieldStep"
+      :pattern="fieldPattern" :accept="fieldAccept" @update:model-value="handleInput" @blur="handleBlur" />
 
     <!-- Textarea -->
     <Textarea v-else-if="field.type === 'textarea'" :id="fieldId" :model-value="modelValue"
-      :placeholder="field.placeholder" :disabled="field.disabled" :readonly="field.readonly" :rows="field.rows || 3"
+      :placeholder="fieldPlaceholder" :disabled="fieldDisabled" :readonly="fieldReadonly" :rows="fieldRows"
       @update:model-value="handleInput" @blur="handleBlur" />
 
     <!-- Select -->
     <Select v-else-if="field.type === 'select'" :id="fieldId" :model-value="modelValue" :options="selectOptions"
-      :disabled="field.disabled" :placeholder="field.placeholder || 'Selecione...'" @update:model-value="handleInput"
+      :disabled="fieldDisabled" :placeholder="fieldPlaceholder || 'Selecione...'" @update:model-value="handleInput"
       @blur="handleBlur" />
 
     <!-- Checkbox -->
-    <Checkbox v-else-if="field.type === 'checkbox'" :id="fieldId" :model-value="modelValue" :label="field.label"
-      :disabled="field.disabled" @update:model-value="handleInput" @blur="handleBlur" />
+    <Checkbox v-else-if="field.type === 'checkbox'" :id="fieldId" :model-value="modelValue" :label="fieldLabel"
+      :disabled="fieldDisabled" @update:model-value="handleInput" @blur="handleBlur" />
 
     <!-- Radio Group -->
     <div v-else-if="field.type === 'radio'" class="field-renderer__radio-group">
-      <div v-for="option in field.options" :key="option.value" class="field-renderer__radio-option">
-        <input :id="`${fieldId}-${option.value}`" type="radio" :name="field.name" :value="option.value"
-          :checked="modelValue === option.value" :disabled="field.disabled || option.disabled"
+      <div v-for="option in fieldOptions" :key="option.value" class="field-renderer__radio-option">
+        <input :id="`${fieldId}-${option.value}`" type="radio" :name="fieldId" :value="option.value"
+          :checked="modelValue === option.value" :disabled="fieldDisabled || option.disabled"
           @change="handleRadioChange(option.value)" @blur="handleBlur" />
         <label :for="`${fieldId}-${option.value}`">
           {{ option.label }}
@@ -45,7 +45,7 @@
 
     <!-- Switch (usando Checkbox com aparência de switch) -->
     <div v-else-if="field.type === 'switch'" class="field-renderer__switch">
-      <Checkbox :id="fieldId" :model-value="modelValue" :label="field.label" :disabled="field.disabled"
+      <Checkbox :id="fieldId" :model-value="modelValue" :label="fieldLabel" :disabled="fieldDisabled"
         @update:model-value="handleInput" @blur="handleBlur" />
     </div>
 
@@ -53,8 +53,8 @@
     <input v-else-if="field.type === 'hidden'" :id="fieldId" type="hidden" :value="modelValue" />
 
     <!-- Help text -->
-    <p v-if="field.helpText && !hasError" class="field-renderer__help">
-      {{ field.helpText }}
+    <p v-if="fieldHelpText && !hasError" class="field-renderer__help">
+      {{ fieldHelpText }}
     </p>
 
     <!-- Errors -->
@@ -116,7 +116,79 @@ const emit = defineEmits<{
 /**
  * ID único do campo.
  */
-const fieldId = computed(() => `field-${props.field.name}`)
+const fieldId = computed(() => {
+  // Support both name (old FormRenderer) and id (new FormBuilder)
+  const fieldKey = (props.field as any).name || props.field.id
+  return `field-${fieldKey}`
+})
+
+/**
+ * Get field property - supports both old and new structure
+ */
+function getFieldProp<T>(key: string, defaultValue?: T): T {
+  // New structure: field.props[key]
+  if (props.field.props && key in props.field.props) {
+    return props.field.props[key]
+  }
+  // Old structure: field[key]
+  if (key in props.field) {
+    return (props.field as any)[key]
+  }
+  return defaultValue as T
+}
+
+/**
+ * Field label
+ */
+const fieldLabel = computed(() => getFieldProp<string>('label', ''))
+
+/**
+ * Field placeholder
+ */
+const fieldPlaceholder = computed(() => getFieldProp<string>('placeholder'))
+
+/**
+ * Field help text
+ */
+const fieldHelpText = computed(() => getFieldProp<string>('helperText') || getFieldProp<string>('helpText'))
+
+/**
+ * Field required
+ */
+const fieldRequired = computed(() => getFieldProp<boolean>('required', false))
+
+/**
+ * Field disabled
+ */
+const fieldDisabled = computed(() => getFieldProp<boolean>('disabled', false))
+
+/**
+ * Field readonly
+ */
+const fieldReadonly = computed(() => getFieldProp<boolean>('readonly', false))
+
+/**
+ * Field options
+ */
+const fieldOptions = computed(() => getFieldProp<any[]>('options', []))
+
+/**
+ * Field min/max/step
+ */
+const fieldMin = computed(() => getFieldProp<number>('min'))
+const fieldMax = computed(() => getFieldProp<number>('max'))
+const fieldStep = computed(() => getFieldProp<number>('step'))
+
+/**
+ * Field pattern/accept
+ */
+const fieldPattern = computed(() => getFieldProp<string>('pattern'))
+const fieldAccept = computed(() => getFieldProp<string>('accept'))
+
+/**
+ * Field rows (textarea)
+ */
+const fieldRows = computed(() => getFieldProp<number>('rows', 3))
 
 /**
  * Tipos de input text.
@@ -150,7 +222,7 @@ const inputType = computed(() => {
  * Opções do select (mapeadas para formato do Select component).
  */
 const selectOptions = computed(() => {
-  return (props.field.options || []).map((opt) => ({
+  return fieldOptions.value.map((opt: any) => ({
     label: opt.label,
     value: opt.value
   }))
@@ -167,15 +239,16 @@ const hasError = computed(() => {
  * Se campo deve ser exibido (showIf condition).
  */
 const shouldShow = computed(() => {
-  if (!props.field.showIf) return true
+  const showIf = getFieldProp<any>('showIf')
+  if (!showIf) return true
 
-  if (typeof props.field.showIf === 'function') {
-    return props.field.showIf(props.formData)
+  if (typeof showIf === 'function') {
+    return showIf(props.formData)
   }
 
   // Simple expression evaluation
   try {
-    const func = new Function(...Object.keys(props.formData), `return ${props.field.showIf}`)
+    const func = new Function(...Object.keys(props.formData), `return ${showIf}`)
     return func(...Object.values(props.formData))
   } catch (error) {
     console.warn('[FieldRenderer] Failed to evaluate showIf:', error)
@@ -187,9 +260,10 @@ const shouldShow = computed(() => {
  * Estilo do campo (grid col span).
  */
 const fieldStyle = computed(() => {
-  if (props.field.colSpan) {
+  const colSpan = getFieldProp<number>('colSpan')
+  if (colSpan) {
     return {
-      gridColumn: `span ${props.field.colSpan}`
+      gridColumn: `span ${colSpan}`
     }
   }
   return {}
@@ -206,7 +280,8 @@ function handleInput(value: any) {
  * Handler de blur.
  */
 function handleBlur() {
-  emit('blur', props.field.name)
+  const fieldKey = (props.field as any).name || props.field.id
+  emit('blur', fieldKey)
 }
 
 /**

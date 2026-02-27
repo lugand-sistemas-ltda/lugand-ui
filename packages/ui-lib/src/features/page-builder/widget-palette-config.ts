@@ -15,13 +15,13 @@ export const WIDGET_PALETTE: WidgetTypePalette[] = [
   // LAYOUT WIDGETS
   // ============================================
   {
-    type: 'Container',
+    type: 'container',
     label: 'Container',
     icon: '📦',
     category: 'layout',
     description: 'Container genérico para agrupar widgets',
     defaultWidget: {
-      type: 'Container',
+      type: 'container',
       config: {
         padding: 'md',
         gap: 'md'
@@ -55,13 +55,13 @@ export const WIDGET_PALETTE: WidgetTypePalette[] = [
   },
 
   {
-    type: 'Grid',
+    type: 'grid',
     label: 'Grid',
     icon: '▦',
     category: 'layout',
     description: 'Grid responsivo com colunas',
     defaultWidget: {
-      type: 'Grid',
+      type: 'grid',
       config: {
         columns: 2,
         gap: 'md',
@@ -94,13 +94,13 @@ export const WIDGET_PALETTE: WidgetTypePalette[] = [
   },
 
   {
-    type: 'Section',
+    type: 'section',
     label: 'Section',
     icon: '📄',
     category: 'layout',
     description: 'Seção com título e conteúdo',
     defaultWidget: {
-      type: 'Section',
+      type: 'section',
       config: {
         title: 'Section Title',
         collapsible: false
@@ -126,13 +126,13 @@ export const WIDGET_PALETTE: WidgetTypePalette[] = [
   // ============================================
 
   {
-    type: 'Text',
+    type: 'text',
     label: 'Text',
     icon: '📝',
     category: 'content',
     description: 'Texto estático ou dinâmico',
     defaultWidget: {
-      type: 'Text',
+      type: 'text',
       config: {
         content: 'Text content',
         variant: 'body',
@@ -172,13 +172,13 @@ export const WIDGET_PALETTE: WidgetTypePalette[] = [
   },
 
   {
-    type: 'Image',
+    type: 'image',
     label: 'Image',
     icon: '🖼️',
     category: 'content',
     description: 'Imagem com alt text',
     defaultWidget: {
-      type: 'Image',
+      type: 'image',
       config: {
         src: 'https://via.placeholder.com/400x300',
         alt: 'Image',
@@ -216,13 +216,13 @@ export const WIDGET_PALETTE: WidgetTypePalette[] = [
   // ============================================
 
   {
-    type: 'DataTable',
+    type: 'datatable',
     label: 'Data Table',
     icon: '📊',
     category: 'data',
     description: 'Tabela de dados com sort/filter',
     defaultWidget: {
-      type: 'DataTable',
+      type: 'datatable',
       config: {
         dataSource: 'users',
         columns: [],
@@ -264,13 +264,13 @@ export const WIDGET_PALETTE: WidgetTypePalette[] = [
   },
 
   {
-    type: 'Card',
+    type: 'card',
     label: 'Card',
-    icon: '🃏',
+    icon: '🏏',
     category: 'data',
     description: 'Card com header/body/footer',
     defaultWidget: {
-      type: 'Card',
+      type: 'card',
       config: {
         title: 'Card Title',
         variant: 'default',
@@ -306,13 +306,13 @@ export const WIDGET_PALETTE: WidgetTypePalette[] = [
   // ============================================
 
   {
-    type: 'FormRenderer',
+    type: 'formrenderer',
     label: 'Form',
     icon: '📋',
-    category: 'forms',
+    category: 'form',
     description: 'Form dinâmico (FASE 2)',
     defaultWidget: {
-      type: 'FormRenderer',
+      type: 'formrenderer',
       config: {
         schema: {
           id: 'form-1',
@@ -332,14 +332,14 @@ export const WIDGET_PALETTE: WidgetTypePalette[] = [
   },
 
   {
-    type: 'FormBuilder',
+    type: 'formbuilder',
     label: 'Form Builder',
-    icon: '🏗️',
-    category: 'forms',
+    icon: '🏯️',
+    category: 'form',
     description: 'Editor visual de forms (FASE 4)',
     isPro: true,
     defaultWidget: {
-      type: 'FormBuilder',
+      type: 'formbuilder',
       config: {
         initialMode: 'design'
       }
@@ -363,13 +363,13 @@ export const WIDGET_PALETTE: WidgetTypePalette[] = [
   // ============================================
 
   {
-    type: 'Tabs',
+    type: 'tabs',
     label: 'Tabs',
     icon: '📑',
     category: 'navigation',
     description: 'Navegação por abas',
     defaultWidget: {
-      type: 'Tabs',
+      type: 'tabs',
       config: {
         items: [
           { label: 'Tab 1', value: 'tab1' },
@@ -388,13 +388,13 @@ export const WIDGET_PALETTE: WidgetTypePalette[] = [
   },
 
   {
-    type: 'Breadcrumb',
+    type: 'breadcrumb',
     label: 'Breadcrumb',
     icon: '🍞',
     category: 'navigation',
     description: 'Navegação hierárquica',
     defaultWidget: {
-      type: 'Breadcrumb',
+      type: 'breadcrumb',
       config: {
         items: [
           { label: 'Home', to: '/' },
@@ -417,13 +417,13 @@ export const WIDGET_PALETTE: WidgetTypePalette[] = [
   // ============================================
 
   {
-    type: 'Alert',
+    type: 'alert',
     label: 'Alert',
     icon: '⚠️',
     category: 'feedback',
     description: 'Mensagem de alerta',
     defaultWidget: {
-      type: 'Alert',
+      type: 'alert',
       config: {
         title: 'Alert Title',
         variant: 'info',
@@ -457,13 +457,13 @@ export const WIDGET_PALETTE: WidgetTypePalette[] = [
   },
 
   {
-    type: 'Badge',
+    type: 'badge',
     label: 'Badge',
     icon: '🏷️',
     category: 'feedback',
     description: 'Badge de status/contagem',
     defaultWidget: {
-      type: 'Badge',
+      type: 'badge',
       config: {
         text: 'Badge',
         variant: 'primary'
@@ -515,7 +515,7 @@ export const WIDGET_CATEGORIES = [
   { id: 'layout', label: 'Layout', icon: '📐' },
   { id: 'content', label: 'Content', icon: '📝' },
   { id: 'data', label: 'Data', icon: '📊' },
-  { id: 'forms', label: 'Forms', icon: '📋' },
+  { id: 'form', label: 'Forms', icon: '📋' },
   { id: 'navigation', label: 'Navigation', icon: '🧭' },
   { id: 'feedback', label: 'Feedback', icon: '💬' },
   { id: 'custom', label: 'Custom', icon: '🎨' }

@@ -2,16 +2,13 @@
  * Core Systems
  * 
  * Sistemas fundamentais da biblioteca low-code.
- * Fornece infraestrutura para Widget System, Schema System e Component Registry.
+ * Fornece infraestrutura para Widget System, Schema Builder e Component Registry.
  * 
  * @module core
  */
 
 // Widget System
 export * from './widget-system'
-
-// Schema System
-export * from './schema-system'
 
 // Component Registry
 export * from './component-registry'
@@ -20,7 +17,6 @@ export * from './component-registry'
 export * from './config'
 
 // Schema Builder (sistema genérico de builders)
-// Evitar conflitos com schema-system usando exports explícitos
 export {
   useSchemaBuilder,
   useSchemaHistory,
@@ -39,6 +35,10 @@ export {
   deserializeSchema,
   cloneSchema as cloneGenericSchema
 } from './schema-builder'
+
+// Builder Manager (gerenciador global de builders)
+export { builderManager, useBuilderManager } from './builder-manager'
+export type { BuilderInstance, BuilderType } from './builder-manager'
 
 export type {
   BaseSchema,

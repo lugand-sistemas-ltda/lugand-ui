@@ -7,7 +7,7 @@
 
 import { defineComponent, h, resolveComponent } from 'vue'
 import type { WidgetSchema } from '@/core/widget-system/types'
-import type { PageSchema } from '@/core/schema-system/types'
+import type { PageSchema } from '@/features/page-builder/types'
 
 export default defineComponent({
     name: 'PageRenderer',
@@ -96,11 +96,11 @@ export default defineComponent({
             const children = widget.children?.map(child => renderWidget(child)) || []
 
             // Para alguns widgets, adicionar conteúdo padrão
-            if (widget.type === 'text' && widget.config.content) {
+            if (widget.type === 'text' && widget.config?.content) {
                 children.push(widget.config.content)
-            } else if (widget.type === 'heading' && widget.config.text) {
+            } else if (widget.type === 'heading' && widget.config?.text) {
                 children.push(widget.config.text)
-            } else if (widget.type === 'button' && widget.config.label) {
+            } else if (widget.type === 'button' && widget.config?.label) {
                 children.push(widget.config.label)
             }
 
@@ -121,14 +121,14 @@ export default defineComponent({
             const pageStyles: Record<string, any> = {}
 
             // Se layout é grid, aplicar configurações
-            if (props.schema.layout?.strategy === 'grid') {
+            if (props.schema.layout?.strategy === 'grid' && props.schema.layout.config) {
                 pageStyles.display = 'grid'
                 pageStyles.gridTemplateColumns = `repeat(${props.schema.layout.config.columns || 12}, 1fr)`
                 pageStyles.gap = props.schema.layout.config.gap || '1rem'
             }
 
             // Renderizar todos os widgets
-            const widgets = props.schema.widgets?.map(widget => renderWidget(widget)) || []
+            const widgets = props.schema.items?.map(widget => renderWidget(widget)) || []
 
             return h(
                 'div',

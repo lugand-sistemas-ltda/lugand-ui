@@ -7,7 +7,7 @@
   <div class="page-canvas">
     <!-- Page Header -->
     <div class="page-header">
-      <input :value="schema.metadata.title" type="text" class="page-title-input" placeholder="Page Title"
+      <input :value="schema.metadata?.title" type="text" class="page-title-input" placeholder="Page Title"
         @input="updatePageTitle" />
       <input :value="schema.id" type="text" class="page-route-input" placeholder="page-id" @input="updatePageId" />
     </div>
@@ -16,8 +16,8 @@
     <div :class="['canvas-area', { 'drag-over': isDragOver }]" @dragover.prevent="handleDragOver"
       @dragleave="handleDragLeave" @drop.prevent="handleDrop">
       <!-- Widgets -->
-      <div v-if="schema.widgets.length > 0" class="widget-tree">
-        <WidgetTreeItem v-for="(widget, index) in schema.widgets" :key="widget.id" :widget="widget" :index="index"
+      <div v-if="schema.items && schema.items.length > 0" class="widget-tree">
+        <WidgetTreeItem v-for="(widget, index) in schema.items" :key="widget.id" :widget="widget" :index="index"
           :parent-id="null" :selected-id="selectedWidgetId" :hovered-id="hoveredWidgetId" @select="handleSelect"
           @hover="handleHover" @remove="handleRemove" @duplicate="handleDuplicate" @drag-start="handleWidgetDragStart"
           @drag-end="handleWidgetDragEnd" @drop="handleWidgetDrop" />
@@ -57,7 +57,7 @@ const props = defineProps<Props>()
 // ============================================
 
 const emit = defineEmits<{
-  'update:schema': [schema: Partial<PageSchema>]
+  'update:schema': [schema: PageSchema]
   'update:selectedWidgetId': [id: string | null]
   'update:hoveredWidgetId': [id: string | null]
   'widget-add': [widget: Omit<WidgetSchema, 'id'>, parentId: string | null, index: number]
@@ -80,6 +80,7 @@ const draggedWidget = ref<{ widget: WidgetSchema; parentId: string | null; index
 function updatePageTitle(e: Event) {
   const target = e.target as HTMLInputElement
   emit('update:schema', {
+    ...props.schema,
     metadata: {
       ...props.schema.metadata,
       title: target.value
@@ -90,6 +91,7 @@ function updatePageTitle(e: Event) {
 function updatePageId(e: Event) {
   const target = e.target as HTMLInputElement
   emit('update:schema', {
+    ...props.schema,
     id: target.value
   })
 }
@@ -115,7 +117,7 @@ function handleDrop(e: DragEvent) {
 
     if (data.type === 'palette-widget') {
       // Widget from palette
-      emit('widget-add', data.widget, null, props.schema.widgets.length)
+      emit('widget-add', data.widget, null, props.schema.items?.length || 0)
     }
   } catch (err) {
     console.error('Failed to parse drop data:', err)

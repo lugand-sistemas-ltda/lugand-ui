@@ -22,7 +22,7 @@
             🗑️ Limpar
           </button>
           <button class="action-button action-button--primary" @click="generateCode"
-            :disabled="!currentSchema || currentSchema.widgets.length === 0"
+            :disabled="!currentSchema || currentSchema.items.length === 0"
             title="Gerar código Vue a partir do schema">
             ⚡ Gerar Código
           </button>
@@ -74,7 +74,7 @@ import { ref, computed, onMounted } from 'vue'
 import { PageBuilder } from '@/features/page-builder'
 import { useCodeGenerator } from '@/features/code-generator'
 import { Modal } from '@/modules/modal'
-import type { PageSchema } from '@/core/schema-system/types'
+import type { PageSchema } from '@/features/page-builder/types'
 
 // ============================================
 // STATE

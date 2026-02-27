@@ -5,7 +5,7 @@
  * Suporta geração de arquivos .vue, .ts, router config, etc.
  */
 
-import type { PageSchema } from '../../core/schema-system/types'
+import type { PageSchema } from '../page-builder/types'
 
 // ============================================
 // CODE GENERATION OPTIONS

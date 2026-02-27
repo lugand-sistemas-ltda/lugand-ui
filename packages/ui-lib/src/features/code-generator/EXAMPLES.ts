@@ -7,7 +7,14 @@
 
 import { useCodeGenerator } from '@lugand-sistemas-ltda/vue-ui-lib'
 import type { PageSchema } from '@lugand-sistemas-ltda/vue-ui-lib'
-import { createSchemaMetadata, createFlexLayout, createGridLayout } from '@/core/schema-system/types'
+
+// Helper functions
+function createMetadata(title: string, description?: string) {
+  return {
+    title,
+    description
+  }
+}
 
 // ============================================
 // EXEMPLO 1: Geração Básica
@@ -17,33 +24,12 @@ export async function exemploBasico() {
   // Schema de exemplo
   const schema: PageSchema = {
     id: 'products-page',
-    type: 'page',
-    metadata: createSchemaMetadata('Products Page', 'Página de listagem de produtos'),
-    layout: createFlexLayout('column'),
-    widgets: [
-      {
-        id: 'page-header',
-        type: 'card',
-        config: {
-          title: 'Products',
-          variant: 'elevated'
-        }
-      },
-      {
-        id: 'products-table',
-        type: 'data-table',
-        config: {
-          columns: [
-            { key: 'name', label: 'Name' },
-            { key: 'price', label: 'Price' },
-            { key: 'stock', label: 'Stock' }
-          ],
-          sortable: true,
-          filterable: true,
-          paginated: true
-        }
-      }
-    ]
+    name: 'Products Page',
+    version: '2.0.0',
+    items: [], // Widgets agora são items
+    metadata: createMetadata('Products Page', 'Página de listagem de produtos'),
+    createdAt: new Date().toISOString(),
+    updatedAt: new Date().toISOString()
   }
 
   // Inicializa generator
@@ -75,13 +61,13 @@ export async function exemploBasico() {
 export async function exemploComValidacao() {
   const schema: PageSchema = {
     id: 'dashboard',
-    type: 'page',
-    metadata: createSchemaMetadata('Dashboard', 'Admin dashboard'),
-    layout: createGridLayout(4, 16),
-    widgets: [
+    name: 'Dashboard',
+    version: '2.0.0',
+    items: [
       {
         id: 'stat-1',
         type: 'card',
+        props: {},
         config: {
           title: 'Total Sales',
           variant: 'primary',
@@ -91,6 +77,7 @@ export async function exemploComValidacao() {
       {
         id: 'stat-2',
         type: 'card',
+        props: {},
         config: {
           title: 'Orders',
           variant: 'success',
@@ -98,36 +85,15 @@ export async function exemploComValidacao() {
         }
       }
     ],
-    dataSources: {
-      salesData: {
-        type: 'api',
-        config: {
-          endpoint: '/api/sales',
-          method: 'GET'
-        }
-      }
-    }
+    metadata: createMetadata('Dashboard', 'Admin dashboard'),
+    createdAt: new Date().toISOString(),
+    updatedAt: new Date().toISOString()
   }
 
-  const generator = useCodeGenerator()
-
-  // Valida antes de gerar
-  const validation = generator.validateSchema(schema)
-
-  if (!validation.isValid) {
-    console.error('Schema inválido:', validation.errors)
-    return
-  }
-
-  if (validation.warnings.length > 0) {
-    console.warn('Avisos:', validation.warnings)
-  }
-
-  console.log('Análise do schema:')
-  console.log('- Widgets únicos:', validation.analysis?.uniqueWidgets)
-  console.log('- Total de widgets:', validation.analysis?.totalWidgets)
-  console.log('- Tem data sources:', validation.analysis?.hasDataSources)
-  console.log('- Componentes complexos:', validation.analysis?.complexComponents)
+  const generator = useCodeGenerator({
+    typescript: true,
+    includeComments: true
+  })
 
   // Gera código
   const result = await generator.generate(schema)
@@ -145,19 +111,22 @@ export async function exemploComValidacao() {
 export async function exemploDiferentesFormatos() {
   const schema: PageSchema = {
     id: 'form-page',
-    type: 'page',
-    metadata: createSchemaMetadata('Contact Form', 'Formulário de contato'),
-    layout: createFlexLayout('column'),
-    widgets: [
+    name: 'Contact Form',
+    version: '2.0.0',
+    items: [
       {
         id: 'contact-form',
-        type: 'form-renderer',
+        type: 'formrenderer',
+        props: {},
         config: {
           submitText: 'Send Message',
           resetText: 'Clear'
         }
       }
-    ]
+    ],
+    metadata: createMetadata('Contact Form', 'Formulário de contato'),
+    createdAt: new Date().toISOString(),
+    updatedAt: new Date().toISOString()
   }
 
   const generator = useCodeGenerator()
@@ -186,24 +155,30 @@ export async function exemploBatchGeneration() {
   const schemas: PageSchema[] = [
     {
       id: 'home',
-      type: 'page',
-      metadata: createSchemaMetadata('Home'),
-      layout: createFlexLayout('column'),
-      widgets: []
+      name: 'Home',
+      version: '2.0.0',
+      items: [],
+      metadata: createMetadata('Home'),
+      createdAt: new Date().toISOString(),
+      updatedAt: new Date().toISOString()
     },
     {
       id: 'about',
-      type: 'page',
-      metadata: createSchemaMetadata('About'),
-      layout: createFlexLayout('column'),
-      widgets: []
+      name: 'About',
+      version: '2.0.0',
+      items: [],
+      metadata: createMetadata('About'),
+      createdAt: new Date().toISOString(),
+      updatedAt: new Date().toISOString()
     },
     {
       id: 'contact',
-      type: 'page',
-      metadata: createSchemaMetadata('Contact'),
-      layout: createFlexLayout('column'),
-      widgets: []
+      name: 'Contact',
+      version: '2.0.0',
+      items: [],
+      metadata: createMetadata('Contact'),
+      createdAt: new Date().toISOString(),
+      updatedAt: new Date().toISOString()
     }
   ]
 
@@ -244,19 +219,22 @@ export async function exemploBatchGeneration() {
 export async function exemploCustomImports() {
   const schema: PageSchema = {
     id: 'custom-page',
-    type: 'page',
-    metadata: createSchemaMetadata('Custom Page'),
-    layout: createFlexLayout('column'),
-    widgets: [
+    name: 'Custom Page',
+    version: '2.0.0',
+    items: [
       {
         id: 'btn-1',
         type: 'button',
+        props: {},
         config: {
           text: 'Click Me',
           variant: 'primary'
         }
       }
-    ]
+    ],
+    metadata: createMetadata('Custom Page'),
+    createdAt: new Date().toISOString(),
+    updatedAt: new Date().toISOString()
   }
 
   // Named imports (tree-shakeable)
@@ -291,17 +269,19 @@ export async function exemploCustomImports() {
 export async function exemploAnalise() {
   const schema: PageSchema = {
     id: 'complex-page',
-    type: 'page',
-    metadata: createSchemaMetadata('Complex Page'),
-    layout: createGridLayout(12, 16),
-    widgets: [
-      { id: 'card-1', type: 'card', config: {} },
-      { id: 'card-2', type: 'card', config: {} },
-      { id: 'table-1', type: 'data-table', config: {} },
-      { id: 'form-1', type: 'form-renderer', config: {} },
-      { id: 'btn-1', type: 'button', config: {} },
-      { id: 'btn-2', type: 'button', config: {} }
-    ]
+    name: 'Complex Page',
+    version: '2.0.0',
+    items: [
+      { id: 'card-1', type: 'card', props: {}, config: {} },
+      { id: 'card-2', type: 'card', props: {}, config: {} },
+      { id: 'table-1', type: 'datatable', props: {}, config: {} },
+      { id: 'form-1', type: 'formrenderer', props: {}, config: {} },
+      { id: 'btn-1', type: 'button', props: {}, config: {} },
+      { id: 'btn-2', type: 'button', props: {}, config: {} }
+    ],
+    metadata: createMetadata('Complex Page'),
+    createdAt: new Date().toISOString(),
+    updatedAt: new Date().toISOString()
   }
 
   const generator = useCodeGenerator()
@@ -334,10 +314,12 @@ export async function exemploAnalise() {
 export async function exemploNamingConventions() {
   const schema: PageSchema = {
     id: 'my-awesome-page',
-    type: 'page',
-    metadata: createSchemaMetadata('My Awesome Page'),
-    layout: createFlexLayout('column'),
-    widgets: []
+    name: 'My Awesome Page',
+    version: '2.0.0',
+    items: [],
+    metadata: createMetadata('My Awesome Page'),
+    createdAt: new Date().toISOString(),
+    updatedAt: new Date().toISOString()
   }
 
   const generator = useCodeGenerator()
@@ -411,15 +393,9 @@ import type { PageSchema } from '@lugand-sistemas-ltda/vue-ui-lib'
 
 const mySchema: PageSchema = {
   id: 'demo-page',
-  type: 'page',
-  metadata: {
-    title: 'Demo Page',
-    version: '1.0.0',
-    createdAt: new Date().toISOString(),
-    updatedAt: new Date().toISOString()
-  },
-  layout: { type: 'flex', responsive: {} },
-  widgets: [
+  name: 'Demo Page',
+  version: '2.0.0',
+  items: [
     {
       id: 'welcome-card',
       type: 'card',
@@ -429,7 +405,10 @@ const mySchema: PageSchema = {
       },
       slot: 'Hello World!'
     }
-  ]
+  ],
+  metadata: createMetadata('Demo Page', 'Demo page description'),
+  createdAt: new Date().toISOString(),
+  updatedAt: new Date().toISOString()
 }
 
 const {

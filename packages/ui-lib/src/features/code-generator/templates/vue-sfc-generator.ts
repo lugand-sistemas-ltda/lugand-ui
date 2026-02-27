@@ -5,7 +5,7 @@
  * Suporta script setup, TypeScript, scoped styles.
  */
 
-import type { PageSchema } from "../../../core/schema-system/types";
+import type { PageSchema } from "../../page-builder/types";
 import type { WidgetSchema } from "../../../core/widget-system/types";
 import type { CodeGeneratorOptions } from "../types";
 
@@ -61,13 +61,12 @@ export function generateTemplate(
   // Comentário de header (se habilitado)
   if (options.includeComments) {
     lines.push("<!--");
-    lines.push(`  ${schema.metadata.title || "Page Component"}`);
-    if (schema.metadata.description) {
+    lines.push(`  ${schema.metadata?.title || "Page Component"}`);
+    if (schema.metadata?.description) {
       lines.push(`  ${schema.metadata.description}`);
     }
     if (options.includeMetadata) {
       lines.push(`  Generated: ${new Date().toISOString()}`);
-      lines.push(`  Version: ${schema.metadata.version}`);
     }
     lines.push("-->");
   }
@@ -79,7 +78,7 @@ export function generateTemplate(
   lines.push(`${indent}<div class="${containerClass}">`);
 
   // Widgets (index será usado para key generation quando suportar listas dinâmicas)
-  const widgetLines = schema.widgets.map((widget, _index) =>
+  const widgetLines = (schema.items || []).map((widget, _index) =>
     generateWidgetTemplate(widget, options, 2),
   );
   lines.push(...widgetLines);
@@ -316,7 +315,7 @@ function generateDataSources(
   if (!schema.dataSources) return lines;
 
   for (const [name, source] of Object.entries(schema.dataSources)) {
-    if (source.type === "static") {
+    if (source.type === "static" && source.config?.data) {
       lines.push(`const ${name} = ref(${JSON.stringify(source.config.data)})`);
     } else if (source.type === "api") {
       lines.push(`const ${name} = ref([])`);
@@ -338,7 +337,7 @@ function generateReactiveState(
   const lines: string[] = [];
 
   // Procura widgets que precisam de state
-  schema.widgets.forEach((widget) => {
+  schema.items?.forEach((widget) => {
     if (needsVModel(widget)) {
       const varName = getVModelBinding(widget);
       const initialValue = getInitialValue(widget);
@@ -475,7 +474,7 @@ export function generateStyle(
 function extractComponentsUsed(schema: PageSchema): Set<string> {
   const components = new Set<string>();
 
-  schema.widgets.forEach((widget) => {
+  schema.items?.forEach((widget) => {
     const componentName = getComponentName(widget.type);
     components.add(componentName);
   });
@@ -500,7 +499,7 @@ function getComponentName(type: string): string {
  * Gera nome da classe container baseado no schema
  */
 function getContainerClass(schema: PageSchema): string {
-  const base = schema.metadata.title || "page";
+  const base = schema.metadata?.title || "page";
   return (
     base
       .toLowerCase()

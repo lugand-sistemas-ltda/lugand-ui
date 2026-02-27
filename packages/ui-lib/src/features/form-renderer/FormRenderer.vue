@@ -12,9 +12,9 @@
 
     <!-- Fields Grid -->
     <div class="form-renderer__fields" :style="gridStyle">
-      <FieldRenderer v-for="field in schema.fields" :key="field.name" :field="field" :model-value="formData[field.name]"
-        :errors="getFieldErrors(field.name)" :show-errors="shouldShowFieldErrors(field.name)" :form-data="formData"
-        @update:model-value="(value) => updateField(field.name, value)" @blur="handleFieldBlur(field.name)" />
+      <FieldRenderer v-for="field in formFields" :key="getFieldId(field)" :field="field" :model-value="formData[getFieldId(field)]"
+        :errors="getFieldErrors(getFieldId(field))" :show-errors="shouldShowFieldErrors(getFieldId(field))" :form-data="formData"
+        @update:model-value="(value) => updateField(getFieldId(field), value)" @blur="handleFieldBlur(getFieldId(field))" />
     </div>
 
     <!-- Global Errors -->
@@ -51,7 +51,7 @@
  */
 
 import { ref, computed, onMounted, watch } from 'vue'
-import type { FormSchema, FormErrors, FormSubmitEvent, FieldChangeEvent } from './types'
+import type { FormSchema, FormField, FormErrors, FormSubmitEvent, FieldChangeEvent } from './types'
 import { useFormValidation } from './useFormValidation'
 import FieldRenderer from './FieldRenderer.vue'
 import { Button } from '../../shared/components'
@@ -94,6 +94,13 @@ const submitted = ref(false)
 const submitting = ref(false)
 
 /**
+ * Lista de campos (compatível com items/fields)
+ */
+const formFields = computed(() => {
+  return (props.schema.items || props.schema.fields || []) as FormField[]
+})
+
+/**
  * Validação.
  */
 const {
@@ -106,7 +113,7 @@ const {
   reset: resetValidation,
   getFieldErrors: getErrors,
   isFieldTouched
-} = useFormValidation(props.schema.fields, formData)
+} = useFormValidation(formFields.value, formData)
 
 /**
  * Estilo do grid.
@@ -130,14 +137,22 @@ const formStyle = computed(() => {
 })
 
 /**
+ * Helper: Retorna ID do campo (compatível com id/name)
+ */
+function getFieldId(field: FormField): string {
+  return (field.id || field.name || '') as string
+}
+
+/**
  * Inicializa form data com default values.
  */
 function initializeFormData() {
   const data: Record<string, any> = { ...props.initialValues }
 
-  props.schema.fields.forEach((field) => {
-    if (!(field.name in data)) {
-      data[field.name] = field.defaultValue !== undefined ? field.defaultValue : null
+  formFields.value.forEach((field) => {
+    const fieldName = getFieldId(field)
+    if (fieldName && !(fieldName in data)) {
+      data[fieldName] = field.props?.defaultValue !== undefined ? field.props.defaultValue : null
     }
   })
 

@@ -22,7 +22,7 @@
             🗑️ Limpar
           </button>
           <button class="action-button action-button--primary" @click="exportSchema"
-            :disabled="!currentSchema || currentSchema.fields.length === 0" title="Exportar schema JSON">
+            :disabled="!currentSchema || currentSchema.items.length === 0" title="Exportar schema JSON">
             💾 Exportar Schema
           </button>
         </div>

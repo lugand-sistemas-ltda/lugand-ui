@@ -130,7 +130,7 @@ export interface WidgetSchema<TConfig = Record<string, any>> {
   position?: WidgetPosition
 
   /** Configuração específica do widget */
-  config: TConfig
+  config?: TConfig
 
   /** Widgets filhos (para containers/layouts) */
   children?: WidgetSchema[]

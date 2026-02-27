@@ -28,7 +28,7 @@
 <script setup lang="ts">
 import { ref, computed } from 'vue'
 import { Button } from '../../../shared/components'
-import type { FormSchema } from '../../form-renderer/types'
+import type { FormSchema } from '../types'
 
 interface Props {
   schema: FormSchema

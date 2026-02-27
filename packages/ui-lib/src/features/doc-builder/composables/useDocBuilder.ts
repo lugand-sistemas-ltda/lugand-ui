@@ -406,10 +406,10 @@ function documentSchemaToPDFContent(
   // Implementação básica - será expandida nas próximas etapas
   const content: PDFContent = {
     metadata: {
-      title: schema.metadata.title,
-      author: schema.metadata.author,
-      subject: schema.metadata.subject,
-      keywords: schema.metadata.keywords,
+      title: schema.metadata?.title,
+      author: schema.metadata?.author,
+      subject: schema.metadata?.subject,
+      keywords: schema.metadata?.keywords,
       creator: 'Lugand UI Lib - Doc Builder'
     },
     pages: []
@@ -425,10 +425,12 @@ function documentSchemaToPDFContent(
   
   // Converter blocos para elementos PDF
   let yPosition = 0
-  for (const block of schema.items) {
-    const elements = blockToPDFElements(block, data, yPosition, schema.layout.margins)
-    page.elements.push(...elements)
-    yPosition += 20 // Espaçamento básico
+  if (schema.items) {
+    for (const block of schema.items) {
+      const elements = blockToPDFElements(block, data, yPosition, schema.layout.margins)
+      page.elements.push(...elements)
+      yPosition += 20 // Espaçamento básico
+    }
   }
   
   content.pages.push(page)
@@ -491,7 +493,7 @@ function documentSchemaToHTML(schema: DocumentSchema, data: DocumentData): strin
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>${schema.metadata.title}</title>
+  <title>${schema.metadata?.title || 'Document'}</title>
   <style>
     body {
       font-family: Arial, sans-serif;
@@ -505,8 +507,10 @@ function documentSchemaToHTML(schema: DocumentSchema, data: DocumentData): strin
 `
   
   // Renderizar blocos
-  for (const block of schema.items) {
-    html += blockToHTML(block, data)
+  if (schema.items) {
+    for (const block of schema.items) {
+      html += blockToHTML(block, data)
+    }
   }
   
   html += `

@@ -50,7 +50,7 @@
 
         <div
           v-for="prop in editableProps"
-          :key="prop.name"
+          :key="getPropKey(prop)"
           class="property-group"
         >
           <label class="property-label">
@@ -61,21 +61,21 @@
           <!-- Text Input -->
           <input
             v-if="prop.inputType === 'text'"
-            :value="getPropertyValue(prop.name)"
+            :value="getPropertyValue(getPropKey(prop))"
             type="text"
             class="property-input"
             :placeholder="prop.helpText"
-            @input="updateProperty(prop.name, ($event.target as HTMLInputElement).value)"
+            @input="updateProperty(getPropKey(prop), ($event.target as HTMLInputElement).value)"
           />
 
           <!-- Number Input -->
           <input
             v-else-if="prop.inputType === 'number'"
-            :value="getPropertyValue(prop.name)"
+            :value="getPropertyValue(getPropKey(prop))"
             type="number"
             class="property-input"
             :placeholder="prop.helpText"
-            @input="updateProperty(prop.name, Number(($event.target as HTMLInputElement).value))"
+            @input="updateProperty(getPropKey(prop), Number(($event.target as HTMLInputElement).value))"
           />
 
           <!-- Boolean (Checkbox) -->
@@ -84,9 +84,9 @@
             class="checkbox-label"
           >
             <input
-              :checked="getPropertyValue(prop.name)"
+              :checked="getPropertyValue(getPropKey(prop))"
               type="checkbox"
-              @change="updateProperty(prop.name, ($event.target as HTMLInputElement).checked)"
+              @change="updateProperty(getPropKey(prop), ($event.target as HTMLInputElement).checked)"
             />
             <span>{{ prop.helpText || 'Enable' }}</span>
           </label>
@@ -94,9 +94,9 @@
           <!-- Select -->
           <select
             v-else-if="prop.inputType === 'select'"
-            :value="getPropertyValue(prop.name)"
+            :value="getPropertyValue(getPropKey(prop))"
             class="property-select"
-            @change="updateProperty(prop.name, ($event.target as HTMLSelectElement).value)"
+            @change="updateProperty(getPropKey(prop), ($event.target as HTMLSelectElement).value)"
           >
             <option
               v-for="option in prop.options"
@@ -110,20 +110,20 @@
           <!-- Color -->
           <input
             v-else-if="prop.inputType === 'color'"
-            :value="getPropertyValue(prop.name)"
+            :value="getPropertyValue(getPropKey(prop))"
             type="color"
             class="property-color"
-            @input="updateProperty(prop.name, ($event.target as HTMLInputElement).value)"
+            @input="updateProperty(getPropKey(prop), ($event.target as HTMLInputElement).value)"
           />
 
           <!-- JSON Editor -->
           <textarea
             v-else-if="prop.inputType === 'json'"
-            :value="JSON.stringify(getPropertyValue(prop.name), null, 2)"
+            :value="JSON.stringify(getPropertyValue(getPropKey(prop)), null, 2)"
             class="property-textarea"
             rows="6"
             :placeholder="prop.helpText"
-            @input="updateJsonProperty(prop.name, ($event.target as HTMLTextAreaElement).value)"
+            @input="updateJsonProperty(getPropKey(prop), ($event.target as HTMLTextAreaElement).value)"
           />
 
           <!-- Help Text -->
@@ -189,6 +189,13 @@ const editableProps = computed((): EditableWidgetProperty[] => {
 // ============================================
 // METHODS
 // ============================================
+
+/**
+ * Retorna chave da propriedade (compat com key/name)
+ */
+function getPropKey(prop: EditableWidgetProperty): string {
+  return (prop.key || prop.name || '') as string
+}
 
 function getPropertyValue(propName: string): any {
   if (!props.widget?.config) return undefined

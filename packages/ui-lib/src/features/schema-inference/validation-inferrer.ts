@@ -8,7 +8,7 @@
  * @created 2025-01-XX
  */
 
-import type { FormField } from '../form-renderer/types'
+import type { FieldValidationRule } from '../form-renderer/types'
 import type { PropertyMetadata, InferenceConfig } from './types'
 
 /**
@@ -72,8 +72,8 @@ export function inferAdvancedValidations(
   property: PropertyMetadata,
   // @ts-expect-error - config será usado para customizar regras de validação
   config: InferenceConfig
-): NonNullable<FormField['validation']> {
-  const validations: NonNullable<FormField['validation']> = []
+): FieldValidationRule[] {
+  const validations: FieldValidationRule[] = []
 
   // 1. Extrair validações de JSDoc tags (se description contém tags)
   if (property.description) {
@@ -109,8 +109,8 @@ export function inferAdvancedValidations(
  * //   { type: 'pattern', value: /^[A-Z]/ }
  * // ]
  */
-function parseJSDocValidations(description: string): NonNullable<FormField['validation']> {
-  const validations: NonNullable<FormField['validation']> = []
+function parseJSDocValidations(description: string): FieldValidationRule[] {
+  const validations: FieldValidationRule[] = []
 
   // @required
   if (description.includes(VALIDATION_TAGS.REQUIRED)) {
@@ -196,8 +196,8 @@ function parseJSDocValidations(description: string): NonNullable<FormField['vali
  * @param fieldName - Nome do campo
  * @returns Validações inferidas
  */
-function inferValidationsByName(fieldName: string): NonNullable<FormField['validation']> {
-  const validations: NonNullable<FormField['validation']> = []
+function inferValidationsByName(fieldName: string): FieldValidationRule[] {
+  const validations: FieldValidationRule[] = []
   const name = fieldName.toLowerCase()
 
   // Email
@@ -306,8 +306,8 @@ function inferValidationsByName(fieldName: string): NonNullable<FormField['valid
  * @param property - Propriedade
  * @returns Validações inferidas
  */
-function inferValidationsByType(property: PropertyMetadata): NonNullable<FormField['validation']> {
-  const validations: NonNullable<FormField['validation']> = []
+function inferValidationsByType(property: PropertyMetadata): FieldValidationRule[] {
+  const validations: FieldValidationRule[] = []
 
   // Required (se não é optional e não é nullable)
   if (!property.optional && !property.nullable) {
@@ -349,10 +349,10 @@ function inferValidationsByType(property: PropertyMetadata): NonNullable<FormFie
  * @returns Array sem duplicatas
  */
 function deduplicateValidations(
-  validations: NonNullable<FormField['validation']>
-): NonNullable<FormField['validation']> {
+  validations: FieldValidationRule[]
+): FieldValidationRule[] {
   const seen = new Set<string>()
-  const unique: NonNullable<FormField['validation']> = []
+  const unique: FieldValidationRule[] = []
 
   for (const validation of validations) {
     // Criar chave única baseada no tipo
@@ -383,7 +383,7 @@ function deduplicateValidations(
 export function createCustomValidation(
   validator: (value: unknown) => boolean | Promise<boolean>,
   message: string
-): NonNullable<FormField['validation']>[number] {
+): FieldValidationRule {
   return {
     type: 'custom',
     validator,
@@ -405,7 +405,7 @@ export function createCustomValidation(
 export function createMatchValidation(
   fieldName: string,
   message: string
-): NonNullable<FormField['validation']>[number] {
+): FieldValidationRule {
   return {
     type: 'custom',
     validator: (value: unknown, formData?: Record<string, unknown>) => {
