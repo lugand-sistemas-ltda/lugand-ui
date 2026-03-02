@@ -10,8 +10,10 @@
     "packages/*"
   ],
   "scripts": {
-    "dev": "npm run build:lib && npm run dev --workspace=test-ui-lib",
+    "dev": "npm run dev --workspace=@lugand-sistemas-ltda/vue-ui-lib",
     "dev:lib": "npm run dev --workspace=@lugand-sistemas-ltda/vue-ui-lib",
+    "dev:test": "npm run build:lib && npm run dev --workspace=test-ui-lib",
+    "dev:demo": "npm run dev:test",
     "build": "npm run build:lib",
     "build:lib": "npm run build:lib --workspace=@lugand-sistemas-ltda/vue-ui-lib",
     "build:test": "npm run build --workspace=test-ui-lib",

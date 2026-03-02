@@ -44,8 +44,10 @@
   },
   "scripts": {
     "dev": "vite",
+    "dev:watch": "vite build --config vite.config.lib.ts --watch",
     "build": "vue-tsc -b && vite build",
     "build:lib": "vite build --config vite.config.lib.ts",
+    "type-check": "vue-tsc --noEmit -p tsconfig.app.json --composite false",
     "preview": "vite preview",
     "prepublishOnly": "npm run build:lib"
   },

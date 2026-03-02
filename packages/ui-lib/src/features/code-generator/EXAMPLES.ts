@@ -5,8 +5,8 @@
  * Vue SFC a partir de PageSchema JSON.
  */
 
-import { useCodeGenerator } from '@lugand-sistemas-ltda/vue-ui-lib'
-import type { PageSchema } from '@lugand-sistemas-ltda/vue-ui-lib'
+import { useCodeGenerator } from './useCodeGenerator'
+import type { PageSchema } from '../page-builder/types'
 
 // Helper functions
 function createMetadata(title: string, description?: string) {

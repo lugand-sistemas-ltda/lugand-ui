@@ -61,21 +61,46 @@ npm install
 
 ## 🏃 Executando o Projeto
 
-### Servidor de Desenvolvimento (Test App)
+### Servidor de Desenvolvimento (UI Lib)
 
 ```bash
 npm run dev
+# ou
+npm run dev:lib
 ```
 
 Acesse: [http://localhost:5173](http://localhost:5173)
 
-### Servidor de Desenvolvimento (Lib)
+Inicia o servidor Vite com **Hot Module Replacement (HMR)**. Ideal para desenvolver componentes da lib.
+
+### Servidor de Desenvolvimento (App de Teste/Demo)
 
 ```bash
-npm run dev:lib
+npm run dev:test
+# ou
+npm run dev:demo
 ```
 
-Útil para testar componentes isolados durante desenvolvimento da lib.
+Inicia o app de teste que consome a lib. Útil para testar integração end-to-end.
+
+**Nota:** O comando `dev:test` faz build da lib antes de iniciar o servidor.
+
+### 🔄 Modo Watch (Desenvolvimento Avançado)
+
+Para desenvolver simultaneamente lib e app de teste:
+
+**Terminal 1 - Watch build da lib:**
+```bash
+cd packages/ui-lib
+npm run dev:watch
+```
+
+**Terminal 2 - App de teste:**
+```bash
+npm run dev:demo
+```
+
+Toda mudança em `src/` da lib é automaticamente recompilada. O app de teste precisa ser recarregado manualmente no browser.
 
 ---
 
