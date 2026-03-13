@@ -17,7 +17,7 @@
 
 import { computed, ref } from 'vue'
 import type { Ref } from 'vue'
-import { useSchemaHistory } from '@/core/schema-builder/history'
+import { useSchemaHistory } from './useSchemaHistory'
 import type {
   ActiveBreakpoint,
   InsertPosition,

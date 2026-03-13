@@ -16,8 +16,5 @@
  * ```
  */
 
-// Exportar validadores do schema-builder (genéricos)
-export * from '../schema-builder/validators'
-
 // Validadores brasileiros
 export * from './brazilian'

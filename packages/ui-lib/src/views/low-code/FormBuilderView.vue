@@ -22,7 +22,7 @@
             🗑️ Limpar
           </button>
           <button class="action-button action-button--primary" @click="exportSchema"
-            :disabled="!currentSchema || currentSchema.items.length === 0" title="Exportar schema JSON">
+            :disabled="!hasNodes" title="Exportar schema JSON">
             💾 Exportar Schema
           </button>
         </div>
@@ -31,8 +31,12 @@
 
     <!-- Form Builder Component (full-screen) -->
     <div class="view-content">
-      <FormBuilder v-model="currentSchema" :height="builderHeight" :initial-mode="builderMode" @save="handleSave"
-        @field-add="handleFieldAdd" @field-remove="handleFieldRemove" />
+      <LowCodeEngine
+        :context="formBuilderContext"
+        v-model="currentSchema"
+        @save="handleSave"
+        @toolbar-action="handleToolbarAction"
+      />
     </div>
 
     <!-- Schema Preview Modal -->
@@ -52,8 +56,7 @@
         </div>
 
         <div class="schema-preview__stats">
-          <span>📊 {{ currentSchema?.items?.length || 0 }} campos</span>
-          <span>🔍 {{ validationCount }} validações</span>
+          <span>📊 {{ nodeCount }} componentes</span>
           <span>📦 {{ formatBytes(schemaSize) }}</span>
         </div>
       </div>
@@ -63,161 +66,66 @@
 
 <script setup lang="ts">
 import { ref, computed, onMounted } from 'vue'
-import { FormBuilder } from '@/features/form-builder'
+import { LowCodeEngine } from '@/core/low-code-engine/components'
+import {
+  formBuilderContext,
+  createEmptyTree,
+  createNode,
+  flattenTree,
+} from '@/core/low-code-engine'
 import { Modal } from '@/modules/modal'
-import type { FormSchema } from '@/features/form-renderer/types'
-import type { FormField } from '@/features/form-renderer/types'
+import type { SchemaTree } from '@/core/low-code-engine'
 
 // ============================================
 // STATE
 // ============================================
 
-const currentSchema = ref<FormSchema>(createEmptySchema())
+const currentSchema = ref<SchemaTree>(formBuilderContext.defaultSchema())
 const showSchemaPreview = ref(false)
-const builderMode = ref<'design' | 'preview' | 'code'>('design')
-const builderHeight = ref('calc(100vh - 180px)')
 
 // ============================================
 // COMPUTED
 // ============================================
 
-const formattedSchema = computed(() => {
-  return JSON.stringify(currentSchema.value, null, 2)
+const formattedSchema = computed(() => JSON.stringify(currentSchema.value, null, 2))
+
+const schemaSize = computed(() => new Blob([formattedSchema.value]).size)
+
+const nodeCount = computed(() => {
+  const all = flattenTree(currentSchema.value.root)
+  return Math.max(0, all.length - 1) // exclude root node
 })
 
-const schemaSize = computed(() => {
-  return new Blob([formattedSchema.value]).size
-})
-
-const validationCount = computed(() => {
-  if (!currentSchema.value?.items) return 0
-  return currentSchema.value.items.reduce((count: number, field: FormField) => {
-    return count + (field.validation?.length || 0)
-  }, 0)
-})
+const hasNodes = computed(() => nodeCount.value > 0)
 
 // ============================================
 // METHODS
 // ============================================
 
-/**
- * Cria schema vazio inicial
- */
-function createEmptySchema(): FormSchema {
-  return {
-    id: 'new-form',
-    description: 'Design your form here',
-    items: []
-  }
-}
-
-/**
- * Carrega exemplo pré-configurado
- */
 function loadExample() {
-  currentSchema.value = {
-    id: 'contact-form',
-    description: 'Formulário de contato completo com validações',
-    items: [
-      {
-        name: 'fullName',
-        label: 'Full Name',
-        type: 'text',
-        placeholder: 'Enter your full name',
-        required: true,
-        validation: [
-          { type: 'required', message: 'Name is required' },
-          { type: 'minLength', value: 3, message: 'Name must be at least 3 characters' }
-        ]
-      },
-      {
-        name: 'email',
-        label: 'Email Address',
-        type: 'email',
-        placeholder: 'your.email@example.com',
-        required: true,
-        validation: [
-          { type: 'required', message: 'Email is required' },
-          { type: 'email', message: 'Invalid email format' }
-        ]
-      },
-      {
-        name: 'phone',
-        label: 'Phone Number',
-        type: 'tel',
-        placeholder: '(00) 00000-0000',
-        required: false,
-        validation: [
-          { type: 'pattern', value: '^\\(?\\d{2}\\)?\\s?\\d{4,5}-?\\d{4}$', message: 'Invalid phone format' }
-        ]
-      },
-      {
-        name: 'subject',
-        label: 'Subject',
-        type: 'select',
-        required: true,
-        options: [
-          { value: '', label: 'Select a subject' },
-          { value: 'support', label: 'Technical Support' },
-          { value: 'sales', label: 'Sales Inquiry' },
-          { value: 'feedback', label: 'Feedback' },
-          { value: 'other', label: 'Other' }
-        ],
-        validation: [
-          { type: 'required', message: 'Please select a subject' }
-        ]
-      },
-      {
-        name: 'message',
-        label: 'Message',
-        type: 'textarea',
-        placeholder: 'Enter your message here...',
-        required: true,
-        rows: 5,
-        validation: [
-          { type: 'required', message: 'Message is required' },
-          { type: 'minLength', value: 10, message: 'Message must be at least 10 characters' },
-          { type: 'maxLength', value: 500, message: 'Message must not exceed 500 characters' }
-        ]
-      },
-      {
-        name: 'newsletter',
-        label: 'Subscribe to newsletter',
-        type: 'checkbox',
-        required: false
-      },
-      {
-        name: 'termsAccepted',
-        label: 'I accept the terms and conditions',
-        type: 'checkbox',
-        required: true,
-        validation: [
-          { type: 'required', message: 'You must accept the terms' }
-        ]
-      }
-    ]
-  }
+  const tree = createEmptyTree('form', { name: 'Contact Form' })
+  tree.root.children = [
+    createNode({ type: 'text-input', props: { label: 'Full Name', placeholder: 'Enter your full name', required: true }, style: {}, children: [], meta: { label: 'Full Name', droppable: false, draggable: true, accepts: 'none' } }),
+    createNode({ type: 'email-input', props: { label: 'Email Address', placeholder: 'your@email.com', required: true }, style: {}, children: [], meta: { label: 'Email Address', droppable: false, draggable: true, accepts: 'none' } }),
+    createNode({ type: 'tel-input', props: { label: 'Phone', placeholder: '(00) 00000-0000' }, style: {}, children: [], meta: { label: 'Phone', droppable: false, draggable: true, accepts: 'none' } }),
+    createNode({ type: 'select', props: { label: 'Subject', required: true, options: ['Support', 'Sales', 'Feedback', 'Other'] }, style: {}, children: [], meta: { label: 'Subject', droppable: false, draggable: true, accepts: 'none' } }),
+    createNode({ type: 'textarea', props: { label: 'Message', placeholder: 'Type your message...', rows: 4, required: true }, style: {}, children: [], meta: { label: 'Message', droppable: false, draggable: true, accepts: 'none' } }),
+    createNode({ type: 'checkbox', props: { label: 'I accept the terms and conditions', required: true }, style: {}, children: [], meta: { label: 'Terms Checkbox', droppable: false, draggable: true, accepts: 'none' } }),
+    createNode({ type: 'button', props: { text: 'Submit', variant: 'primary' }, style: {}, children: [], meta: { label: 'Submit Button', droppable: false, draggable: true, accepts: 'none' } }),
+  ]
+  currentSchema.value = tree
 }
 
-/**
- * Limpa formulário atual
- */
 function clearForm() {
   if (confirm('Tem certeza que deseja limpar o formulário atual?')) {
-    currentSchema.value = createEmptySchema()
+    currentSchema.value = formBuilderContext.defaultSchema()
   }
 }
 
-/**
- * Exporta schema JSON
- */
 function exportSchema() {
   showSchemaPreview.value = true
 }
 
-/**
- * Copia schema para clipboard
- */
 async function copySchema() {
   try {
     await navigator.clipboard.writeText(formattedSchema.value)
@@ -228,16 +136,13 @@ async function copySchema() {
   }
 }
 
-/**
- * Download do schema JSON
- */
 function downloadSchema() {
   try {
     const blob = new Blob([formattedSchema.value], { type: 'application/json' })
     const url = URL.createObjectURL(blob)
     const a = document.createElement('a')
     a.href = url
-    a.download = `${currentSchema.value.id || 'form-schema'}.json`
+    a.download = `${currentSchema.value.metadata?.name ?? 'form-schema'}.json`
     document.body.appendChild(a)
     a.click()
     document.body.removeChild(a)
@@ -248,31 +153,16 @@ function downloadSchema() {
   }
 }
 
-/**
- * Handler para save do Form Builder
- */
-function handleSave(schema: FormSchema) {
-  console.log('Form schema salvo:', schema)
-  localStorage.setItem('last-form-schema', JSON.stringify(schema))
+function handleSave(tree: SchemaTree) {
+  localStorage.setItem('last-form-schema', JSON.stringify(tree))
 }
 
-/**
- * Handler para adição de campo
- */
-function handleFieldAdd(field: any) {
-  console.log('Campo adicionado:', field)
+function handleToolbarAction(actionId: string) {
+  if (actionId === 'export-json' || actionId === 'validate-schema') {
+    showSchemaPreview.value = true
+  }
 }
 
-/**
- * Handler para remoção de campo
- */
-function handleFieldRemove(fieldName: string) {
-  console.log('Campo removido:', fieldName)
-}
-
-/**
- * Formata bytes para formato legível
- */
 function formatBytes(bytes: number): string {
   if (bytes === 0) return '0 Bytes'
   const k = 1024
@@ -286,11 +176,10 @@ function formatBytes(bytes: number): string {
 // ============================================
 
 onMounted(() => {
-  // Tenta carregar último schema salvo
   const savedSchema = localStorage.getItem('last-form-schema')
   if (savedSchema) {
     try {
-      currentSchema.value = JSON.parse(savedSchema)
+      currentSchema.value = JSON.parse(savedSchema) as SchemaTree
     } catch (error) {
       console.error('Erro ao carregar schema salvo:', error)
     }

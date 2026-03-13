@@ -9,27 +9,27 @@
             Doc Builder
           </h1>
           <p class="view-header__description">
-            Crie documentos dinâmicos com templates, variáveis e exporte para PDF ou HTML
+            Crie documentos dinâmicos com templates, variáveis e exporte para PDF ou JSON
           </p>
         </div>
 
         <div class="view-header__actions">
-          <button 
-            class="action-button action-button--secondary" 
+          <button
+            class="action-button action-button--secondary"
             @click="loadTemplate"
             title="Carregar template pré-configurado"
           >
             📝 Carregar Template
           </button>
-          <button 
-            class="action-button action-button--secondary" 
-            @click="clearDocument" 
+          <button
+            class="action-button action-button--secondary"
+            @click="clearDocument"
             title="Limpar documento"
           >
             🗑️ Limpar
           </button>
-          <button 
-            class="action-button action-button--primary" 
+          <button
+            class="action-button action-button--primary"
             @click="exportDocument"
             :disabled="!hasBlocks"
             title="Exportar documento"
@@ -42,30 +42,35 @@
 
     <!-- Doc Builder Component (full-screen) -->
     <div class="view-content">
-      <DocBuilderEditor />
+      <LowCodeEngine
+        :context="docBuilderContext"
+        v-model="currentSchema"
+        @save="handleSave"
+        @toolbar-action="handleToolbarAction"
+      />
     </div>
 
     <!-- Template Selection Modal -->
-    <Modal 
-      v-model="showTemplateModal" 
-      size="lg" 
+    <Modal
+      v-model="showTemplateModal"
+      size="lg"
       title="Selecionar Template"
     >
       <div class="template-gallery">
         <div class="template-gallery__grid">
           <div
-            v-for="template in availableTemplates"
+            v-for="template in BUILT_IN_TEMPLATES"
             :key="template.id"
             class="template-card"
             @click="selectTemplate(template)"
           >
-            <div class="template-card__icon">{{ getTemplateIcon(template.category) }}</div>
+            <div class="template-card__icon">{{ template.icon }}</div>
             <h3 class="template-card__title">{{ template.name }}</h3>
             <p class="template-card__description">{{ template.description }}</p>
             <div class="template-card__tags">
-              <span 
-                v-for="tag in template.tags" 
-                :key="tag" 
+              <span
+                v-for="tag in template.tags"
+                :key="tag"
                 class="tag"
               >
                 {{ tag }}
@@ -77,9 +82,9 @@
     </Modal>
 
     <!-- Export Options Modal -->
-    <Modal 
-      v-model="showExportModal" 
-      size="md" 
+    <Modal
+      v-model="showExportModal"
+      size="md"
       title="Exportar Documento"
     >
       <div class="export-options">
@@ -111,13 +116,13 @@
         </div>
 
         <div class="export-options__actions">
-          <button 
+          <button
             class="action-button action-button--secondary"
             @click="showExportModal = false"
           >
             Cancelar
           </button>
-          <button 
+          <button
             class="action-button action-button--primary"
             @click="performExport"
           >
@@ -126,23 +131,99 @@
         </div>
       </div>
     </Modal>
+
+    <!-- Schema Preview Modal (JSON export) -->
+    <Modal v-model="showSchemaPreview" size="lg" title="Document Schema JSON">
+      <div class="schema-preview">
+        <div class="schema-preview__actions">
+          <button class="action-button action-button--sm" @click="copySchema">
+            📋 Copiar JSON
+          </button>
+          <button class="action-button action-button--sm" @click="downloadSchema">
+            💾 Download JSON
+          </button>
+        </div>
+        <div class="schema-preview__content">
+          <pre><code>{{ formattedSchema }}</code></pre>
+        </div>
+        <div class="schema-preview__stats">
+          <span>📊 {{ nodeCount }} blocos</span>
+          <span>📦 {{ formatBytes(schemaSize) }}</span>
+        </div>
+      </div>
+    </Modal>
   </div>
 </template>
 
 <script setup lang="ts">
-import { ref, computed } from 'vue'
-import { DocBuilderEditor } from '@/features/doc-builder/components'
-import { templates } from '@/features/doc-builder/templates'
+import { ref, computed, onMounted } from 'vue'
+import { LowCodeEngine } from '@/core/low-code-engine/components'
+import {
+  docBuilderContext,
+  createEmptyTree,
+  createNode,
+  flattenTree,
+} from '@/core/low-code-engine'
 import { Modal } from '@/modules/modal'
 import { useToast } from '@/modules/toast'
-import type { DocumentTemplate } from '@/features/doc-builder/templates'
+import type { SchemaTree } from '@/core/low-code-engine'
+
+// ============================================
+// BUILT-IN TEMPLATES
+// ============================================
+
+interface BuiltInTemplate {
+  id: string
+  name: string
+  description: string
+  icon: string
+  tags: string[]
+  nodeTypes: string[]
+}
+
+const BUILT_IN_TEMPLATES: BuiltInTemplate[] = [
+  {
+    id: 'contract',
+    name: 'Contrato Simples',
+    description: 'Template de contrato com cláusulas e assinatura',
+    icon: '📋',
+    tags: ['contrato', 'legal', 'assinatura'],
+    nodeTypes: ['heading', 'paragraph', 'clause', 'signature'],
+  },
+  {
+    id: 'invoice',
+    name: 'Nota Fiscal',
+    description: 'Template de nota fiscal com itens e valores',
+    icon: '🧾',
+    tags: ['fiscal', 'financeiro', 'nfe'],
+    nodeTypes: ['heading', 'table', 'paragraph', 'qrcode'],
+  },
+  {
+    id: 'report',
+    name: 'Relatório',
+    description: 'Template de relatório gerencial com gráficos e tabelas',
+    icon: '📊',
+    tags: ['relatório', 'analytics', 'dados'],
+    nodeTypes: ['heading', 'paragraph', 'chart', 'table'],
+  },
+  {
+    id: 'letter',
+    name: 'Carta Formal',
+    description: 'Template de carta formal com cabeçalho e rodapé',
+    icon: '✉️',
+    tags: ['carta', 'comunicado', 'formal'],
+    nodeTypes: ['heading', 'paragraph', 'signature'],
+  },
+]
 
 // ============================================
 // STATE
 // ============================================
 
+const currentSchema = ref<SchemaTree>(docBuilderContext.defaultSchema())
 const showTemplateModal = ref(false)
 const showExportModal = ref(false)
+const showSchemaPreview = ref(false)
 const exportFormat = ref<'pdf' | 'html' | 'json'>('pdf')
 const toast = useToast()
 
@@ -150,12 +231,16 @@ const toast = useToast()
 // COMPUTED
 // ============================================
 
-const availableTemplates = computed(() => templates)
+const formattedSchema = computed(() => JSON.stringify(currentSchema.value, null, 2))
 
-const hasBlocks = computed(() => {
-  // TODO: Conectar com estado do builder quando disponível
-  return true
+const schemaSize = computed(() => new Blob([formattedSchema.value]).size)
+
+const nodeCount = computed(() => {
+  const all = flattenTree(currentSchema.value.root)
+  return Math.max(0, all.length - 1)
 })
+
+const hasBlocks = computed(() => nodeCount.value > 0)
 
 // ============================================
 // METHODS
@@ -165,11 +250,13 @@ function loadTemplate() {
   showTemplateModal.value = true
 }
 
-function selectTemplate(template: DocumentTemplate) {
+function selectTemplate(template: BuiltInTemplate) {
   try {
-    // TODO: Implementar carregamento do template no builder
-    console.log('Template selecionado:', template)
-    
+    const tree = createEmptyTree('doc', { name: template.name, description: template.description })
+    tree.root.children = template.nodeTypes.map(type =>
+      createNode({ type, props: { label: type }, style: {}, children: [], meta: { label: type, droppable: false, draggable: true, accepts: 'none' } }),
+    )
+    currentSchema.value = tree
     toast.success(`Template "${template.name}" carregado com sucesso!`)
     showTemplateModal.value = false
   } catch (error) {
@@ -180,7 +267,7 @@ function selectTemplate(template: DocumentTemplate) {
 
 function clearDocument() {
   if (confirm('Tem certeza que deseja limpar o documento?')) {
-    // TODO: Implementar limpeza do builder
+    currentSchema.value = docBuilderContext.defaultSchema()
     toast.info('Documento limpo')
   }
 }
@@ -190,42 +277,92 @@ function exportDocument() {
 }
 
 function performExport() {
-  try {
-    // TODO: Implementar exportação real
-    console.log('Exportando como:', exportFormat.value)
-    
-    toast.success(`Documento exportado como ${exportFormat.value.toUpperCase()}!`)
+  if (exportFormat.value === 'json') {
     showExportModal.value = false
+    showSchemaPreview.value = true
+    return
+  }
+  toast.info(`Exportação ${exportFormat.value.toUpperCase()} em breve`)
+  showExportModal.value = false
+}
+
+async function copySchema() {
+  try {
+    await navigator.clipboard.writeText(formattedSchema.value)
+    alert('Schema JSON copiado para clipboard!')
   } catch (error) {
-    toast.error('Erro ao exportar documento')
-    console.error(error)
+    console.error('Erro ao copiar:', error)
+    alert('Erro ao copiar schema')
   }
 }
 
-function getTemplateIcon(category: string): string {
-  const icons: Record<string, string> = {
-    contract: '📋',
-    invoice: '🧾',
-    report: '📊',
-    certificate: '🎓',
-    letter: '✉️',
-    custom: '📄'
+function downloadSchema() {
+  try {
+    const blob = new Blob([formattedSchema.value], { type: 'application/json' })
+    const url = URL.createObjectURL(blob)
+    const a = document.createElement('a')
+    a.href = url
+    a.download = `${currentSchema.value.metadata?.name ?? 'doc-schema'}.json`
+    document.body.appendChild(a)
+    a.click()
+    document.body.removeChild(a)
+    URL.revokeObjectURL(url)
+  } catch (error) {
+    console.error('Erro ao fazer download:', error)
+    alert('Erro ao fazer download do schema')
   }
-  return icons[category] || '📄'
 }
+
+function handleSave(tree: SchemaTree) {
+  localStorage.setItem('last-doc-schema', JSON.stringify(tree))
+  toast.success('Documento salvo!')
+}
+
+function handleToolbarAction(actionId: string) {
+  if (actionId === 'export-pdf') {
+    exportFormat.value = 'pdf'
+    showExportModal.value = true
+  } else if (actionId === 'export-json') {
+    showSchemaPreview.value = true
+  } else if (actionId === 'page-settings') {
+    toast.info('Configurações de página em breve')
+  }
+}
+
+function formatBytes(bytes: number): string {
+  if (bytes === 0) return '0 Bytes'
+  const k = 1024
+  const sizes = ['Bytes', 'KB', 'MB']
+  const i = Math.floor(Math.log(bytes) / Math.log(k))
+  return Math.round(bytes / Math.pow(k, i) * 100) / 100 + ' ' + sizes[i]
+}
+
+// ============================================
+// LIFECYCLE
+// ============================================
+
+onMounted(() => {
+  const savedSchema = localStorage.getItem('last-doc-schema')
+  if (savedSchema) {
+    try {
+      currentSchema.value = JSON.parse(savedSchema) as SchemaTree
+    } catch (error) {
+      console.error('Erro ao carregar schema salvo:', error)
+    }
+  }
+})
 </script>
 
-<style scoped lang="scss">
-.doc-builder-view {
-  display: flex;
-  flex-direction: column;
-  height: 100vh;
-  background-color: var(--theme-background);
-}
+<style lang="scss" scoped>
+@use '@/styles/utils/mixins' as *;
 
-.fullscreen-view {
-  position: relative;
-  overflow: hidden;
+// ============================================
+// DOC BUILDER VIEW (usa tokens e mixins da lib)
+// ============================================
+
+.doc-builder-view {
+  @include fullscreen-view-base;
+  background: var(--canvas-bg);
 }
 
 // ============================================
@@ -233,90 +370,51 @@ function getTemplateIcon(category: string): string {
 // ============================================
 
 .view-header {
-  border-bottom: 1px solid var(--theme-border);
-  background-color: var(--theme-card);
-  backdrop-filter: blur(8px);
-  z-index: 10;
-  
+  @include panel-header;
+  background: var(--toolbar-bg);
+  border-bottom: var(--toolbar-border);
+  padding: var(--toolbar-padding);
+  min-height: var(--toolbar-height);
+
   &__content {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    padding: 20px 32px;
-    max-width: 100%;
+    @include flex-between;
+    gap: var(--spacing-lg);
+
+    @media (max-width: 1024px) {
+      flex-direction: column;
+      align-items: flex-start;
+    }
   }
-  
+
   &__title-section {
     flex: 1;
   }
-  
+
   &__title {
     display: flex;
     align-items: center;
-    gap: 12px;
-    margin: 0 0 8px 0;
-    font-size: 28px;
-    font-weight: 700;
-    color: var(--theme-foreground);
+    gap: var(--spacing-sm);
+    margin: 0 0 var(--spacing-xs) 0;
+    font-size: var(--font-size-2xl);
+    font-weight: var(--font-weight-bold);
+    color: var(--color-text-primary);
   }
-  
+
   &__icon {
-    font-size: 32px;
+    font-size: var(--font-size-3xl);
   }
-  
+
   &__description {
     margin: 0;
-    font-size: 14px;
-    color: var(--theme-muted-foreground);
+    font-size: var(--font-size-sm);
+    color: var(--color-text-secondary);
     max-width: 600px;
   }
-  
+
   &__actions {
     display: flex;
-    gap: 12px;
-    flex-shrink: 0;
-  }
-}
-
-// ============================================
-// BUTTONS
-// ============================================
-
-.action-button {
-  padding: 10px 20px;
-  border: none;
-  border-radius: 8px;
-  font-size: 14px;
-  font-weight: 600;
-  cursor: pointer;
-  transition: all 0.2s ease;
-  white-space: nowrap;
-  
-  &--primary {
-    background-color: var(--theme-primary);
-    color: var(--theme-primary-foreground);
-    
-    &:hover:not(:disabled) {
-      background-color: var(--theme-primary-hover, var(--theme-primary));
-      transform: translateY(-1px);
-      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
-    }
-  }
-  
-  &--secondary {
-    background-color: var(--theme-secondary);
-    color: var(--theme-secondary-foreground);
-    border: 1px solid var(--theme-border);
-    
-    &:hover:not(:disabled) {
-      background-color: var(--theme-accent);
-      border-color: var(--theme-accent-foreground);
-    }
-  }
-  
-  &:disabled {
-    opacity: 0.5;
-    cursor: not-allowed;
+    gap: var(--spacing-sm);
+    flex-wrap: wrap;
   }
 }
 
@@ -327,7 +425,61 @@ function getTemplateIcon(category: string): string {
 .view-content {
   flex: 1;
   overflow: hidden;
-  position: relative;
+  padding: var(--canvas-padding);
+}
+
+// ============================================
+// ACTION BUTTONS
+// ============================================
+
+.action-button {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--spacing-xs);
+  padding: var(--spacing-sm) var(--spacing-md);
+  font-size: var(--font-size-sm);
+  font-weight: var(--font-weight-medium);
+  border: 1px solid var(--color-border-base);
+  border-radius: var(--radius-md);
+  background: var(--color-bg-primary);
+  color: var(--color-text-primary);
+  cursor: pointer;
+  transition: all var(--transition-base);
+
+  &:hover:not(:disabled) {
+    background: var(--color-bg-tertiary);
+    border-color: var(--color-primary);
+    transform: translateY(-1px);
+  }
+
+  &:active:not(:disabled) {
+    transform: translateY(0);
+  }
+
+  &:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+  }
+
+  &--primary {
+    background: var(--color-primary);
+    color: white;
+    border-color: var(--color-primary);
+
+    &:hover:not(:disabled) {
+      background: var(--color-primary-hover);
+      border-color: var(--color-primary-hover);
+    }
+  }
+
+  &--secondary {
+    background: var(--color-bg-secondary);
+  }
+
+  &--sm {
+    padding: var(--spacing-xs) var(--spacing-sm);
+    font-size: var(--font-size-xs);
+  }
 }
 
 // ============================================
@@ -335,62 +487,62 @@ function getTemplateIcon(category: string): string {
 // ============================================
 
 .template-gallery {
-  padding: 20px;
-  
+  padding: var(--spacing-md);
+
   &__grid {
     display: grid;
     grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
-    gap: 20px;
+    gap: var(--spacing-lg);
   }
 }
 
 .template-card {
-  padding: 24px;
-  border: 2px solid var(--theme-border);
-  border-radius: 12px;
-  background-color: var(--theme-card);
+  padding: var(--spacing-lg);
+  border: 2px solid var(--color-border-base);
+  border-radius: var(--radius-lg);
+  background: var(--color-bg-primary);
   cursor: pointer;
-  transition: all 0.2s ease;
-  
+  transition: all var(--transition-base);
+
   &:hover {
-    border-color: var(--theme-primary);
+    border-color: var(--color-primary);
     transform: translateY(-4px);
-    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.1);
+    box-shadow: var(--shadow-lg);
   }
-  
+
   &__icon {
-    font-size: 48px;
-    margin-bottom: 16px;
+    font-size: var(--font-size-4xl);
+    margin-bottom: var(--spacing-md);
   }
-  
+
   &__title {
-    margin: 0 0 8px 0;
-    font-size: 18px;
-    font-weight: 600;
-    color: var(--theme-foreground);
+    margin: 0 0 var(--spacing-xs) 0;
+    font-size: var(--font-size-lg);
+    font-weight: var(--font-weight-semibold);
+    color: var(--color-text-primary);
   }
-  
+
   &__description {
-    margin: 0 0 16px 0;
-    font-size: 14px;
-    color: var(--theme-muted-foreground);
+    margin: 0 0 var(--spacing-md) 0;
+    font-size: var(--font-size-sm);
+    color: var(--color-text-secondary);
     line-height: 1.5;
   }
-  
+
   &__tags {
     display: flex;
     flex-wrap: wrap;
-    gap: 8px;
+    gap: var(--spacing-xs);
   }
 }
 
 .tag {
-  padding: 4px 10px;
-  border-radius: 6px;
-  background-color: var(--theme-muted);
-  color: var(--theme-muted-foreground);
-  font-size: 12px;
-  font-weight: 500;
+  padding: var(--spacing-xs) var(--spacing-sm);
+  border-radius: var(--radius-sm);
+  background: var(--color-bg-tertiary);
+  color: var(--color-text-secondary);
+  font-size: var(--font-size-xs);
+  font-weight: var(--font-weight-medium);
 }
 
 // ============================================
@@ -398,51 +550,106 @@ function getTemplateIcon(category: string): string {
 // ============================================
 
 .export-options {
-  padding: 20px;
-  
-  &__format {
-    h3 {
-      margin: 0 0 16px 0;
-      font-size: 16px;
-      font-weight: 600;
-      color: var(--theme-foreground);
-    }
+  padding: var(--spacing-md);
+
+  &__format h3 {
+    margin: 0 0 var(--spacing-md) 0;
+    font-size: var(--font-size-base);
+    font-weight: var(--font-weight-semibold);
+    color: var(--color-text-primary);
   }
-  
+
   &__actions {
     display: flex;
     justify-content: flex-end;
-    gap: 12px;
-    margin-top: 24px;
-    padding-top: 20px;
-    border-top: 1px solid var(--theme-border);
+    gap: var(--spacing-sm);
+    margin-top: var(--spacing-lg);
+    padding-top: var(--spacing-md);
+    border-top: 1px solid var(--color-border-base);
   }
 }
 
 .format-buttons {
   display: flex;
-  gap: 12px;
+  gap: var(--spacing-sm);
 }
 
 .format-button {
   flex: 1;
-  padding: 16px;
-  border: 2px solid var(--theme-border);
-  border-radius: 8px;
-  background-color: var(--theme-card);
-  font-size: 14px;
-  font-weight: 600;
+  padding: var(--spacing-md);
+  border: 2px solid var(--color-border-base);
+  border-radius: var(--radius-md);
+  background: var(--color-bg-primary);
+  font-size: var(--font-size-sm);
+  font-weight: var(--font-weight-semibold);
   cursor: pointer;
-  transition: all 0.2s ease;
-  
+  transition: all var(--transition-base);
+
   &:hover {
-    border-color: var(--theme-primary);
+    border-color: var(--color-primary);
   }
-  
+
   &--active {
-    border-color: var(--theme-primary);
-    background-color: var(--theme-primary);
-    color: var(--theme-primary-foreground);
+    border-color: var(--color-primary);
+    background: var(--color-primary);
+    color: white;
+  }
+}
+
+// ============================================
+// SCHEMA PREVIEW MODAL
+// ============================================
+
+.schema-preview {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-md);
+  max-height: 70vh;
+
+  &__actions {
+    display: flex;
+    gap: var(--spacing-xs);
+    justify-content: flex-end;
+    padding-bottom: var(--spacing-sm);
+    border-bottom: 1px solid var(--color-border-base);
+  }
+
+  &__content {
+    flex: 1;
+    overflow: auto;
+    background: var(--editor-bg);
+    border-radius: var(--editor-border-radius);
+    padding: var(--editor-padding);
+
+    pre {
+      margin: 0;
+      font-family: var(--editor-font-family);
+      font-size: var(--editor-font-size);
+      line-height: var(--editor-line-height);
+      color: var(--editor-fg);
+      white-space: pre-wrap;
+      word-wrap: break-word;
+    }
+
+    code {
+      font-family: inherit;
+    }
+  }
+
+  &__stats {
+    display: flex;
+    gap: var(--spacing-lg);
+    padding: var(--spacing-sm) var(--spacing-md);
+    background: var(--color-bg-secondary);
+    border-radius: var(--radius-md);
+    font-size: var(--font-size-sm);
+    color: var(--color-text-secondary);
+
+    span {
+      display: flex;
+      align-items: center;
+      gap: var(--spacing-xs);
+    }
   }
 }
 </style>

@@ -6,10 +6,10 @@
         <div class="view-header__title-section">
           <h1 class="view-header__title">
             <span class="view-header__icon">⚡</span>
-            Code Generator
+            Schema Inspector
           </h1>
           <p class="view-header__description">
-            Transforme schemas JSON em código Vue production-ready com validação e otimização automática
+            Validador e inspetor de SchemaTree JSON — analise a estrutura da árvore e exporte o schema formatado
           </p>
         </div>
 
@@ -21,59 +21,61 @@
           <button class="action-button action-button--secondary" @click="clearSchema" title="Limpar editor">
             🗑️ Limpar
           </button>
-          <button class="action-button action-button--primary" @click="generateCode" :disabled="!schemaInput.trim()"
-            title="Gerar código a partir do schema">
-            ⚡ Gerar Código
+          <button class="action-button action-button--primary" @click="formatSchema" :disabled="!schemaInput.trim()"
+            title="Formatar JSON">
+            🎨 Formatar JSON
           </button>
         </div>
       </div>
     </div>
 
-    <!-- Content: Split View (Schema Input | Generated Code) -->
+    <!-- Content: Split View (JSON Input | Inspector) -->
     <div class="view-content">
       <!-- Left Panel: Schema Input -->
       <div class="panel panel--input">
         <div class="panel__header">
-          <h2 class="panel__title">📄 Schema JSON</h2>
+          <h2 class="panel__title">📄 SchemaTree JSON</h2>
           <div class="panel__actions">
             <label class="file-upload">
               📁 Carregar Arquivo
               <input type="file" accept=".json" @change="handleFileUpload" hidden />
             </label>
-            <button class="action-button action-button--sm" @click="formatSchema" title="Formatar JSON">
-              🎨 Formatar
+            <button class="action-button action-button--sm" @click="validateSchema" :disabled="!schemaInput.trim()"
+              title="Validar schema">
+              🔍 Validar
             </button>
           </div>
         </div>
 
-        <textarea v-model="schemaInput" class="schema-editor" placeholder="Cole ou digite seu PageSchema JSON aqui...
+        <textarea
+          v-model="schemaInput"
+          class="schema-editor"
+          placeholder="Cole ou digite seu SchemaTree JSON aqui...
 
 Exemplo:
 {
-  &quot;id&quot;: &quot;my-page&quot;,
-  &quot;description&quot;: &quot;Minha página&quot;,
-  &quot;widgets&quot;: [
-    {
-      &quot;id&quot;: &quot;card-1&quot;,
-      &quot;type&quot;: &quot;card&quot;,
-      &quot;config&quot;: {
-        &quot;title&quot;: &quot;Welcome&quot;,
-        &quot;content&quot;: &quot;Hello World&quot;
-      },
-      &quot;layout&quot;: {
-        &quot;x&quot;: 0,
-        &quot;y&quot;: 0,
-        &quot;width&quot;: 12,
-        &quot;height&quot;: 4
-      }
-    }
-  ]
-}" spellcheck="false"></textarea>
+  &quot;version&quot;: &quot;2.0&quot;,
+  &quot;context&quot;: &quot;page&quot;,
+  &quot;root&quot;: {
+    &quot;id&quot;: &quot;root-1&quot;,
+    &quot;type&quot;: &quot;page-root&quot;,
+    &quot;props&quot;: {},
+    &quot;style&quot;: {},
+    &quot;children&quot;: []
+  },
+  &quot;breakpoints&quot;: {},
+  &quot;metadata&quot;: {
+    &quot;name&quot;: &quot;My Page&quot;,
+    &quot;status&quot;: &quot;draft&quot;
+  }
+}"
+          spellcheck="false"
+        ></textarea>
 
         <!-- Validation Status -->
         <div v-if="validationResult" class="validation-status">
           <div v-if="validationResult.isValid" class="validation-status__success">
-            ✅ Schema válido
+            ✅ SchemaTree válido
           </div>
           <div v-else class="validation-status__errors">
             <strong>❌ Erros no schema:</strong>
@@ -83,54 +85,65 @@ Exemplo:
               </li>
             </ul>
           </div>
-          <div v-if="validationResult.warnings && validationResult.warnings.length > 0"
-            class="validation-status__warnings">
-            <strong>⚠️ Avisos:</strong>
-            <ul>
-              <li v-for="(warning, index) in validationResult.warnings" :key="index">
-                {{ warning }}
-              </li>
-            </ul>
-          </div>
         </div>
       </div>
 
-      <!-- Right Panel: Generated Code -->
+      <!-- Right Panel: Tree Inspector -->
       <div class="panel panel--output">
         <div class="panel__header">
-          <h2 class="panel__title">💻 Código Gerado (Vue SFC)</h2>
+          <h2 class="panel__title">🌳 Tree Inspector</h2>
           <div class="panel__actions">
-            <button class="action-button action-button--sm" @click="copyGeneratedCode" :disabled="!generatedCode"
-              title="Copiar código">
+            <button class="action-button action-button--sm" @click="copyFormatted" :disabled="!parsedTree"
+              title="Copiar JSON formatado">
               📋 Copiar
             </button>
-            <button class="action-button action-button--sm" @click="downloadGeneratedCode" :disabled="!generatedCode"
-              title="Download arquivo">
+            <button class="action-button action-button--sm" @click="downloadFormatted" :disabled="!parsedTree"
+              title="Download JSON">
               💾 Download
             </button>
           </div>
         </div>
 
-        <div v-if="isGenerating" class="loading-state">
-          <div class="spinner"></div>
-          <p>Gerando código...</p>
+        <!-- Stats (when valid) -->
+        <div v-if="parsedTree" class="tree-stats">
+          <div class="stat-card">
+            <span class="stat-card__icon">🌿</span>
+            <span class="stat-card__value">{{ treeStats.nodeCount }}</span>
+            <span class="stat-card__label">nós</span>
+          </div>
+          <div class="stat-card">
+            <span class="stat-card__icon">📐</span>
+            <span class="stat-card__value">{{ treeStats.depth }}</span>
+            <span class="stat-card__label">profundidade</span>
+          </div>
+          <div class="stat-card">
+            <span class="stat-card__icon">📱</span>
+            <span class="stat-card__value">{{ treeStats.breakpointCount }}</span>
+            <span class="stat-card__label">breakpoints</span>
+          </div>
+          <div class="stat-card">
+            <span class="stat-card__icon">📦</span>
+            <span class="stat-card__value">{{ formatBytes(schemaSize) }}</span>
+            <span class="stat-card__label">tamanho</span>
+          </div>
         </div>
 
-        <pre v-else-if="generatedCode" class="code-output"><code>{{ generatedCode }}</code></pre>
+        <!-- Context badge -->
+        <div v-if="parsedTree" class="context-badge">
+          <span class="context-badge__label">Contexto:</span>
+          <span class="context-badge__value">{{ parsedTree.context }}</span>
+          <span class="context-badge__label" style="margin-left: 1rem">Versão:</span>
+          <span class="context-badge__value">{{ parsedTree.version }}</span>
+        </div>
 
+        <!-- Formatted JSON Output -->
+        <pre v-if="parsedTree" class="code-output"><code>{{ formattedOutput }}</code></pre>
+
+        <!-- Empty state -->
         <div v-else class="empty-state">
-          <div class="empty-state__icon">⚡</div>
-          <p class="empty-state__text">Nenhum código gerado ainda</p>
-          <p class="empty-state__hint">
-            Cole um schema JSON válido e clique em "Gerar Código"
-          </p>
-        </div>
-
-        <!-- Code Stats -->
-        <div v-if="codeStats" class="code-stats">
-          <span>📊 {{ codeStats.lines }} linhas</span>
-          <span>🧩 {{ codeStats.components }} componentes</span>
-          <span>📦 {{ formatBytes(codeStats.size) }}</span>
+          <div class="empty-state__icon">🌳</div>
+          <p class="empty-state__text">Nenhum schema inspecionado</p>
+          <p class="empty-state__hint">Cole um SchemaTree JSON e clique em "Validar"</p>
         </div>
       </div>
     </div>
@@ -139,256 +152,194 @@ Exemplo:
 
 <script setup lang="ts">
 import { ref, computed } from 'vue'
-import { useCodeGenerator } from '@/features/code-generator'
-import type { PageSchema } from '@/features/page-builder/types'
+import {
+  flattenTree,
+  getTreeDepth,
+} from '@/core/low-code-engine'
+import type { SchemaTree } from '@/core/low-code-engine'
 
 // ============================================
 // STATE
 // ============================================
 
 const schemaInput = ref('')
-const isGenerating = ref(false)
-const validationResult = ref<any>(null)
-
-// Code Generator Instance
-const codeGenerator = useCodeGenerator({
-  typescript: true,
-  importStrategy: 'named',
-  namingConvention: 'PascalCase',
-  scopedStyles: true
-})
+const parsedTree = ref<SchemaTree | null>(null)
+const validationResult = ref<{ isValid: boolean; errors: string[] } | null>(null)
 
 // ============================================
 // COMPUTED
 // ============================================
 
-const generatedCode = computed(() => {
-  return codeGenerator.generatedCode.value?.content || null
-})
+const formattedOutput = computed(() =>
+  parsedTree.value ? JSON.stringify(parsedTree.value, null, 2) : '',
+)
 
-const codeStats = computed(() => {
-  const code = codeGenerator.generatedCode.value
-  if (!code) return null
+const schemaSize = computed(() =>
+  new Blob([formattedOutput.value]).size,
+)
 
-  return {
-    lines: code.content.split('\n').length,
-    components: code.components?.length || 0,
-    size: new Blob([code.content]).size
-  }
+const treeStats = computed(() => {
+  if (!parsedTree.value) return { nodeCount: 0, depth: 0, breakpointCount: 0 }
+  const nodeCount = Math.max(0, flattenTree(parsedTree.value.root).length - 1)
+  const depth = getTreeDepth(parsedTree.value.root)
+  const breakpointCount = Object.keys(parsedTree.value.breakpoints ?? {}).length
+  return { nodeCount, depth, breakpointCount }
 })
 
 // ============================================
 // METHODS
 // ============================================
 
-/**
- * Carrega schema de exemplo
- */
 function loadExampleSchema() {
-  const exampleSchema: PageSchema = {
-    id: 'dashboard-example',
-    type: 'page',
-    metadata: createSchemaMetadata('Dashboard Exemplo', 'Dashboard de exemplo com múltiplos widgets'),
-    layout: createGridLayout(12, 16),
-    widgets: [
-      {
-        id: 'header-card',
-        type: 'card',
-        config: {
-          title: 'Dashboard Overview',
-          content: 'Bem-vindo ao sistema de gestão',
-          variant: 'elevated'
+  const example: SchemaTree = {
+    version: '2.0',
+    context: 'page',
+    root: {
+      id: 'root-example',
+      type: 'page-root',
+      props: {},
+      style: {},
+      children: [
+        {
+          id: 'card-1',
+          type: 'card',
+          props: { title: 'Dashboard Header', variant: 'elevated' },
+          style: { padding: '1rem' },
+          children: [],
+          meta: { label: 'Dashboard Header', droppable: false, draggable: true, accepts: 'none' },
         },
-        position: {
-          x: 0,
-          y: 0,
-          w: 12,
-          h: 3
-        }
-      },
-      {
-        id: 'stats-total',
-        type: 'card',
-        config: {
-          title: 'Total de Itens',
-          content: '1,234',
-          variant: 'outlined'
+        {
+          id: 'table-1',
+          type: 'data-table',
+          props: { columns: [{ key: 'id', label: 'ID' }, { key: 'name', label: 'Name' }], paginated: true },
+          style: {},
+          children: [],
+          meta: { label: 'Data Table', droppable: false, draggable: true, accepts: 'none' },
         },
-        position: {
-          x: 0,
-          y: 3,
-          w: 4,
-          h: 4
-        }
-      },
-      {
-        id: 'stats-active',
-        type: 'card',
-        config: {
-          title: 'Ativos',
-          content: '856',
-          variant: 'outlined'
+        {
+          id: 'alert-1',
+          type: 'alert',
+          props: { message: 'System operational', variant: 'info' },
+          style: {},
+          children: [],
+          meta: { label: 'System Alert', droppable: false, draggable: true, accepts: 'none' },
         },
-        position: {
-          x: 4,
-          y: 3,
-          w: 4,
-          h: 4
-        }
-      },
-      {
-        id: 'stats-pending',
-        type: 'card',
-        config: {
-          title: 'Pendentes',
-          content: '378',
-          variant: 'outlined'
-        },
-        position: {
-          x: 8,
-          y: 3,
-          w: 4,
-          h: 4
-        }
-      },
-      {
-        id: 'info-alert',
-        type: 'alert',
-        config: {
-          message: 'Sistema em operação normal',
-          type: 'info'
-        },
-        position: {
-          x: 0,
-          y: 7,
-          w: 12,
-          h: 2
-        }
-      }
-    ]
+      ],
+      meta: { label: 'Root', locked: true, droppable: true, draggable: false, accepts: 'all' },
+    },
+    breakpoints: {
+      sm: 640,
+      md: 768,
+      lg: 1024,
+      xl: 1280,
+    },
+    metadata: {
+      name: 'Dashboard Example',
+      description: 'Example SchemaTree for inspection',
+      createdAt: new Date().toISOString(),
+      updatedAt: new Date().toISOString(),
+      tags: ['example', 'dashboard'],
+    },
   }
-
-  schemaInput.value = JSON.stringify(exampleSchema, null, 2)
-  validationResult.value = null
+  schemaInput.value = JSON.stringify(example, null, 2)
+  parsedTree.value = example
+  validationResult.value = { isValid: true, errors: [] }
 }
 
-/**
- * Limpa editor
- */
 function clearSchema() {
   if (confirm('Tem certeza que deseja limpar o editor?')) {
     schemaInput.value = ''
+    parsedTree.value = null
     validationResult.value = null
-    codeGenerator.generatedCode.value = null
   }
 }
 
-/**
- * Formata JSON no editor
- */
 function formatSchema() {
   try {
     const parsed = JSON.parse(schemaInput.value)
     schemaInput.value = JSON.stringify(parsed, null, 2)
-  } catch (error) {
+  } catch {
     alert('JSON inválido. Não é possível formatar.')
   }
 }
 
-/**
- * Handle file upload
- */
+function validateSchema() {
+  try {
+    const parsed = JSON.parse(schemaInput.value)
+    const errors: string[] = []
+
+    if (!parsed.version) errors.push('Campo obrigatório ausente: version')
+    if (!parsed.context) errors.push('Campo obrigatório ausente: context')
+    if (!parsed.root) errors.push('Campo obrigatório ausente: root')
+    else {
+      if (!parsed.root.id) errors.push('root.id é obrigatório')
+      if (!parsed.root.type) errors.push('root.type é obrigatório')
+      if (!Array.isArray(parsed.root.children)) errors.push('root.children deve ser um array')
+    }
+    if (!parsed.breakpoints) errors.push('Campo obrigatório ausente: breakpoints')
+    if (!parsed.metadata) errors.push('Campo obrigatório ausente: metadata')
+
+    if (errors.length === 0) {
+      parsedTree.value = parsed as SchemaTree
+      validationResult.value = { isValid: true, errors: [] }
+    } else {
+      parsedTree.value = null
+      validationResult.value = { isValid: false, errors }
+    }
+  } catch (error) {
+    parsedTree.value = null
+    validationResult.value = {
+      isValid: false,
+      errors: ['JSON inválido: ' + (error as Error).message],
+    }
+  }
+}
+
 function handleFileUpload(event: Event) {
   const target = event.target as HTMLInputElement
   const file = target.files?.[0]
   if (!file) return
-
   const reader = new FileReader()
   reader.onload = (e) => {
     schemaInput.value = e.target?.result as string
+    parsedTree.value = null
     validationResult.value = null
   }
   reader.readAsText(file)
 }
 
-/**
- * Gera código a partir do schema
- */
-async function generateCode() {
+async function copyFormatted() {
   try {
-    isGenerating.value = true
-    validationResult.value = null
-
-    // Parse JSON
-    let schema: PageSchema
-    try {
-      schema = JSON.parse(schemaInput.value)
-    } catch (error) {
-      validationResult.value = {
-        isValid: false,
-        errors: ['JSON inválido: ' + (error as Error).message]
-      }
-      return
-    }
-
-    // Valida schema
-    const validation = codeGenerator.validateSchema(schema)
-    validationResult.value = validation
-
-    if (!validation.isValid) {
-      return
-    }
-
-    // Gera código
-    await codeGenerator.generate(schema)
-
-  } catch (error) {
-    console.error('Erro ao gerar código:', error)
-    validationResult.value = {
-      isValid: false,
-      errors: ['Erro ao gerar código: ' + (error as Error).message]
-    }
-  } finally {
-    isGenerating.value = false
-  }
-}
-
-/**
- * Copia código gerado
- */
-async function copyGeneratedCode() {
-  if (!generatedCode.value) return
-
-  try {
-    await codeGenerator.copyToClipboard()
-    alert('Código copiado para clipboard!')
+    await navigator.clipboard.writeText(formattedOutput.value)
+    alert('SchemaTree JSON copiado para clipboard!')
   } catch (error) {
     console.error('Erro ao copiar:', error)
-    alert('Erro ao copiar código')
+    alert('Erro ao copiar schema')
   }
 }
 
-/**
- * Download código gerado
- */
-function downloadGeneratedCode() {
-  if (!generatedCode.value) return
-
+function downloadFormatted() {
+  if (!parsedTree.value) return
   try {
-    codeGenerator.downloadCode()
+    const blob = new Blob([formattedOutput.value], { type: 'application/json' })
+    const url = URL.createObjectURL(blob)
+    const a = document.createElement('a')
+    a.href = url
+    a.download = `${parsedTree.value.metadata?.name ?? 'schema'}.json`
+    document.body.appendChild(a)
+    a.click()
+    document.body.removeChild(a)
+    URL.revokeObjectURL(url)
   } catch (error) {
     console.error('Erro ao fazer download:', error)
-    alert('Erro ao fazer download do código')
+    alert('Erro ao fazer download')
   }
 }
 
-/**
- * Formata bytes
- */
 function formatBytes(bytes: number): string {
-  if (bytes === 0) return '0 Bytes'
+  if (bytes === 0) return '0 B'
   const k = 1024
-  const sizes = ['Bytes', 'KB', 'MB']
+  const sizes = ['B', 'KB', 'MB']
   const i = Math.floor(Math.log(bytes) / Math.log(k))
   return Math.round(bytes / Math.pow(k, i) * 100) / 100 + ' ' + sizes[i]
 }
@@ -460,7 +411,7 @@ function formatBytes(bytes: number): string {
 }
 
 // ============================================
-// VIEW CONTENT (usa split-view-layout mixin)
+// VIEW CONTENT (split panel)
 // ============================================
 
 .view-content {
@@ -470,8 +421,7 @@ function formatBytes(bytes: number): string {
 }
 
 // ============================================
-// PANELS (usa panel mixins da lib)
-// ============================================
+// PANELS
 // ============================================
 
 .panel {
@@ -490,12 +440,6 @@ function formatBytes(bytes: number): string {
     border-bottom: 1px solid var(--color-border-base);
     background: var(--color-bg-tertiary);
     flex-shrink: 0;
-
-    @media (max-width: 768px) {
-      flex-direction: column;
-      align-items: flex-start;
-      gap: var(--spacing-sm);
-    }
   }
 
   &__title {
@@ -549,8 +493,9 @@ function formatBytes(bytes: number): string {
     font-weight: var(--font-weight-medium);
   }
 
-  &__errors,
-  &__warnings {
+  &__errors {
+    color: var(--color-danger);
+
     strong {
       display: block;
       margin-bottom: var(--spacing-xs);
@@ -566,14 +511,67 @@ function formatBytes(bytes: number): string {
       margin-bottom: var(--spacing-xs);
     }
   }
+}
 
-  &__errors {
-    color: var(--color-danger);
+// ============================================
+// TREE STATS
+// ============================================
+
+.tree-stats {
+  display: flex;
+  gap: var(--spacing-sm);
+  padding: var(--spacing-md);
+  border-bottom: 1px solid var(--color-border-base);
+  flex-shrink: 0;
+  flex-wrap: wrap;
+}
+
+.stat-card {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-xs);
+  padding: var(--spacing-xs) var(--spacing-md);
+  background: var(--color-bg-primary);
+  border: 1px solid var(--color-border-base);
+  border-radius: var(--radius-md);
+  font-size: var(--font-size-sm);
+
+  &__icon {
+    font-size: var(--font-size-base);
   }
 
-  &__warnings {
-    color: var(--color-warning);
-    margin-top: var(--spacing-sm);
+  &__value {
+    font-weight: var(--font-weight-bold);
+    color: var(--color-text-primary);
+  }
+
+  &__label {
+    color: var(--color-text-secondary);
+  }
+}
+
+// ============================================
+// CONTEXT BADGE
+// ============================================
+
+.context-badge {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-xs);
+  padding: var(--spacing-xs) var(--spacing-md);
+  background: var(--color-bg-tertiary);
+  border-bottom: 1px solid var(--color-border-base);
+  font-size: var(--font-size-sm);
+  flex-shrink: 0;
+
+  &__label {
+    color: var(--color-text-secondary);
+  }
+
+  &__value {
+    font-weight: var(--font-weight-semibold);
+    color: var(--color-primary);
+    font-family: 'Consolas', 'Monaco', monospace;
   }
 }
 
@@ -628,99 +626,6 @@ function formatBytes(bytes: number): string {
     margin: 0;
     font-size: var(--font-size-sm);
     color: var(--color-text-tertiary);
-  }
-}
-
-// ============================================
-// LOADING STATE
-// ============================================
-
-.loading-state {
-  flex: 1;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  gap: var(--spacing-md);
-  color: var(--color-text-secondary);
-
-  .spinner {
-    width: 40px;
-    height: 40px;
-    border: 3px solid var(--color-border-base);
-    border-top-color: var(--color-primary);
-    border-radius: 50%;
-    animation: spin 0.8s linear infinite;
-  }
-
-  p {
-    margin: 0;
-    font-size: var(--font-size-sm);
-  }
-}
-
-@keyframes spin {
-  to {
-    transform: rotate(360deg);
-  }
-}
-
-// ============================================
-// CODE STATS
-// ============================================
-
-.code-stats {
-  display: flex;
-  gap: var(--spacing-lg);
-  padding: var(--spacing-sm) var(--spacing-md);
-  border-top: 1px solid var(--color-border-base);
-  background: var(--color-bg-tertiary);
-  font-size: var(--font-size-sm);
-  color: var(--color-text-secondary);
-  flex-shrink: 0;
-
-  span {
-    display: flex;
-    align-items: center;
-    gap: var(--spacing-xs);
-  }
-}
-
-// ============================================
-// FORMAT SELECTOR
-// ============================================
-
-.format-selector {
-  display: flex;
-  gap: var(--spacing-xs);
-  padding: 2px;
-  background: var(--color-bg-primary);
-  border-radius: var(--radius-md);
-}
-
-.format-button {
-  padding: var(--spacing-xs) var(--spacing-sm);
-  font-size: var(--font-size-xs);
-  font-weight: var(--font-weight-medium);
-  background: transparent;
-  color: var(--color-text-secondary);
-  border: none;
-  border-radius: calc(var(--radius-md) - 2px);
-  cursor: pointer;
-  transition: all var(--transition-base);
-
-  &:hover {
-    background: var(--color-bg-secondary);
-    color: var(--color-text-primary);
-  }
-
-  &--active {
-    background: var(--color-primary);
-    color: white;
-
-    &:hover {
-      background: var(--color-primary-hover);
-    }
   }
 }
 

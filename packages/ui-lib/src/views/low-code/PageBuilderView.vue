@@ -9,7 +9,7 @@
             Page Builder
           </h1>
           <p class="view-header__description">
-            Design páginas visualmente com drag-drop de widgets e exporte código Vue production-ready
+            Design páginas visualmente com drag-drop de widgets e exporte o schema JSON para integrações
           </p>
         </div>
 
@@ -21,10 +21,10 @@
           <button class="action-button action-button--secondary" @click="clearSchema" title="Limpar e começar do zero">
             🗑️ Limpar
           </button>
-          <button class="action-button action-button--primary" @click="generateCode"
-            :disabled="!currentSchema || currentSchema.items.length === 0"
-            title="Gerar código Vue a partir do schema">
-            ⚡ Gerar Código
+          <button class="action-button action-button--primary" @click="exportSchema"
+            :disabled="!hasNodes"
+            title="Exportar schema JSON">
+            💾 Exportar Schema
           </button>
         </div>
       </div>
@@ -32,37 +32,33 @@
 
     <!-- Page Builder Component (full-screen) -->
     <div class="view-content">
-      <PageBuilder v-model="currentSchema" :height="builderHeight" @save="handleSave" @export="handleExport" />
+      <LowCodeEngine
+        :context="pageBuilderContext"
+        v-model="currentSchema"
+        @save="handleSave"
+        @toolbar-action="handleToolbarAction"
+      />
     </div>
 
-    <!-- Code Preview Modal (quando gerar código) -->
-    <Modal v-model="showCodePreview" size="xl" title="Código Gerado">
-      <div class="code-preview">
-        <div class="code-preview__header">
-          <div class="code-preview__tabs">
-            <button class="tab-button tab-button--active">
-              VUE SFC
-            </button>
-          </div>
-
-          <div class="code-preview__actions">
-            <button class="action-button action-button--sm" @click="copyCode">
-              📋 Copiar
-            </button>
-            <button class="action-button action-button--sm" @click="downloadCode">
-              💾 Download
-            </button>
-          </div>
+    <!-- Schema Preview Modal -->
+    <Modal v-model="showSchemaPreview" size="xl" title="Page Schema JSON">
+      <div class="schema-preview">
+        <div class="schema-preview__actions">
+          <button class="action-button action-button--sm" @click="copySchema">
+            📋 Copiar JSON
+          </button>
+          <button class="action-button action-button--sm" @click="downloadSchema">
+            💾 Download JSON
+          </button>
         </div>
 
-        <div class="code-preview__content">
-          <pre><code>{{ generatedCode }}</code></pre>
+        <div class="schema-preview__content">
+          <pre><code>{{ formattedSchema }}</code></pre>
         </div>
 
-        <div v-if="codeStats" class="code-preview__stats">
-          <span>📊 {{ codeStats.totalLines }} linhas</span>
-          <span>🧩 {{ codeStats.componentCount }} componentes</span>
-          <span>📦 {{ formatBytes(codeStats.estimatedSize) }}</span>
+        <div class="schema-preview__stats">
+          <span>📊 {{ nodeCount }} componentes</span>
+          <span>📦 {{ formatBytes(schemaSize) }}</span>
         </div>
       </div>
     </Modal>
@@ -71,274 +67,122 @@
 
 <script setup lang="ts">
 import { ref, computed, onMounted } from 'vue'
-import { PageBuilder } from '@/features/page-builder'
-import { useCodeGenerator } from '@/features/code-generator'
+import { LowCodeEngine } from '@/core/low-code-engine/components'
+import {
+  pageBuilderContext,
+  createEmptyTree,
+  createNode,
+  flattenTree,
+} from '@/core/low-code-engine'
 import { Modal } from '@/modules/modal'
-import type { PageSchema } from '@/features/page-builder/types'
+import type { SchemaTree } from '@/core/low-code-engine'
 
 // ============================================
 // STATE
 // ============================================
 
-const currentSchema = ref<PageSchema>(createEmptySchema())
-const showCodePreview = ref(false)
-const builderHeight = ref('calc(100vh - 180px)')
-
-// Code Generator
-const codeGenerator = useCodeGenerator({
-  typescript: true,
-  includeComments: true,
-  formatCode: true,
-  scopedStyles: true,
-  namingConvention: 'PascalCase'
-})
+const currentSchema = ref<SchemaTree>(pageBuilderContext.defaultSchema())
+const showSchemaPreview = ref(false)
 
 // ============================================
 // COMPUTED
 // ============================================
 
-const generatedCode = computed(() => {
-  return codeGenerator.generatedCode.value?.content || ''
+const formattedSchema = computed(() => JSON.stringify(currentSchema.value, null, 2))
+
+const schemaSize = computed(() => new Blob([formattedSchema.value]).size)
+
+const nodeCount = computed(() => {
+  const all = flattenTree(currentSchema.value.root)
+  return Math.max(0, all.length - 1)
 })
 
-const codeStats = computed(() => codeGenerator.generatedCode.value?.stats)
+const hasNodes = computed(() => nodeCount.value > 0)
 
 // ============================================
 // METHODS
 // ============================================
 
-/**
- * Cria schema vazio inicial
- */
-function createEmptySchema(): PageSchema {
-  return {
-    id: 'new-page',
-    type: 'page',
-    metadata: {
-      title: 'New Page',
-      description: 'Design your page here',
-      version: '1.0',
-      createdAt: new Date().toISOString(),
-      updatedAt: new Date().toISOString()
-    },
-    layout: {
-      strategy: 'grid',
-      config: {
-        columns: 12,
-        gap: 16
-      }
-    },
-    items: []
-  }
-}
-
-/**
- * Carrega exemplo pré-configurado
- */
 function loadExample() {
-  currentSchema.value = {
-    id: 'products-dashboard',
-    type: 'page',
-    metadata: {
-      title: 'Products Dashboard',
-      description: 'Painel de gerenciamento de produtos',
-      version: '1.0',
-      author: 'Low-Code Platform',
-      createdAt: new Date().toISOString(),
-      updatedAt: new Date().toISOString(),
-      tags: ['dashboard', 'products', 'management']
-    },
-    layout: {
-      strategy: 'grid',
-      config: {
-        columns: 12,
-        gap: 16
-      }
-    },
-    items: [
-      {
-        id: 'page-header',
-        type: 'card',
-        config: {
-          title: 'Products Dashboard',
-          content: 'Gerencie seus produtos de forma visual',
-          variant: 'elevated',
-          padding: 'lg'
-        }
+  const tree = createEmptyTree('page', { name: 'Products Dashboard' })
+  tree.root.children = [
+    createNode({ type: 'card', props: { title: 'Products Dashboard', content: 'Gerencie seus produtos de forma visual', variant: 'elevated' }, style: {}, children: [], meta: { label: 'Header Card', droppable: false, draggable: true, accepts: 'none' } }),
+    createNode({ type: 'card', props: { title: 'Total Products', content: '1,234', variant: 'primary' }, style: {}, children: [], meta: { label: 'Total Products Card', droppable: false, draggable: true, accepts: 'none' } }),
+    createNode({ type: 'card', props: { title: 'Active', content: '856', variant: 'success' }, style: {}, children: [], meta: { label: 'Active Card', droppable: false, draggable: true, accepts: 'none' } }),
+    createNode({ type: 'card', props: { title: 'Pending', content: '42', variant: 'warning' }, style: {}, children: [], meta: { label: 'Pending Card', droppable: false, draggable: true, accepts: 'none' } }),
+    createNode({
+      type: 'data-table',
+      props: {
+        columns: [
+          { key: 'id', label: 'ID' },
+          { key: 'name', label: 'Product Name' },
+          { key: 'category', label: 'Category' },
+          { key: 'price', label: 'Price' },
+          { key: 'status', label: 'Status' },
+        ],
+        sortable: true,
+        filterable: true,
+        paginated: true,
+        pageSize: 10,
       },
-      {
-        id: 'stats-card-total',
-        type: 'card',
-        config: {
-          title: 'Total Products',
-          content: '1,234',
-          variant: 'primary'
-        }
-      },
-      {
-        id: 'stats-card-active',
-        type: 'card',
-        config: {
-          title: 'Active',
-          content: '856',
-          variant: 'success'
-        }
-      },
-      {
-        id: 'stats-card-pending',
-        type: 'card',
-        config: {
-          title: 'Pending',
-          content: '42',
-          variant: 'warning'
-        }
-      },
-      {
-        id: 'products-table',
-        type: 'data-table',
-        config: {
-          columns: [
-            { key: 'id', label: 'ID' },
-            { key: 'name', label: 'Product Name' },
-            { key: 'category', label: 'Category' },
-            { key: 'price', label: 'Price' },
-            { key: 'stock', label: 'Stock' },
-            { key: 'status', label: 'Status' }
-          ],
-          sortable: true,
-          filterable: true,
-          paginated: true,
-          pageSize: 10
-        }
-      },
-      {
-        id: 'actions-alert',
-        type: 'alert',
-        config: {
-          title: 'Quick Actions',
-          message: 'Use os botões abaixo para adicionar ou exportar produtos',
-          variant: 'info',
-          dismissible: false
-        }
-      },
-      {
-        id: 'action-add',
-        type: 'button',
-        config: {
-          text: 'Add New Product',
-          variant: 'primary',
-          size: 'lg',
-          fullWidth: false
-        }
-      },
-      {
-        id: 'action-export',
-        type: 'button',
-        config: {
-          text: 'Export to CSV',
-          variant: 'secondary',
-          size: 'lg',
-          fullWidth: false
-        }
-      }
-    ],
-    dataSources: {
-      products: {
-        type: 'api',
-        config: {
-          endpoint: '/api/products',
-          method: 'GET'
-        }
-      }
-    }
-  }
+      style: {},
+      children: [],
+      meta: { label: 'Products Table', droppable: false, draggable: true, accepts: 'none' },
+    }),
+    createNode({ type: 'alert', props: { title: 'Quick Actions', message: 'Use os botões abaixo para adicionar ou exportar produtos', variant: 'info' }, style: {}, children: [], meta: { label: 'Quick Actions Alert', droppable: false, draggable: true, accepts: 'none' } }),
+    createNode({ type: 'button', props: { text: 'Add New Product', variant: 'primary' }, style: {}, children: [], meta: { label: 'Add Button', droppable: false, draggable: true, accepts: 'none' } }),
+    createNode({ type: 'button', props: { text: 'Export to CSV', variant: 'secondary' }, style: {}, children: [], meta: { label: 'Export Button', droppable: false, draggable: true, accepts: 'none' } }),
+  ]
+  currentSchema.value = tree
 }
 
-/**
- * Limpa schema atual
- */
 function clearSchema() {
   if (confirm('Tem certeza que deseja limpar o schema atual?')) {
-    currentSchema.value = createEmptySchema()
+    currentSchema.value = pageBuilderContext.defaultSchema()
   }
 }
 
-/**
- * Gera código a partir do schema
- */
-async function generateCode() {
-  if (!currentSchema.value) return
-
-  try {
-    // Valida schema
-    const validation = codeGenerator.validateSchema(currentSchema.value)
-
-    if (!validation.isValid) {
-      alert(`Schema inválido:\n${validation.errors.join('\n')}`)
-      return
-    }
-
-    // Mostra warnings se houver
-    if (validation.warnings.length > 0) {
-      console.warn('Avisos:', validation.warnings)
-    }
-
-    // Gera código no formato atual
-    await codeGenerator.generate(currentSchema.value)
-
-    // Mostra preview
-    showCodePreview.value = true
-
-  } catch (error) {
-    console.error('Erro ao gerar código:', error)
-    alert('Erro ao gerar código. Verifique o console.')
-  }
+function exportSchema() {
+  showSchemaPreview.value = true
 }
 
-/**
- * Copia código para clipboard
- */
-async function copyCode() {
+async function copySchema() {
   try {
-    await codeGenerator.copyToClipboard()
-    alert('Código copiado para clipboard!')
+    await navigator.clipboard.writeText(formattedSchema.value)
+    alert('Schema JSON copiado para clipboard!')
   } catch (error) {
     console.error('Erro ao copiar:', error)
-    alert('Erro ao copiar código')
+    alert('Erro ao copiar schema')
   }
 }
 
-/**
- * Download do código
- */
-function downloadCode() {
+function downloadSchema() {
   try {
-    codeGenerator.downloadCode()
+    const blob = new Blob([formattedSchema.value], { type: 'application/json' })
+    const url = URL.createObjectURL(blob)
+    const a = document.createElement('a')
+    a.href = url
+    a.download = `${currentSchema.value.metadata?.name ?? 'page-schema'}.json`
+    document.body.appendChild(a)
+    a.click()
+    document.body.removeChild(a)
+    URL.revokeObjectURL(url)
   } catch (error) {
     console.error('Erro ao fazer download:', error)
-    alert('Erro ao fazer download do código')
+    alert('Erro ao fazer download do schema')
   }
 }
 
-/**
- * Handler para save do Page Builder
- */
-function handleSave(schema: PageSchema) {
-  console.log('Schema salvo:', schema)
-  // TODO: Salvar em localStorage ou backend
-  localStorage.setItem('last-page-schema', JSON.stringify(schema))
+function handleSave(tree: SchemaTree) {
+  localStorage.setItem('last-page-schema', JSON.stringify(tree))
 }
 
-/**
- * Handler para export do Page Builder
- */
-function handleExport(exportData: any) {
-  console.log('Export:', exportData)
+function handleToolbarAction(actionId: string) {
+  if (actionId === 'export-json' || actionId === 'validate-schema') {
+    showSchemaPreview.value = true
+  }
 }
 
-/**
- * Formata bytes para formato legível
- */
 function formatBytes(bytes: number): string {
   if (bytes === 0) return '0 Bytes'
   const k = 1024
@@ -352,11 +196,10 @@ function formatBytes(bytes: number): string {
 // ============================================
 
 onMounted(() => {
-  // Tenta carregar último schema salvo
   const savedSchema = localStorage.getItem('last-page-schema')
   if (savedSchema) {
     try {
-      currentSchema.value = JSON.parse(savedSchema)
+      currentSchema.value = JSON.parse(savedSchema) as SchemaTree
     } catch (error) {
       console.error('Erro ao carregar schema salvo:', error)
     }
@@ -494,47 +337,36 @@ onMounted(() => {
 }
 
 // ============================================
-// CODE PREVIEW MODAL
+// SCHEMA PREVIEW MODAL
 // ============================================
 
-.code-preview {
+.schema-preview {
   display: flex;
   flex-direction: column;
   gap: var(--spacing-md);
   max-height: 70vh;
 
-  &__header {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    gap: var(--spacing-md);
-    padding-bottom: var(--spacing-sm);
-    border-bottom: 1px solid var(--color-border-base);
-  }
-
-  &__tabs {
-    display: flex;
-    gap: var(--spacing-xs);
-  }
-
   &__actions {
     display: flex;
     gap: var(--spacing-xs);
+    justify-content: flex-end;
+    padding-bottom: var(--spacing-sm);
+    border-bottom: 1px solid var(--color-border-base);
   }
 
   &__content {
     flex: 1;
     overflow: auto;
-    background: #1e1e1e;
-    border-radius: var(--radius-md);
-    padding: var(--spacing-md);
+    background: var(--editor-bg);
+    border-radius: var(--editor-border-radius);
+    padding: var(--editor-padding);
 
     pre {
       margin: 0;
-      font-family: 'Consolas', 'Monaco', 'Courier New', monospace;
-      font-size: var(--font-size-sm);
-      line-height: 1.5;
-      color: #d4d4d4;
+      font-family: var(--editor-font-family);
+      font-size: var(--editor-font-size);
+      line-height: var(--editor-line-height);
+      color: var(--editor-fg);
       white-space: pre-wrap;
       word-wrap: break-word;
     }
@@ -558,29 +390,6 @@ onMounted(() => {
       align-items: center;
       gap: var(--spacing-xs);
     }
-  }
-}
-
-.tab-button {
-  padding: var(--spacing-xs) var(--spacing-md);
-  font-size: var(--font-size-sm);
-  font-weight: var(--font-weight-medium);
-  border: 1px solid var(--color-border-base);
-  border-radius: var(--radius-sm);
-  background: var(--color-bg-secondary);
-  color: var(--color-text-secondary);
-  cursor: pointer;
-  transition: all var(--transition-base);
-
-  &:hover {
-    background: var(--color-bg-tertiary);
-    color: var(--color-text-primary);
-  }
-
-  &--active {
-    background: var(--color-primary);
-    color: white;
-    border-color: var(--color-primary);
   }
 }
 </style>
